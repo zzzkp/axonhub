@@ -102,28 +102,17 @@ func (svc *ChannelService) syncChannelModelsForChannel(ctx context.Context, ch *
 		}
 	}
 
-	// Read existing manual models from the channel
-	manualModels := ch.ManualModels
-	if manualModels == nil {
-		manualModels = []string{}
+	// Replace supported models with the fetched upstream list.
+	// manual_models is preserved as user-owned metadata but is not merged into auto-sync results.
+	syncedModels := lo.Uniq(fetchedModelIDs)
+	if syncedModels == nil {
+		syncedModels = []string{}
 	}
 
-	// Merge fetched models with manual models, removing duplicates
-	mergedModels := lo.Uniq(append(manualModels, fetchedModelIDs...))
-
-	if len(mergedModels) == 0 {
-		log.Warn(ctx, "no models to sync for channel (both fetched and manual are empty)",
-			log.Int("channel_id", ch.ID),
-			log.String("channel_name", ch.Name))
-
-		return ch, nil
-	}
-
-	// Update channel's supported models with merged list
-	// Keep manual_models unchanged (preserve user's manually added models)
+	// Keep manual_models unchanged while making supported_models match upstream exactly.
 	updatedCh, err := svc.entFromContext(ctx).Channel.
 		UpdateOneID(ch.ID).
-		SetSupportedModels(mergedModels).
+		SetSupportedModels(syncedModels).
 		Save(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to update channel supported models: %w", err)
@@ -133,8 +122,7 @@ func (svc *ChannelService) syncChannelModelsForChannel(ctx context.Context, ch *
 		log.Int("channel_id", ch.ID),
 		log.String("channel_name", ch.Name),
 		log.Int("fetched_count", len(fetchedModelIDs)),
-		log.Int("manual_count", len(manualModels)),
-		log.Int("total_count", len(mergedModels)))
+		log.Int("synced_count", len(syncedModels)))
 
 	return updatedCh, nil
 }
