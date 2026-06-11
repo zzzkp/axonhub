@@ -85,6 +85,8 @@ extend type Mutation {
   createRelaySiteConfig(input: CreateRelaySiteConfigInput!): RelaySite!
   updateRelaySiteConfig(id: ID!, input: UpdateRelaySiteConfigInput!): RelaySite!
   deleteRelaySiteConfig(id: ID!): RelaySite!
+  exportRelaySitesBackup: String!
+  importRelaySitesBackup(payload: String!): Boolean!
   syncRelaySite(id: ID!): RelaySite!
   syncAllRelaySites: Boolean!
   checkinRelaySite(id: ID!): RelaySiteCheckinLog!

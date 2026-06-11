@@ -206,6 +206,11 @@ export const importRelaySiteAPIKeyToChannelInputSchema = z.object({
 });
 export type ImportRelaySiteAPIKeyToChannelInput = z.infer<typeof importRelaySiteAPIKeyToChannelInputSchema>;
 
+export const importRelaySitesBackupInputSchema = z.object({
+  payload: z.string().min(1),
+});
+export type ImportRelaySitesBackupInput = z.infer<typeof importRelaySitesBackupInputSchema>;
+
 export const relaySiteAPIKeyConfigInputSchema = z.object({
   name: z.string().min(1),
   status: z.number().optional(),

@@ -938,7 +938,9 @@ type ComplexityRoot struct {
 		EnableAllChannelAPIKeys              func(childComplexity int, channelID objects.GUID) int
 		EnableChannelAPIKey                  func(childComplexity int, channelID objects.GUID, key string) int
 		EnableSelectedChannelAPIKeys         func(childComplexity int, channelID objects.GUID, keys []string) int
+		ExportRelaySitesBackup               func(childComplexity int) int
 		ImportRelaySiteAPIKeyToChannel       func(childComplexity int, relaySiteAPIKeyID objects.GUID, input biz.ImportRelaySiteAPIKeyToChannelInput) int
+		ImportRelaySitesBackup               func(childComplexity int, payload string) int
 		LoadAPIKeyProfileTemplate            func(childComplexity int, input LoadAPIKeyProfileTemplateInput) int
 		MarkRelaySiteAnnouncementsRead       func(childComplexity int, id objects.GUID) int
 		PreviewPromptProtectionRule          func(childComplexity int, input PromptProtectionRulePreviewInput) int
@@ -2345,6 +2347,8 @@ type MutationResolver interface {
 	CreateRelaySiteConfig(ctx context.Context, input biz.CreateRelaySiteConfigInput) (*ent.RelaySite, error)
 	UpdateRelaySiteConfig(ctx context.Context, id objects.GUID, input biz.UpdateRelaySiteConfigInput) (*ent.RelaySite, error)
 	DeleteRelaySiteConfig(ctx context.Context, id objects.GUID) (*ent.RelaySite, error)
+	ExportRelaySitesBackup(ctx context.Context) (string, error)
+	ImportRelaySitesBackup(ctx context.Context, payload string) (bool, error)
 	SyncRelaySite(ctx context.Context, id objects.GUID) (*ent.RelaySite, error)
 	SyncAllRelaySites(ctx context.Context) (bool, error)
 	CheckinRelaySite(ctx context.Context, id objects.GUID) (*ent.RelaySiteCheckinLog, error)
@@ -2596,13 +2600,9 @@ type UserRoleResolver interface {
 
 type CreateRelaySiteConfigInputResolver interface {
 	Credential(ctx context.Context, obj *biz.CreateRelaySiteConfigInput, data *RelaySiteCredentialInput) error
-	CheckinPageURL(ctx context.Context, obj *biz.CreateRelaySiteConfigInput, data *string) error
-	ExternalCheckinPageURL(ctx context.Context, obj *biz.CreateRelaySiteConfigInput, data *string) error
 }
 type UpdateRelaySiteConfigInputResolver interface {
 	Credential(ctx context.Context, obj *biz.UpdateRelaySiteConfigInput, data *RelaySiteCredentialInput) error
-	CheckinPageURL(ctx context.Context, obj *biz.UpdateRelaySiteConfigInput, data *string) error
-	ExternalCheckinPageURL(ctx context.Context, obj *biz.UpdateRelaySiteConfigInput, data *string) error
 }
 
 type executableSchema struct {
@@ -6123,6 +6123,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.EnableSelectedChannelAPIKeys(childComplexity, args["channelID"].(objects.GUID), args["keys"].([]string)), true
+	case "Mutation.exportRelaySitesBackup":
+		if e.complexity.Mutation.ExportRelaySitesBackup == nil {
+			break
+		}
+
+		return e.complexity.Mutation.ExportRelaySitesBackup(childComplexity), true
 	case "Mutation.importRelaySiteAPIKeyToChannel":
 		if e.complexity.Mutation.ImportRelaySiteAPIKeyToChannel == nil {
 			break
@@ -6134,6 +6140,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.ImportRelaySiteAPIKeyToChannel(childComplexity, args["relaySiteAPIKeyID"].(objects.GUID), args["input"].(biz.ImportRelaySiteAPIKeyToChannelInput)), true
+	case "Mutation.importRelaySitesBackup":
+		if e.complexity.Mutation.ImportRelaySitesBackup == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_importRelaySitesBackup_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.ImportRelaySitesBackup(childComplexity, args["payload"].(string)), true
 	case "Mutation.loadApiKeyProfileTemplate":
 		if e.complexity.Mutation.LoadAPIKeyProfileTemplate == nil {
 			break
@@ -13085,6 +13102,17 @@ func (ec *executionContext) field_Mutation_importRelaySiteAPIKeyToChannel_args(c
 		return nil, err
 	}
 	args["input"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_importRelaySitesBackup_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "payload", ec.unmarshalNString2string)
+	if err != nil {
+		return nil, err
+	}
+	args["payload"] = arg0
 	return args, nil
 }
 
@@ -36491,6 +36519,76 @@ func (ec *executionContext) fieldContext_Mutation_deleteRelaySiteConfig(ctx cont
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteRelaySiteConfig_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_exportRelaySitesBackup(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_exportRelaySitesBackup,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Mutation().ExportRelaySitesBackup(ctx)
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_exportRelaySitesBackup(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_importRelaySitesBackup(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_importRelaySitesBackup,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().ImportRelaySitesBackup(ctx, fc.Args["payload"].(string))
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_importRelaySitesBackup(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_importRelaySitesBackup_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -72066,18 +72164,14 @@ func (ec *executionContext) unmarshalInputCreateRelaySiteConfigInput(ctx context
 			if err != nil {
 				return it, err
 			}
-			if err = ec.resolvers.CreateRelaySiteConfigInput().CheckinPageURL(ctx, &it, data); err != nil {
-				return it, err
-			}
+			it.CheckinPageURL = data
 		case "externalCheckinPageURL":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("externalCheckinPageURL"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			if err = ec.resolvers.CreateRelaySiteConfigInput().ExternalCheckinPageURL(ctx, &it, data); err != nil {
-				return it, err
-			}
+			it.ExternalCheckinPageURL = data
 		}
 	}
 
@@ -91877,18 +91971,14 @@ func (ec *executionContext) unmarshalInputUpdateRelaySiteConfigInput(ctx context
 			if err != nil {
 				return it, err
 			}
-			if err = ec.resolvers.UpdateRelaySiteConfigInput().CheckinPageURL(ctx, &it, data); err != nil {
-				return it, err
-			}
+			it.CheckinPageURL = data
 		case "externalCheckinPageURL":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("externalCheckinPageURL"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			if err = ec.resolvers.UpdateRelaySiteConfigInput().ExternalCheckinPageURL(ctx, &it, data); err != nil {
-				return it, err
-			}
+			it.ExternalCheckinPageURL = data
 		}
 	}
 
@@ -104346,6 +104436,20 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "deleteRelaySiteConfig":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteRelaySiteConfig(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "exportRelaySitesBackup":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_exportRelaySitesBackup(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "importRelaySitesBackup":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_importRelaySitesBackup(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++

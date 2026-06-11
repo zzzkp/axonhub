@@ -46,6 +46,7 @@ type newAPITokenPage struct {
 
 type newAPIToken struct {
 	ID                 int    `json:"id"`
+	Key                string `json:"key"`
 	Name               string `json:"name"`
 	Status             int    `json:"status"`
 	RemainQuota        int    `json:"remain_quota"`
