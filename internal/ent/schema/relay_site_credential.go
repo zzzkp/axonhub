@@ -29,7 +29,7 @@ func (RelaySiteCredential) Indexes() []ent.Index {
 func (RelaySiteCredential) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("relay_site_id").Immutable(),
-		field.Enum("auth_type").Values("token", "password"),
+		field.Enum("auth_type").Values("token", "password", "jwt"),
 		field.JSON("credential", objects.RelaySiteCredential{}).Sensitive(),
 	}
 }

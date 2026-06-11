@@ -53,7 +53,7 @@ const RELAY_SITE_FIELDS = `
   checkinPageURL
   externalCheckinPageURL
   hasUnreadAnnouncements
-  displayCredential { authType token userId username password }
+  displayCredential { authType token userId username password refreshToken tokenExpiresAt }
   apiKeys(first: 100, orderBy: { field: UPDATED_AT, direction: DESC }) {
     edges { node { id remoteID name status groupName quota usedQuota expiresAt syncedAt } }
     totalCount

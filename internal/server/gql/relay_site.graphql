@@ -1,6 +1,7 @@
 enum RelaySiteCredentialAuthType {
   token
   password
+  jwt
 }
 
 input RelaySiteCredentialInput {
@@ -9,6 +10,8 @@ input RelaySiteCredentialInput {
   userId: Int
   username: String
   password: String
+  refreshToken: String
+  tokenExpiresAt: Time
 }
 
 type RelaySiteDisplayCredential {
@@ -17,10 +20,13 @@ type RelaySiteDisplayCredential {
   userId: Int
   username: String
   password: String
+  refreshToken: String
+  tokenExpiresAt: Time
 }
 
 input CreateRelaySiteConfigInput {
   name: String!
+  type: RelaySiteType
   baseURL: String!
   status: RelaySiteStatus
   autoCheckinEnabled: Boolean

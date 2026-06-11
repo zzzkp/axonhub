@@ -534,7 +534,7 @@ var (
 		{Name: "updated_at", Type: field.TypeTime, Default: schema.Expr("CURRENT_TIMESTAMP")},
 		{Name: "deleted_at", Type: field.TypeInt, Default: 0},
 		{Name: "name", Type: field.TypeString},
-		{Name: "type", Type: field.TypeEnum, Enums: []string{"new_api"}, Default: "new_api"},
+		{Name: "type", Type: field.TypeEnum, Enums: []string{"new_api", "sub2api"}, Default: "new_api"},
 		{Name: "base_url", Type: field.TypeString},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"enabled", "disabled", "archived"}, Default: "disabled"},
 		{Name: "auto_checkin_enabled", Type: field.TypeBool, Default: false},
@@ -737,7 +737,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "created_at", Type: field.TypeTime, Default: schema.Expr("CURRENT_TIMESTAMP")},
 		{Name: "updated_at", Type: field.TypeTime, Default: schema.Expr("CURRENT_TIMESTAMP")},
-		{Name: "auth_type", Type: field.TypeEnum, Enums: []string{"token", "password"}},
+		{Name: "auth_type", Type: field.TypeEnum, Enums: []string{"token", "password", "jwt"}},
 		{Name: "credential", Type: field.TypeJSON},
 		{Name: "relay_site_id", Type: field.TypeInt, Unique: true},
 	}

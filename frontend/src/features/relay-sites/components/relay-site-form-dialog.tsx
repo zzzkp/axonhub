@@ -16,17 +16,20 @@ import { useCreateRelaySite, useUpdateRelaySite, type CreateRelaySiteInput, type
 
 type RelaySiteFormValues = {
   name: string;
+  type: 'new_api' | 'sub2api';
   baseURL: string;
   status: 'enabled' | 'disabled' | 'archived';
   autoCheckinEnabled: boolean;
   remark: string;
   checkinPageURL: string;
   externalCheckinPageURL: string;
-  authType: 'token' | 'password';
+  authType: 'token' | 'password' | 'jwt';
   token: string;
   userId: string;
   username: string;
   password: string;
+  refreshToken: string;
+  tokenExpiresAt: string;
 };
 
 function normalizeBaseURL(value: string) {
@@ -34,6 +37,19 @@ function normalizeBaseURL(value: string) {
 }
 
 function buildCredential(data: RelaySiteFormValues, credentialRequired: boolean) {
+  if (data.authType === 'jwt') {
+    const token = data.token.trim();
+    const refreshToken = data.refreshToken.trim();
+    const tokenExpiresAt = data.tokenExpiresAt.trim();
+    if (!token && !refreshToken && !tokenExpiresAt && !credentialRequired) return undefined;
+    return {
+      authType: 'jwt' as const,
+      token,
+      refreshToken,
+      ...(tokenExpiresAt ? { tokenExpiresAt: new Date(tokenExpiresAt).toISOString() } : {}),
+    };
+  }
+
   if (data.authType === 'token') {
     const token = data.token.trim();
     const userId = Number(data.userId.trim());
@@ -49,6 +65,7 @@ function buildCredential(data: RelaySiteFormValues, credentialRequired: boolean)
 
 const emptyRelaySiteFormValues: RelaySiteFormValues = {
   name: '',
+  type: 'new_api',
   baseURL: '',
   status: 'enabled',
   autoCheckinEnabled: false,
@@ -60,6 +77,8 @@ const emptyRelaySiteFormValues: RelaySiteFormValues = {
   userId: '',
   username: '',
   password: '',
+  refreshToken: '',
+  tokenExpiresAt: '',
 };
 
 export function RelaySiteFormDialog({ mode }: { mode: 'create' | 'edit' }) {
@@ -92,10 +111,23 @@ export function RelaySiteFormDialog({ mode }: { mode: 'create' | 'edit' }) {
   });
 
   const authType = watch('authType');
+  const siteType = watch('type');
   const token = watch('token');
   const userId = watch('userId');
   const username = watch('username');
   const password = watch('password');
+  const refreshToken = watch('refreshToken');
+  const tokenExpiresAt = watch('tokenExpiresAt');
+
+  useEffect(() => {
+    if (siteType === 'sub2api' && authType !== 'jwt') {
+      setValue('authType', 'jwt');
+      setValue('autoCheckinEnabled', false);
+    }
+    if (siteType === 'new_api' && authType === 'jwt') {
+      setValue('authType', 'token');
+    }
+  }, [authType, setValue, siteType]);
 
   useEffect(() => {
     if (!open) return;
@@ -107,6 +139,7 @@ export function RelaySiteFormDialog({ mode }: { mode: 'create' | 'edit' }) {
       const credential = editingRelaySite.displayCredential;
       reset({
         name: editingRelaySite.name,
+        type: editingRelaySite.type,
         baseURL: editingRelaySite.baseURL,
         status: editingRelaySite.status,
         autoCheckinEnabled: editingRelaySite.autoCheckinEnabled,
@@ -118,6 +151,8 @@ export function RelaySiteFormDialog({ mode }: { mode: 'create' | 'edit' }) {
         userId: credential?.userId ? String(credential.userId) : '',
         username: credential?.username ?? '',
         password: credential?.password ?? '',
+        refreshToken: credential?.refreshToken ?? '',
+        tokenExpiresAt: credential?.tokenExpiresAt ? credential.tokenExpiresAt.slice(0, 16) : '',
       });
     }
   }, [editingRelaySite, isCreate, open, reset]);
@@ -138,6 +173,7 @@ export function RelaySiteFormDialog({ mode }: { mode: 'create' | 'edit' }) {
     if (isCreate) {
       const input: CreateRelaySiteInput = {
         name: data.name.trim(),
+        type: data.type,
         baseURL: normalizeBaseURL(data.baseURL),
         status: data.status,
         autoCheckinEnabled: data.autoCheckinEnabled,
@@ -182,8 +218,18 @@ export function RelaySiteFormDialog({ mode }: { mode: 'create' | 'edit' }) {
             </div>
             <div className='grid gap-2'>
               <Label htmlFor={`${mode}-relay-site-base-url`}>{t('relaySites.fields.baseURL')}</Label>
-              <Input id={`${mode}-relay-site-base-url`} placeholder='https://new-api.example.com' {...register('baseURL', { required: t('relaySites.validation.baseURLRequired') })} />
+              <Input id={`${mode}-relay-site-base-url`} placeholder={siteType === 'sub2api' ? 'https://sub2api.example.com' : 'https://new-api.example.com'} {...register('baseURL', { required: t('relaySites.validation.baseURLRequired') })} />
               {errors.baseURL && <span className='text-sm text-red-500'>{errors.baseURL.message}</span>}
+            </div>
+            <div className='grid gap-2'>
+              <Label htmlFor={`${mode}-relay-site-type`}>{t('relaySites.fields.type')}</Label>
+              <Select value={siteType} onValueChange={(value) => setValue('type', value as RelaySiteFormValues['type'])} disabled={!isCreate}>
+                <SelectTrigger id={`${mode}-relay-site-type`}><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value='new_api'>{t('relaySites.types.new_api')}</SelectItem>
+                  <SelectItem value='sub2api'>{t('relaySites.types.sub2api')}</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div className='grid gap-2'>
               <Label htmlFor={`${mode}-relay-site-status`}>{t('relaySites.fields.status')}</Label>
@@ -223,12 +269,36 @@ export function RelaySiteFormDialog({ mode }: { mode: 'create' | 'edit' }) {
               <Select value={authType} onValueChange={(value) => setValue('authType', value as RelaySiteFormValues['authType'])}>
                 <SelectTrigger id={`${mode}-relay-site-auth-type`}><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value='token'>{t('relaySites.authTypes.token')}</SelectItem>
-                  <SelectItem value='password'>{t('relaySites.authTypes.password')}</SelectItem>
+                  {siteType === 'sub2api' ? (
+                    <SelectItem value='jwt'>{t('relaySites.authTypes.jwt')}</SelectItem>
+                  ) : (
+                    <>
+                      <SelectItem value='token'>{t('relaySites.authTypes.token')}</SelectItem>
+                      <SelectItem value='password'>{t('relaySites.authTypes.password')}</SelectItem>
+                    </>
+                  )}
                 </SelectContent>
               </Select>
             </div>
-            {authType === 'token' ? (
+            {authType === 'jwt' ? (
+              <div className='grid gap-4'>
+                <div className='grid gap-2'>
+                  <Label htmlFor={`${mode}-relay-site-token`}>{t('relaySites.fields.jwtToken')}</Label>
+                  <PasswordInput id={`${mode}-relay-site-token`} autoComplete='off' className='[&_input]:pr-9' {...register('token', { validate: (value) => (isCreate || refreshToken.trim() || tokenExpiresAt.trim()) ? Boolean(value.trim()) || t('relaySites.validation.jwtTokenRequired') : true })} />
+                  {errors.token && <span className='text-sm text-red-500'>{errors.token.message}</span>}
+                </div>
+                <div className='grid gap-4 sm:grid-cols-2'>
+                  <div className='grid gap-2'>
+                    <Label htmlFor={`${mode}-relay-site-refresh-token`}>{t('relaySites.fields.refreshToken')}</Label>
+                    <PasswordInput id={`${mode}-relay-site-refresh-token`} autoComplete='off' className='[&_input]:pr-9' {...register('refreshToken')} />
+                  </div>
+                  <div className='grid gap-2'>
+                    <Label htmlFor={`${mode}-relay-site-token-expires-at`}>{t('relaySites.fields.tokenExpiresAt')}</Label>
+                    <Input id={`${mode}-relay-site-token-expires-at`} type='datetime-local' autoComplete='off' {...register('tokenExpiresAt')} />
+                  </div>
+                </div>
+              </div>
+            ) : authType === 'token' ? (
               <div className='grid gap-4 sm:grid-cols-2'>
                 <div className='grid gap-2'>
                   <Label htmlFor={`${mode}-relay-site-token`}>{t('relaySites.fields.token')}</Label>

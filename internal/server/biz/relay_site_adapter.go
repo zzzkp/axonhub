@@ -94,6 +94,8 @@ func (f *RelaySiteAdapterFactory) New(siteType string, cfg RelaySiteAdapterConfi
 	switch siteType {
 	case "new_api":
 		return NewRelaySiteNewAPIAdapter(cfg, f.httpClient), nil
+	case "sub2api":
+		return NewRelaySiteSub2APIAdapter(cfg, f.httpClient), nil
 	default:
 		return nil, errors.New("unsupported relay site type")
 	}
