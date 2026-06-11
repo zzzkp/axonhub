@@ -19,6 +19,14 @@ import (
 	"github.com/looplj/axonhub/internal/ent/prompt"
 	"github.com/looplj/axonhub/internal/ent/promptprotectionrule"
 	"github.com/looplj/axonhub/internal/ent/providerquotastatus"
+	"github.com/looplj/axonhub/internal/ent/relaysite"
+	"github.com/looplj/axonhub/internal/ent/relaysiteannouncement"
+	"github.com/looplj/axonhub/internal/ent/relaysiteapikey"
+	"github.com/looplj/axonhub/internal/ent/relaysitebalancesnapshot"
+	"github.com/looplj/axonhub/internal/ent/relaysitecheckinlog"
+	"github.com/looplj/axonhub/internal/ent/relaysitecredential"
+	"github.com/looplj/axonhub/internal/ent/relaysitegroup"
+	"github.com/looplj/axonhub/internal/ent/relaysitemodelprice"
 	"github.com/looplj/axonhub/internal/ent/request"
 	"github.com/looplj/axonhub/internal/ent/requestexecution"
 	"github.com/looplj/axonhub/internal/ent/role"
@@ -578,6 +586,266 @@ func init() {
 	providerquotastatusDescReady := providerquotastatusFields[5].Descriptor()
 	// providerquotastatus.DefaultReady holds the default value on creation for the ready field.
 	providerquotastatus.DefaultReady = providerquotastatusDescReady.Default.(bool)
+	relaysiteMixin := schema.RelaySite{}.Mixin()
+	relaysite.Policy = privacy.NewPolicies(schema.RelaySite{})
+	relaysite.Hooks[0] = func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			if err := relaysite.Policy.EvalMutation(ctx, m); err != nil {
+				return nil, err
+			}
+			return next.Mutate(ctx, m)
+		})
+	}
+	relaysiteMixinHooks1 := relaysiteMixin[1].Hooks()
+
+	relaysite.Hooks[1] = relaysiteMixinHooks1[0]
+	relaysiteMixinInters1 := relaysiteMixin[1].Interceptors()
+	relaysite.Interceptors[0] = relaysiteMixinInters1[0]
+	relaysiteMixinFields0 := relaysiteMixin[0].Fields()
+	_ = relaysiteMixinFields0
+	relaysiteMixinFields1 := relaysiteMixin[1].Fields()
+	_ = relaysiteMixinFields1
+	relaysiteFields := schema.RelaySite{}.Fields()
+	_ = relaysiteFields
+	// relaysiteDescCreatedAt is the schema descriptor for created_at field.
+	relaysiteDescCreatedAt := relaysiteMixinFields0[0].Descriptor()
+	// relaysite.DefaultCreatedAt holds the default value on creation for the created_at field.
+	relaysite.DefaultCreatedAt = relaysiteDescCreatedAt.Default.(func() time.Time)
+	// relaysiteDescUpdatedAt is the schema descriptor for updated_at field.
+	relaysiteDescUpdatedAt := relaysiteMixinFields0[1].Descriptor()
+	// relaysite.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	relaysite.DefaultUpdatedAt = relaysiteDescUpdatedAt.Default.(func() time.Time)
+	// relaysite.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	relaysite.UpdateDefaultUpdatedAt = relaysiteDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// relaysiteDescDeletedAt is the schema descriptor for deleted_at field.
+	relaysiteDescDeletedAt := relaysiteMixinFields1[0].Descriptor()
+	// relaysite.DefaultDeletedAt holds the default value on creation for the deleted_at field.
+	relaysite.DefaultDeletedAt = relaysiteDescDeletedAt.Default.(int)
+	// relaysiteDescAutoCheckinEnabled is the schema descriptor for auto_checkin_enabled field.
+	relaysiteDescAutoCheckinEnabled := relaysiteFields[4].Descriptor()
+	// relaysite.DefaultAutoCheckinEnabled holds the default value on creation for the auto_checkin_enabled field.
+	relaysite.DefaultAutoCheckinEnabled = relaysiteDescAutoCheckinEnabled.Default.(bool)
+	relaysiteapikeyMixin := schema.RelaySiteAPIKey{}.Mixin()
+	relaysiteapikey.Policy = privacy.NewPolicies(schema.RelaySiteAPIKey{})
+	relaysiteapikey.Hooks[0] = func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			if err := relaysiteapikey.Policy.EvalMutation(ctx, m); err != nil {
+				return nil, err
+			}
+			return next.Mutate(ctx, m)
+		})
+	}
+	relaysiteapikeyMixinHooks1 := relaysiteapikeyMixin[1].Hooks()
+
+	relaysiteapikey.Hooks[1] = relaysiteapikeyMixinHooks1[0]
+	relaysiteapikeyMixinInters1 := relaysiteapikeyMixin[1].Interceptors()
+	relaysiteapikey.Interceptors[0] = relaysiteapikeyMixinInters1[0]
+	relaysiteapikeyMixinFields0 := relaysiteapikeyMixin[0].Fields()
+	_ = relaysiteapikeyMixinFields0
+	relaysiteapikeyMixinFields1 := relaysiteapikeyMixin[1].Fields()
+	_ = relaysiteapikeyMixinFields1
+	relaysiteapikeyFields := schema.RelaySiteAPIKey{}.Fields()
+	_ = relaysiteapikeyFields
+	// relaysiteapikeyDescCreatedAt is the schema descriptor for created_at field.
+	relaysiteapikeyDescCreatedAt := relaysiteapikeyMixinFields0[0].Descriptor()
+	// relaysiteapikey.DefaultCreatedAt holds the default value on creation for the created_at field.
+	relaysiteapikey.DefaultCreatedAt = relaysiteapikeyDescCreatedAt.Default.(func() time.Time)
+	// relaysiteapikeyDescUpdatedAt is the schema descriptor for updated_at field.
+	relaysiteapikeyDescUpdatedAt := relaysiteapikeyMixinFields0[1].Descriptor()
+	// relaysiteapikey.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	relaysiteapikey.DefaultUpdatedAt = relaysiteapikeyDescUpdatedAt.Default.(func() time.Time)
+	// relaysiteapikey.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	relaysiteapikey.UpdateDefaultUpdatedAt = relaysiteapikeyDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// relaysiteapikeyDescDeletedAt is the schema descriptor for deleted_at field.
+	relaysiteapikeyDescDeletedAt := relaysiteapikeyMixinFields1[0].Descriptor()
+	// relaysiteapikey.DefaultDeletedAt holds the default value on creation for the deleted_at field.
+	relaysiteapikey.DefaultDeletedAt = relaysiteapikeyDescDeletedAt.Default.(int)
+	// relaysiteapikeyDescMetadata is the schema descriptor for metadata field.
+	relaysiteapikeyDescMetadata := relaysiteapikeyFields[8].Descriptor()
+	// relaysiteapikey.DefaultMetadata holds the default value on creation for the metadata field.
+	relaysiteapikey.DefaultMetadata = relaysiteapikeyDescMetadata.Default.(objects.RelaySiteAPIKeyMetadata)
+	relaysiteannouncementMixin := schema.RelaySiteAnnouncement{}.Mixin()
+	relaysiteannouncement.Policy = privacy.NewPolicies(schema.RelaySiteAnnouncement{})
+	relaysiteannouncement.Hooks[0] = func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			if err := relaysiteannouncement.Policy.EvalMutation(ctx, m); err != nil {
+				return nil, err
+			}
+			return next.Mutate(ctx, m)
+		})
+	}
+	relaysiteannouncementMixinFields0 := relaysiteannouncementMixin[0].Fields()
+	_ = relaysiteannouncementMixinFields0
+	relaysiteannouncementFields := schema.RelaySiteAnnouncement{}.Fields()
+	_ = relaysiteannouncementFields
+	// relaysiteannouncementDescCreatedAt is the schema descriptor for created_at field.
+	relaysiteannouncementDescCreatedAt := relaysiteannouncementMixinFields0[0].Descriptor()
+	// relaysiteannouncement.DefaultCreatedAt holds the default value on creation for the created_at field.
+	relaysiteannouncement.DefaultCreatedAt = relaysiteannouncementDescCreatedAt.Default.(func() time.Time)
+	// relaysiteannouncementDescUpdatedAt is the schema descriptor for updated_at field.
+	relaysiteannouncementDescUpdatedAt := relaysiteannouncementMixinFields0[1].Descriptor()
+	// relaysiteannouncement.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	relaysiteannouncement.DefaultUpdatedAt = relaysiteannouncementDescUpdatedAt.Default.(func() time.Time)
+	// relaysiteannouncement.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	relaysiteannouncement.UpdateDefaultUpdatedAt = relaysiteannouncementDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// relaysiteannouncementDescMetadata is the schema descriptor for metadata field.
+	relaysiteannouncementDescMetadata := relaysiteannouncementFields[9].Descriptor()
+	// relaysiteannouncement.DefaultMetadata holds the default value on creation for the metadata field.
+	relaysiteannouncement.DefaultMetadata = relaysiteannouncementDescMetadata.Default.(objects.RelaySiteAnnouncementMetadata)
+	relaysitebalancesnapshotMixin := schema.RelaySiteBalanceSnapshot{}.Mixin()
+	relaysitebalancesnapshot.Policy = privacy.NewPolicies(schema.RelaySiteBalanceSnapshot{})
+	relaysitebalancesnapshot.Hooks[0] = func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			if err := relaysitebalancesnapshot.Policy.EvalMutation(ctx, m); err != nil {
+				return nil, err
+			}
+			return next.Mutate(ctx, m)
+		})
+	}
+	relaysitebalancesnapshotMixinFields0 := relaysitebalancesnapshotMixin[0].Fields()
+	_ = relaysitebalancesnapshotMixinFields0
+	relaysitebalancesnapshotFields := schema.RelaySiteBalanceSnapshot{}.Fields()
+	_ = relaysitebalancesnapshotFields
+	// relaysitebalancesnapshotDescCreatedAt is the schema descriptor for created_at field.
+	relaysitebalancesnapshotDescCreatedAt := relaysitebalancesnapshotMixinFields0[0].Descriptor()
+	// relaysitebalancesnapshot.DefaultCreatedAt holds the default value on creation for the created_at field.
+	relaysitebalancesnapshot.DefaultCreatedAt = relaysitebalancesnapshotDescCreatedAt.Default.(func() time.Time)
+	// relaysitebalancesnapshotDescUpdatedAt is the schema descriptor for updated_at field.
+	relaysitebalancesnapshotDescUpdatedAt := relaysitebalancesnapshotMixinFields0[1].Descriptor()
+	// relaysitebalancesnapshot.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	relaysitebalancesnapshot.DefaultUpdatedAt = relaysitebalancesnapshotDescUpdatedAt.Default.(func() time.Time)
+	// relaysitebalancesnapshot.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	relaysitebalancesnapshot.UpdateDefaultUpdatedAt = relaysitebalancesnapshotDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// relaysitebalancesnapshotDescUnit is the schema descriptor for unit field.
+	relaysitebalancesnapshotDescUnit := relaysitebalancesnapshotFields[2].Descriptor()
+	// relaysitebalancesnapshot.DefaultUnit holds the default value on creation for the unit field.
+	relaysitebalancesnapshot.DefaultUnit = relaysitebalancesnapshotDescUnit.Default.(string)
+	relaysitecheckinlogMixin := schema.RelaySiteCheckinLog{}.Mixin()
+	relaysitecheckinlog.Policy = privacy.NewPolicies(schema.RelaySiteCheckinLog{})
+	relaysitecheckinlog.Hooks[0] = func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			if err := relaysitecheckinlog.Policy.EvalMutation(ctx, m); err != nil {
+				return nil, err
+			}
+			return next.Mutate(ctx, m)
+		})
+	}
+	relaysitecheckinlogMixinFields0 := relaysitecheckinlogMixin[0].Fields()
+	_ = relaysitecheckinlogMixinFields0
+	relaysitecheckinlogFields := schema.RelaySiteCheckinLog{}.Fields()
+	_ = relaysitecheckinlogFields
+	// relaysitecheckinlogDescCreatedAt is the schema descriptor for created_at field.
+	relaysitecheckinlogDescCreatedAt := relaysitecheckinlogMixinFields0[0].Descriptor()
+	// relaysitecheckinlog.DefaultCreatedAt holds the default value on creation for the created_at field.
+	relaysitecheckinlog.DefaultCreatedAt = relaysitecheckinlogDescCreatedAt.Default.(func() time.Time)
+	// relaysitecheckinlogDescUpdatedAt is the schema descriptor for updated_at field.
+	relaysitecheckinlogDescUpdatedAt := relaysitecheckinlogMixinFields0[1].Descriptor()
+	// relaysitecheckinlog.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	relaysitecheckinlog.DefaultUpdatedAt = relaysitecheckinlogDescUpdatedAt.Default.(func() time.Time)
+	// relaysitecheckinlog.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	relaysitecheckinlog.UpdateDefaultUpdatedAt = relaysitecheckinlogDescUpdatedAt.UpdateDefault.(func() time.Time)
+	relaysitecredentialMixin := schema.RelaySiteCredential{}.Mixin()
+	relaysitecredential.Policy = privacy.NewPolicies(schema.RelaySiteCredential{})
+	relaysitecredential.Hooks[0] = func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			if err := relaysitecredential.Policy.EvalMutation(ctx, m); err != nil {
+				return nil, err
+			}
+			return next.Mutate(ctx, m)
+		})
+	}
+	relaysitecredentialMixinFields0 := relaysitecredentialMixin[0].Fields()
+	_ = relaysitecredentialMixinFields0
+	relaysitecredentialFields := schema.RelaySiteCredential{}.Fields()
+	_ = relaysitecredentialFields
+	// relaysitecredentialDescCreatedAt is the schema descriptor for created_at field.
+	relaysitecredentialDescCreatedAt := relaysitecredentialMixinFields0[0].Descriptor()
+	// relaysitecredential.DefaultCreatedAt holds the default value on creation for the created_at field.
+	relaysitecredential.DefaultCreatedAt = relaysitecredentialDescCreatedAt.Default.(func() time.Time)
+	// relaysitecredentialDescUpdatedAt is the schema descriptor for updated_at field.
+	relaysitecredentialDescUpdatedAt := relaysitecredentialMixinFields0[1].Descriptor()
+	// relaysitecredential.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	relaysitecredential.DefaultUpdatedAt = relaysitecredentialDescUpdatedAt.Default.(func() time.Time)
+	// relaysitecredential.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	relaysitecredential.UpdateDefaultUpdatedAt = relaysitecredentialDescUpdatedAt.UpdateDefault.(func() time.Time)
+	relaysitegroupMixin := schema.RelaySiteGroup{}.Mixin()
+	relaysitegroup.Policy = privacy.NewPolicies(schema.RelaySiteGroup{})
+	relaysitegroup.Hooks[0] = func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			if err := relaysitegroup.Policy.EvalMutation(ctx, m); err != nil {
+				return nil, err
+			}
+			return next.Mutate(ctx, m)
+		})
+	}
+	relaysitegroupMixinHooks1 := relaysitegroupMixin[1].Hooks()
+
+	relaysitegroup.Hooks[1] = relaysitegroupMixinHooks1[0]
+	relaysitegroupMixinInters1 := relaysitegroupMixin[1].Interceptors()
+	relaysitegroup.Interceptors[0] = relaysitegroupMixinInters1[0]
+	relaysitegroupMixinFields0 := relaysitegroupMixin[0].Fields()
+	_ = relaysitegroupMixinFields0
+	relaysitegroupMixinFields1 := relaysitegroupMixin[1].Fields()
+	_ = relaysitegroupMixinFields1
+	relaysitegroupFields := schema.RelaySiteGroup{}.Fields()
+	_ = relaysitegroupFields
+	// relaysitegroupDescCreatedAt is the schema descriptor for created_at field.
+	relaysitegroupDescCreatedAt := relaysitegroupMixinFields0[0].Descriptor()
+	// relaysitegroup.DefaultCreatedAt holds the default value on creation for the created_at field.
+	relaysitegroup.DefaultCreatedAt = relaysitegroupDescCreatedAt.Default.(func() time.Time)
+	// relaysitegroupDescUpdatedAt is the schema descriptor for updated_at field.
+	relaysitegroupDescUpdatedAt := relaysitegroupMixinFields0[1].Descriptor()
+	// relaysitegroup.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	relaysitegroup.DefaultUpdatedAt = relaysitegroupDescUpdatedAt.Default.(func() time.Time)
+	// relaysitegroup.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	relaysitegroup.UpdateDefaultUpdatedAt = relaysitegroupDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// relaysitegroupDescDeletedAt is the schema descriptor for deleted_at field.
+	relaysitegroupDescDeletedAt := relaysitegroupMixinFields1[0].Descriptor()
+	// relaysitegroup.DefaultDeletedAt holds the default value on creation for the deleted_at field.
+	relaysitegroup.DefaultDeletedAt = relaysitegroupDescDeletedAt.Default.(int)
+	// relaysitegroupDescSettings is the schema descriptor for settings field.
+	relaysitegroupDescSettings := relaysitegroupFields[3].Descriptor()
+	// relaysitegroup.DefaultSettings holds the default value on creation for the settings field.
+	relaysitegroup.DefaultSettings = relaysitegroupDescSettings.Default.(objects.RelaySiteGroupSettings)
+	relaysitemodelpriceMixin := schema.RelaySiteModelPrice{}.Mixin()
+	relaysitemodelprice.Policy = privacy.NewPolicies(schema.RelaySiteModelPrice{})
+	relaysitemodelprice.Hooks[0] = func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			if err := relaysitemodelprice.Policy.EvalMutation(ctx, m); err != nil {
+				return nil, err
+			}
+			return next.Mutate(ctx, m)
+		})
+	}
+	relaysitemodelpriceMixinHooks1 := relaysitemodelpriceMixin[1].Hooks()
+
+	relaysitemodelprice.Hooks[1] = relaysitemodelpriceMixinHooks1[0]
+	relaysitemodelpriceMixinInters1 := relaysitemodelpriceMixin[1].Interceptors()
+	relaysitemodelprice.Interceptors[0] = relaysitemodelpriceMixinInters1[0]
+	relaysitemodelpriceMixinFields0 := relaysitemodelpriceMixin[0].Fields()
+	_ = relaysitemodelpriceMixinFields0
+	relaysitemodelpriceMixinFields1 := relaysitemodelpriceMixin[1].Fields()
+	_ = relaysitemodelpriceMixinFields1
+	relaysitemodelpriceFields := schema.RelaySiteModelPrice{}.Fields()
+	_ = relaysitemodelpriceFields
+	// relaysitemodelpriceDescCreatedAt is the schema descriptor for created_at field.
+	relaysitemodelpriceDescCreatedAt := relaysitemodelpriceMixinFields0[0].Descriptor()
+	// relaysitemodelprice.DefaultCreatedAt holds the default value on creation for the created_at field.
+	relaysitemodelprice.DefaultCreatedAt = relaysitemodelpriceDescCreatedAt.Default.(func() time.Time)
+	// relaysitemodelpriceDescUpdatedAt is the schema descriptor for updated_at field.
+	relaysitemodelpriceDescUpdatedAt := relaysitemodelpriceMixinFields0[1].Descriptor()
+	// relaysitemodelprice.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	relaysitemodelprice.DefaultUpdatedAt = relaysitemodelpriceDescUpdatedAt.Default.(func() time.Time)
+	// relaysitemodelprice.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	relaysitemodelprice.UpdateDefaultUpdatedAt = relaysitemodelpriceDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// relaysitemodelpriceDescDeletedAt is the schema descriptor for deleted_at field.
+	relaysitemodelpriceDescDeletedAt := relaysitemodelpriceMixinFields1[0].Descriptor()
+	// relaysitemodelprice.DefaultDeletedAt holds the default value on creation for the deleted_at field.
+	relaysitemodelprice.DefaultDeletedAt = relaysitemodelpriceDescDeletedAt.Default.(int)
+	// relaysitemodelpriceDescPrice is the schema descriptor for price field.
+	relaysitemodelpriceDescPrice := relaysitemodelpriceFields[2].Descriptor()
+	// relaysitemodelprice.DefaultPrice holds the default value on creation for the price field.
+	relaysitemodelprice.DefaultPrice = relaysitemodelpriceDescPrice.Default.(objects.RelaySiteRemoteModelPrice)
 	requestMixin := schema.Request{}.Mixin()
 	request.Policy = privacy.NewPolicies(schema.Request{})
 	request.Hooks[0] = func(next ent.Mutator) ent.Mutator {

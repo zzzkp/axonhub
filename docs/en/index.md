@@ -16,6 +16,7 @@ Welcome to the AxonHub documentation center! This index will help you quickly fi
 | Document | Description |
 |----------|-------------|
 | [Channel Management](guides/channel-management.md) | Configure and manage AI provider channels |
+| [Relay Sites](guides/relay-sites.md) | Manage new-api relay sites, sync remote resources, and import channels |
 | [Model Management](guides/model-management.md) | Model mapping, associations, and priority configuration |
 | [API Key Profiles](guides/api-key-profiles.md) | Create and manage API key profiles |
 | [Permissions](guides/permissions.md) | Enterprise RBAC access control configuration |
@@ -60,6 +61,7 @@ Welcome to the AxonHub documentation center! This index will help you quickly fi
 | [Git Workflow](development/git-workflow.md) | Git branching and commit conventions |
 | [Entity Relationship Diagram](development/erd.md) | Database model relationship diagrams |
 | [Transformation Flow](development/transformation-flow.md) | Request/response transformation process |
+| [Relay Sites Implementation Notes](development/relay-sites.md) | Relay site module boundaries, data model, and backend/frontend implementation notes |
 | [Authz Coding Guidelines](development/authz-coding-guidelines.md) | Guidelines for writing authorization code |
 
 ### ❓ FAQ

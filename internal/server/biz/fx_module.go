@@ -33,6 +33,8 @@ var Module = fx.Module("biz",
 	fx.Provide(NewProviderQuotaService),
 	fx.Provide(NewOIDCService),
 	fx.Provide(NewAPIKeyProfileTemplateService),
+	fx.Provide(NewRelaySiteAdapterFactory),
+	fx.Provide(NewRelaySiteService),
 	fx.Invoke(func(lc fx.Lifecycle, svc *APIKeyService) {
 		lc.Append(fx.Hook{
 			OnStop: func(ctx context.Context) error {
@@ -99,6 +101,13 @@ var Module = fx.Module("biz",
 		})
 	}),
 	fx.Invoke(func(lc fx.Lifecycle, svc *ProviderQuotaService, s *scheduler.Scheduler) {
+		lc.Append(fx.Hook{
+			OnStart: func(ctx context.Context) error {
+				return svc.RegisterScheduledTasks(ctx, s)
+			},
+		})
+	}),
+	fx.Invoke(func(lc fx.Lifecycle, svc *RelaySiteService, s *scheduler.Scheduler) {
 		lc.Append(fx.Hook{
 			OnStart: func(ctx context.Context) error {
 				return svc.RegisterScheduledTasks(ctx, s)

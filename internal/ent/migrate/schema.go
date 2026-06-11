@@ -478,6 +478,304 @@ var (
 			},
 		},
 	}
+	// RelaySitesColumns holds the columns for the "relay_sites" table.
+	RelaySitesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "created_at", Type: field.TypeTime, Default: schema.Expr("CURRENT_TIMESTAMP")},
+		{Name: "updated_at", Type: field.TypeTime, Default: schema.Expr("CURRENT_TIMESTAMP")},
+		{Name: "deleted_at", Type: field.TypeInt, Default: 0},
+		{Name: "name", Type: field.TypeString},
+		{Name: "type", Type: field.TypeEnum, Enums: []string{"new_api"}, Default: "new_api"},
+		{Name: "base_url", Type: field.TypeString},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"enabled", "disabled", "archived"}, Default: "disabled"},
+		{Name: "auto_checkin_enabled", Type: field.TypeBool, Default: false},
+		{Name: "remark", Type: field.TypeString, Nullable: true},
+		{Name: "last_synced_at", Type: field.TypeTime, Nullable: true},
+		{Name: "last_sync_error", Type: field.TypeString, Nullable: true},
+		{Name: "last_checkin_at", Type: field.TypeTime, Nullable: true},
+		{Name: "last_checkin_result", Type: field.TypeString, Nullable: true},
+	}
+	// RelaySitesTable holds the schema information for the "relay_sites" table.
+	RelaySitesTable = &schema.Table{
+		Name:       "relay_sites",
+		Columns:    RelaySitesColumns,
+		PrimaryKey: []*schema.Column{RelaySitesColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "relay_sites_by_name",
+				Unique:  true,
+				Columns: []*schema.Column{RelaySitesColumns[4], RelaySitesColumns[3]},
+			},
+			{
+				Name:    "relaysite_type",
+				Unique:  false,
+				Columns: []*schema.Column{RelaySitesColumns[5]},
+			},
+			{
+				Name:    "relaysite_status",
+				Unique:  false,
+				Columns: []*schema.Column{RelaySitesColumns[7]},
+			},
+		},
+	}
+	// RelaySiteAPIKeysColumns holds the columns for the "relay_site_api_keys" table.
+	RelaySiteAPIKeysColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "created_at", Type: field.TypeTime, Default: schema.Expr("CURRENT_TIMESTAMP")},
+		{Name: "updated_at", Type: field.TypeTime, Default: schema.Expr("CURRENT_TIMESTAMP")},
+		{Name: "deleted_at", Type: field.TypeInt, Default: 0},
+		{Name: "remote_id", Type: field.TypeString},
+		{Name: "name", Type: field.TypeString, Nullable: true},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"enabled", "disabled", "unknown"}, Default: "unknown"},
+		{Name: "group_name", Type: field.TypeString, Nullable: true},
+		{Name: "quota", Type: field.TypeFloat64, Nullable: true},
+		{Name: "used_quota", Type: field.TypeFloat64, Nullable: true},
+		{Name: "expires_at", Type: field.TypeTime, Nullable: true},
+		{Name: "metadata", Type: field.TypeJSON, Nullable: true},
+		{Name: "synced_at", Type: field.TypeTime},
+		{Name: "relay_site_id", Type: field.TypeInt},
+	}
+	// RelaySiteAPIKeysTable holds the schema information for the "relay_site_api_keys" table.
+	RelaySiteAPIKeysTable = &schema.Table{
+		Name:       "relay_site_api_keys",
+		Columns:    RelaySiteAPIKeysColumns,
+		PrimaryKey: []*schema.Column{RelaySiteAPIKeysColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "relay_site_api_keys_relay_sites_api_keys",
+				Columns:    []*schema.Column{RelaySiteAPIKeysColumns[13]},
+				RefColumns: []*schema.Column{RelaySitesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "relay_site_api_keys_by_site_remote_id",
+				Unique:  true,
+				Columns: []*schema.Column{RelaySiteAPIKeysColumns[13], RelaySiteAPIKeysColumns[4], RelaySiteAPIKeysColumns[3]},
+			},
+			{
+				Name:    "relaysiteapikey_relay_site_id_status",
+				Unique:  false,
+				Columns: []*schema.Column{RelaySiteAPIKeysColumns[13], RelaySiteAPIKeysColumns[6]},
+			},
+			{
+				Name:    "relaysiteapikey_relay_site_id_group_name",
+				Unique:  false,
+				Columns: []*schema.Column{RelaySiteAPIKeysColumns[13], RelaySiteAPIKeysColumns[7]},
+			},
+		},
+	}
+	// RelaySiteAnnouncementsColumns holds the columns for the "relay_site_announcements" table.
+	RelaySiteAnnouncementsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "created_at", Type: field.TypeTime, Default: schema.Expr("CURRENT_TIMESTAMP")},
+		{Name: "updated_at", Type: field.TypeTime, Default: schema.Expr("CURRENT_TIMESTAMP")},
+		{Name: "remote_id", Type: field.TypeString},
+		{Name: "type", Type: field.TypeString, Nullable: true},
+		{Name: "content", Type: field.TypeString, Size: 2147483647},
+		{Name: "extra", Type: field.TypeString, Nullable: true, Size: 2147483647},
+		{Name: "content_hash", Type: field.TypeString},
+		{Name: "published_at", Type: field.TypeTime, Nullable: true},
+		{Name: "fetched_at", Type: field.TypeTime},
+		{Name: "read_at", Type: field.TypeTime, Nullable: true},
+		{Name: "metadata", Type: field.TypeJSON, Nullable: true},
+		{Name: "relay_site_id", Type: field.TypeInt},
+	}
+	// RelaySiteAnnouncementsTable holds the schema information for the "relay_site_announcements" table.
+	RelaySiteAnnouncementsTable = &schema.Table{
+		Name:       "relay_site_announcements",
+		Columns:    RelaySiteAnnouncementsColumns,
+		PrimaryKey: []*schema.Column{RelaySiteAnnouncementsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "relay_site_announcements_relay_sites_announcements",
+				Columns:    []*schema.Column{RelaySiteAnnouncementsColumns[12]},
+				RefColumns: []*schema.Column{RelaySitesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "relay_site_announcements_by_site_remote",
+				Unique:  true,
+				Columns: []*schema.Column{RelaySiteAnnouncementsColumns[12], RelaySiteAnnouncementsColumns[3]},
+			},
+			{
+				Name:    "relaysiteannouncement_relay_site_id_read_at",
+				Unique:  false,
+				Columns: []*schema.Column{RelaySiteAnnouncementsColumns[12], RelaySiteAnnouncementsColumns[10]},
+			},
+			{
+				Name:    "relaysiteannouncement_relay_site_id_published_at",
+				Unique:  false,
+				Columns: []*schema.Column{RelaySiteAnnouncementsColumns[12], RelaySiteAnnouncementsColumns[8]},
+			},
+		},
+	}
+	// RelaySiteBalanceSnapshotsColumns holds the columns for the "relay_site_balance_snapshots" table.
+	RelaySiteBalanceSnapshotsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "created_at", Type: field.TypeTime, Default: schema.Expr("CURRENT_TIMESTAMP")},
+		{Name: "updated_at", Type: field.TypeTime, Default: schema.Expr("CURRENT_TIMESTAMP")},
+		{Name: "balance", Type: field.TypeFloat64},
+		{Name: "unit", Type: field.TypeString, Default: "USD"},
+		{Name: "pulled_at", Type: field.TypeTime},
+		{Name: "relay_site_id", Type: field.TypeInt},
+	}
+	// RelaySiteBalanceSnapshotsTable holds the schema information for the "relay_site_balance_snapshots" table.
+	RelaySiteBalanceSnapshotsTable = &schema.Table{
+		Name:       "relay_site_balance_snapshots",
+		Columns:    RelaySiteBalanceSnapshotsColumns,
+		PrimaryKey: []*schema.Column{RelaySiteBalanceSnapshotsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "relay_site_balance_snapshots_relay_sites_balance_snapshots",
+				Columns:    []*schema.Column{RelaySiteBalanceSnapshotsColumns[6]},
+				RefColumns: []*schema.Column{RelaySitesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "relay_site_balance_snapshots_by_site_pulled_at",
+				Unique:  false,
+				Columns: []*schema.Column{RelaySiteBalanceSnapshotsColumns[6], RelaySiteBalanceSnapshotsColumns[5]},
+			},
+		},
+	}
+	// RelaySiteCheckinLogsColumns holds the columns for the "relay_site_checkin_logs" table.
+	RelaySiteCheckinLogsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "created_at", Type: field.TypeTime, Default: schema.Expr("CURRENT_TIMESTAMP")},
+		{Name: "updated_at", Type: field.TypeTime, Default: schema.Expr("CURRENT_TIMESTAMP")},
+		{Name: "executed_at", Type: field.TypeTime},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"success", "failed"}},
+		{Name: "message", Type: field.TypeString, Nullable: true},
+		{Name: "error_message", Type: field.TypeString, Nullable: true},
+		{Name: "relay_site_id", Type: field.TypeInt},
+	}
+	// RelaySiteCheckinLogsTable holds the schema information for the "relay_site_checkin_logs" table.
+	RelaySiteCheckinLogsTable = &schema.Table{
+		Name:       "relay_site_checkin_logs",
+		Columns:    RelaySiteCheckinLogsColumns,
+		PrimaryKey: []*schema.Column{RelaySiteCheckinLogsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "relay_site_checkin_logs_relay_sites_checkin_logs",
+				Columns:    []*schema.Column{RelaySiteCheckinLogsColumns[7]},
+				RefColumns: []*schema.Column{RelaySitesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "relay_site_checkin_logs_by_site_executed_at",
+				Unique:  false,
+				Columns: []*schema.Column{RelaySiteCheckinLogsColumns[7], RelaySiteCheckinLogsColumns[3]},
+			},
+			{
+				Name:    "relaysitecheckinlog_relay_site_id_status",
+				Unique:  false,
+				Columns: []*schema.Column{RelaySiteCheckinLogsColumns[7], RelaySiteCheckinLogsColumns[4]},
+			},
+		},
+	}
+	// RelaySiteCredentialsColumns holds the columns for the "relay_site_credentials" table.
+	RelaySiteCredentialsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "created_at", Type: field.TypeTime, Default: schema.Expr("CURRENT_TIMESTAMP")},
+		{Name: "updated_at", Type: field.TypeTime, Default: schema.Expr("CURRENT_TIMESTAMP")},
+		{Name: "auth_type", Type: field.TypeEnum, Enums: []string{"token", "password"}},
+		{Name: "credential", Type: field.TypeJSON},
+		{Name: "relay_site_id", Type: field.TypeInt, Unique: true},
+	}
+	// RelaySiteCredentialsTable holds the schema information for the "relay_site_credentials" table.
+	RelaySiteCredentialsTable = &schema.Table{
+		Name:       "relay_site_credentials",
+		Columns:    RelaySiteCredentialsColumns,
+		PrimaryKey: []*schema.Column{RelaySiteCredentialsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "relay_site_credentials_relay_sites_credential",
+				Columns:    []*schema.Column{RelaySiteCredentialsColumns[5]},
+				RefColumns: []*schema.Column{RelaySitesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "relaysitecredential_relay_site_id",
+				Unique:  true,
+				Columns: []*schema.Column{RelaySiteCredentialsColumns[5]},
+			},
+		},
+	}
+	// RelaySiteGroupsColumns holds the columns for the "relay_site_groups" table.
+	RelaySiteGroupsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "created_at", Type: field.TypeTime, Default: schema.Expr("CURRENT_TIMESTAMP")},
+		{Name: "updated_at", Type: field.TypeTime, Default: schema.Expr("CURRENT_TIMESTAMP")},
+		{Name: "deleted_at", Type: field.TypeInt, Default: 0},
+		{Name: "name", Type: field.TypeString},
+		{Name: "ratio", Type: field.TypeFloat64, Nullable: true},
+		{Name: "settings", Type: field.TypeJSON, Nullable: true},
+		{Name: "synced_at", Type: field.TypeTime},
+		{Name: "relay_site_id", Type: field.TypeInt},
+	}
+	// RelaySiteGroupsTable holds the schema information for the "relay_site_groups" table.
+	RelaySiteGroupsTable = &schema.Table{
+		Name:       "relay_site_groups",
+		Columns:    RelaySiteGroupsColumns,
+		PrimaryKey: []*schema.Column{RelaySiteGroupsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "relay_site_groups_relay_sites_groups",
+				Columns:    []*schema.Column{RelaySiteGroupsColumns[8]},
+				RefColumns: []*schema.Column{RelaySitesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "relay_site_groups_by_site_name",
+				Unique:  true,
+				Columns: []*schema.Column{RelaySiteGroupsColumns[8], RelaySiteGroupsColumns[4], RelaySiteGroupsColumns[3]},
+			},
+		},
+	}
+	// RelaySiteModelPricesColumns holds the columns for the "relay_site_model_prices" table.
+	RelaySiteModelPricesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "created_at", Type: field.TypeTime, Default: schema.Expr("CURRENT_TIMESTAMP")},
+		{Name: "updated_at", Type: field.TypeTime, Default: schema.Expr("CURRENT_TIMESTAMP")},
+		{Name: "deleted_at", Type: field.TypeInt, Default: 0},
+		{Name: "model_id", Type: field.TypeString},
+		{Name: "price", Type: field.TypeJSON, Nullable: true},
+		{Name: "synced_at", Type: field.TypeTime},
+		{Name: "relay_site_id", Type: field.TypeInt},
+	}
+	// RelaySiteModelPricesTable holds the schema information for the "relay_site_model_prices" table.
+	RelaySiteModelPricesTable = &schema.Table{
+		Name:       "relay_site_model_prices",
+		Columns:    RelaySiteModelPricesColumns,
+		PrimaryKey: []*schema.Column{RelaySiteModelPricesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "relay_site_model_prices_relay_sites_model_prices",
+				Columns:    []*schema.Column{RelaySiteModelPricesColumns[7]},
+				RefColumns: []*schema.Column{RelaySitesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "relay_site_model_prices_by_site_model",
+				Unique:  true,
+				Columns: []*schema.Column{RelaySiteModelPricesColumns[7], RelaySiteModelPricesColumns[4], RelaySiteModelPricesColumns[3]},
+			},
+		},
+	}
 	// RequestsColumns holds the columns for the "requests" table.
 	RequestsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -1010,6 +1308,14 @@ var (
 		PromptsTable,
 		PromptProtectionRulesTable,
 		ProviderQuotaStatusTable,
+		RelaySitesTable,
+		RelaySiteAPIKeysTable,
+		RelaySiteAnnouncementsTable,
+		RelaySiteBalanceSnapshotsTable,
+		RelaySiteCheckinLogsTable,
+		RelaySiteCredentialsTable,
+		RelaySiteGroupsTable,
+		RelaySiteModelPricesTable,
 		RequestsTable,
 		RequestExecutionsTable,
 		RolesTable,
@@ -1034,6 +1340,13 @@ func init() {
 	ChannelProbesTable.ForeignKeys[0].RefTable = ChannelsTable
 	OidcIdentitiesTable.ForeignKeys[0].RefTable = UsersTable
 	ProviderQuotaStatusTable.ForeignKeys[0].RefTable = ChannelsTable
+	RelaySiteAPIKeysTable.ForeignKeys[0].RefTable = RelaySitesTable
+	RelaySiteAnnouncementsTable.ForeignKeys[0].RefTable = RelaySitesTable
+	RelaySiteBalanceSnapshotsTable.ForeignKeys[0].RefTable = RelaySitesTable
+	RelaySiteCheckinLogsTable.ForeignKeys[0].RefTable = RelaySitesTable
+	RelaySiteCredentialsTable.ForeignKeys[0].RefTable = RelaySitesTable
+	RelaySiteGroupsTable.ForeignKeys[0].RefTable = RelaySitesTable
+	RelaySiteModelPricesTable.ForeignKeys[0].RefTable = RelaySitesTable
 	RequestsTable.ForeignKeys[0].RefTable = APIKeysTable
 	RequestsTable.ForeignKeys[1].RefTable = ChannelsTable
 	RequestsTable.ForeignKeys[2].RefTable = DataStoragesTable

@@ -339,6 +339,22 @@ type QueryModelsInput struct {
 	IncludeAllChannelModels *bool            `json:"includeAllChannelModels,omitempty"`
 }
 
+type RelaySiteCredentialInput struct {
+	AuthType RelaySiteCredentialAuthType `json:"authType"`
+	Token    *string                     `json:"token,omitempty"`
+	UserID   *int                        `json:"userId,omitempty"`
+	Username *string                     `json:"username,omitempty"`
+	Password *string                     `json:"password,omitempty"`
+}
+
+type RelaySiteDisplayCredential struct {
+	AuthType RelaySiteCredentialAuthType `json:"authType"`
+	Token    *string                     `json:"token,omitempty"`
+	UserID   *int                        `json:"userId,omitempty"`
+	Username *string                     `json:"username,omitempty"`
+	Password *string                     `json:"password,omitempty"`
+}
+
 type RemoveUserFromProjectInput struct {
 	ProjectID objects.GUID `json:"projectId"`
 	UserID    objects.GUID `json:"userId"`
@@ -669,6 +685,61 @@ func (e *OverrideApplyMode) UnmarshalJSON(b []byte) error {
 }
 
 func (e OverrideApplyMode) MarshalJSON() ([]byte, error) {
+	var buf bytes.Buffer
+	e.MarshalGQL(&buf)
+	return buf.Bytes(), nil
+}
+
+type RelaySiteCredentialAuthType string
+
+const (
+	RelaySiteCredentialAuthTypeToken    RelaySiteCredentialAuthType = "token"
+	RelaySiteCredentialAuthTypePassword RelaySiteCredentialAuthType = "password"
+)
+
+var AllRelaySiteCredentialAuthType = []RelaySiteCredentialAuthType{
+	RelaySiteCredentialAuthTypeToken,
+	RelaySiteCredentialAuthTypePassword,
+}
+
+func (e RelaySiteCredentialAuthType) IsValid() bool {
+	switch e {
+	case RelaySiteCredentialAuthTypeToken, RelaySiteCredentialAuthTypePassword:
+		return true
+	}
+	return false
+}
+
+func (e RelaySiteCredentialAuthType) String() string {
+	return string(e)
+}
+
+func (e *RelaySiteCredentialAuthType) UnmarshalGQL(v any) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = RelaySiteCredentialAuthType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid RelaySiteCredentialAuthType", str)
+	}
+	return nil
+}
+
+func (e RelaySiteCredentialAuthType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+func (e *RelaySiteCredentialAuthType) UnmarshalJSON(b []byte) error {
+	s, err := strconv.Unquote(string(b))
+	if err != nil {
+		return err
+	}
+	return e.UnmarshalGQL(s)
+}
+
+func (e RelaySiteCredentialAuthType) MarshalJSON() ([]byte, error) {
 	var buf bytes.Buffer
 	e.MarshalGQL(&buf)
 	return buf.Bytes(), nil

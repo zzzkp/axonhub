@@ -23,6 +23,14 @@ import (
 	"github.com/looplj/axonhub/internal/ent/prompt"
 	"github.com/looplj/axonhub/internal/ent/promptprotectionrule"
 	"github.com/looplj/axonhub/internal/ent/providerquotastatus"
+	"github.com/looplj/axonhub/internal/ent/relaysite"
+	"github.com/looplj/axonhub/internal/ent/relaysiteannouncement"
+	"github.com/looplj/axonhub/internal/ent/relaysiteapikey"
+	"github.com/looplj/axonhub/internal/ent/relaysitebalancesnapshot"
+	"github.com/looplj/axonhub/internal/ent/relaysitecheckinlog"
+	"github.com/looplj/axonhub/internal/ent/relaysitecredential"
+	"github.com/looplj/axonhub/internal/ent/relaysitegroup"
+	"github.com/looplj/axonhub/internal/ent/relaysitemodelprice"
 	"github.com/looplj/axonhub/internal/ent/request"
 	"github.com/looplj/axonhub/internal/ent/requestexecution"
 	"github.com/looplj/axonhub/internal/ent/role"
@@ -469,6 +477,222 @@ func (f TraverseProviderQuotaStatus) Traverse(ctx context.Context, q ent.Query) 
 	return fmt.Errorf("unexpected query type %T. expect *ent.ProviderQuotaStatusQuery", q)
 }
 
+// The RelaySiteFunc type is an adapter to allow the use of ordinary function as a Querier.
+type RelaySiteFunc func(context.Context, *ent.RelaySiteQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f RelaySiteFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.RelaySiteQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.RelaySiteQuery", q)
+}
+
+// The TraverseRelaySite type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseRelaySite func(context.Context, *ent.RelaySiteQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseRelaySite) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseRelaySite) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.RelaySiteQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.RelaySiteQuery", q)
+}
+
+// The RelaySiteAPIKeyFunc type is an adapter to allow the use of ordinary function as a Querier.
+type RelaySiteAPIKeyFunc func(context.Context, *ent.RelaySiteAPIKeyQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f RelaySiteAPIKeyFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.RelaySiteAPIKeyQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.RelaySiteAPIKeyQuery", q)
+}
+
+// The TraverseRelaySiteAPIKey type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseRelaySiteAPIKey func(context.Context, *ent.RelaySiteAPIKeyQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseRelaySiteAPIKey) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseRelaySiteAPIKey) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.RelaySiteAPIKeyQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.RelaySiteAPIKeyQuery", q)
+}
+
+// The RelaySiteAnnouncementFunc type is an adapter to allow the use of ordinary function as a Querier.
+type RelaySiteAnnouncementFunc func(context.Context, *ent.RelaySiteAnnouncementQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f RelaySiteAnnouncementFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.RelaySiteAnnouncementQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.RelaySiteAnnouncementQuery", q)
+}
+
+// The TraverseRelaySiteAnnouncement type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseRelaySiteAnnouncement func(context.Context, *ent.RelaySiteAnnouncementQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseRelaySiteAnnouncement) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseRelaySiteAnnouncement) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.RelaySiteAnnouncementQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.RelaySiteAnnouncementQuery", q)
+}
+
+// The RelaySiteBalanceSnapshotFunc type is an adapter to allow the use of ordinary function as a Querier.
+type RelaySiteBalanceSnapshotFunc func(context.Context, *ent.RelaySiteBalanceSnapshotQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f RelaySiteBalanceSnapshotFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.RelaySiteBalanceSnapshotQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.RelaySiteBalanceSnapshotQuery", q)
+}
+
+// The TraverseRelaySiteBalanceSnapshot type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseRelaySiteBalanceSnapshot func(context.Context, *ent.RelaySiteBalanceSnapshotQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseRelaySiteBalanceSnapshot) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseRelaySiteBalanceSnapshot) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.RelaySiteBalanceSnapshotQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.RelaySiteBalanceSnapshotQuery", q)
+}
+
+// The RelaySiteCheckinLogFunc type is an adapter to allow the use of ordinary function as a Querier.
+type RelaySiteCheckinLogFunc func(context.Context, *ent.RelaySiteCheckinLogQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f RelaySiteCheckinLogFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.RelaySiteCheckinLogQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.RelaySiteCheckinLogQuery", q)
+}
+
+// The TraverseRelaySiteCheckinLog type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseRelaySiteCheckinLog func(context.Context, *ent.RelaySiteCheckinLogQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseRelaySiteCheckinLog) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseRelaySiteCheckinLog) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.RelaySiteCheckinLogQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.RelaySiteCheckinLogQuery", q)
+}
+
+// The RelaySiteCredentialFunc type is an adapter to allow the use of ordinary function as a Querier.
+type RelaySiteCredentialFunc func(context.Context, *ent.RelaySiteCredentialQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f RelaySiteCredentialFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.RelaySiteCredentialQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.RelaySiteCredentialQuery", q)
+}
+
+// The TraverseRelaySiteCredential type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseRelaySiteCredential func(context.Context, *ent.RelaySiteCredentialQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseRelaySiteCredential) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseRelaySiteCredential) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.RelaySiteCredentialQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.RelaySiteCredentialQuery", q)
+}
+
+// The RelaySiteGroupFunc type is an adapter to allow the use of ordinary function as a Querier.
+type RelaySiteGroupFunc func(context.Context, *ent.RelaySiteGroupQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f RelaySiteGroupFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.RelaySiteGroupQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.RelaySiteGroupQuery", q)
+}
+
+// The TraverseRelaySiteGroup type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseRelaySiteGroup func(context.Context, *ent.RelaySiteGroupQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseRelaySiteGroup) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseRelaySiteGroup) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.RelaySiteGroupQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.RelaySiteGroupQuery", q)
+}
+
+// The RelaySiteModelPriceFunc type is an adapter to allow the use of ordinary function as a Querier.
+type RelaySiteModelPriceFunc func(context.Context, *ent.RelaySiteModelPriceQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f RelaySiteModelPriceFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.RelaySiteModelPriceQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.RelaySiteModelPriceQuery", q)
+}
+
+// The TraverseRelaySiteModelPrice type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseRelaySiteModelPrice func(context.Context, *ent.RelaySiteModelPriceQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseRelaySiteModelPrice) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseRelaySiteModelPrice) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.RelaySiteModelPriceQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.RelaySiteModelPriceQuery", q)
+}
+
 // The RequestFunc type is an adapter to allow the use of ordinary function as a Querier.
 type RequestFunc func(context.Context, *ent.RequestQuery) (ent.Value, error)
 
@@ -770,6 +994,22 @@ func NewQuery(q ent.Query) (Query, error) {
 		return &query[*ent.PromptProtectionRuleQuery, predicate.PromptProtectionRule, promptprotectionrule.OrderOption]{typ: ent.TypePromptProtectionRule, tq: q}, nil
 	case *ent.ProviderQuotaStatusQuery:
 		return &query[*ent.ProviderQuotaStatusQuery, predicate.ProviderQuotaStatus, providerquotastatus.OrderOption]{typ: ent.TypeProviderQuotaStatus, tq: q}, nil
+	case *ent.RelaySiteQuery:
+		return &query[*ent.RelaySiteQuery, predicate.RelaySite, relaysite.OrderOption]{typ: ent.TypeRelaySite, tq: q}, nil
+	case *ent.RelaySiteAPIKeyQuery:
+		return &query[*ent.RelaySiteAPIKeyQuery, predicate.RelaySiteAPIKey, relaysiteapikey.OrderOption]{typ: ent.TypeRelaySiteAPIKey, tq: q}, nil
+	case *ent.RelaySiteAnnouncementQuery:
+		return &query[*ent.RelaySiteAnnouncementQuery, predicate.RelaySiteAnnouncement, relaysiteannouncement.OrderOption]{typ: ent.TypeRelaySiteAnnouncement, tq: q}, nil
+	case *ent.RelaySiteBalanceSnapshotQuery:
+		return &query[*ent.RelaySiteBalanceSnapshotQuery, predicate.RelaySiteBalanceSnapshot, relaysitebalancesnapshot.OrderOption]{typ: ent.TypeRelaySiteBalanceSnapshot, tq: q}, nil
+	case *ent.RelaySiteCheckinLogQuery:
+		return &query[*ent.RelaySiteCheckinLogQuery, predicate.RelaySiteCheckinLog, relaysitecheckinlog.OrderOption]{typ: ent.TypeRelaySiteCheckinLog, tq: q}, nil
+	case *ent.RelaySiteCredentialQuery:
+		return &query[*ent.RelaySiteCredentialQuery, predicate.RelaySiteCredential, relaysitecredential.OrderOption]{typ: ent.TypeRelaySiteCredential, tq: q}, nil
+	case *ent.RelaySiteGroupQuery:
+		return &query[*ent.RelaySiteGroupQuery, predicate.RelaySiteGroup, relaysitegroup.OrderOption]{typ: ent.TypeRelaySiteGroup, tq: q}, nil
+	case *ent.RelaySiteModelPriceQuery:
+		return &query[*ent.RelaySiteModelPriceQuery, predicate.RelaySiteModelPrice, relaysitemodelprice.OrderOption]{typ: ent.TypeRelaySiteModelPrice, tq: q}, nil
 	case *ent.RequestQuery:
 		return &query[*ent.RequestQuery, predicate.Request, request.OrderOption]{typ: ent.TypeRequest, tq: q}, nil
 	case *ent.RequestExecutionQuery:

@@ -28,6 +28,13 @@ import (
 	"github.com/looplj/axonhub/internal/ent/prompt"
 	"github.com/looplj/axonhub/internal/ent/promptprotectionrule"
 	"github.com/looplj/axonhub/internal/ent/providerquotastatus"
+	"github.com/looplj/axonhub/internal/ent/relaysite"
+	"github.com/looplj/axonhub/internal/ent/relaysiteannouncement"
+	"github.com/looplj/axonhub/internal/ent/relaysiteapikey"
+	"github.com/looplj/axonhub/internal/ent/relaysitebalancesnapshot"
+	"github.com/looplj/axonhub/internal/ent/relaysitecheckinlog"
+	"github.com/looplj/axonhub/internal/ent/relaysitegroup"
+	"github.com/looplj/axonhub/internal/ent/relaysitemodelprice"
 	"github.com/looplj/axonhub/internal/ent/request"
 	"github.com/looplj/axonhub/internal/ent/requestexecution"
 	"github.com/looplj/axonhub/internal/ent/role"
@@ -4573,6 +4580,2312 @@ func (_m *ProviderQuotaStatus) ToEdge(order *ProviderQuotaStatusOrder) *Provider
 		order = DefaultProviderQuotaStatusOrder
 	}
 	return &ProviderQuotaStatusEdge{
+		Node:   _m,
+		Cursor: order.Field.toCursor(_m),
+	}
+}
+
+// RelaySiteEdge is the edge representation of RelaySite.
+type RelaySiteEdge struct {
+	Node   *RelaySite `json:"node"`
+	Cursor Cursor     `json:"cursor"`
+}
+
+// RelaySiteConnection is the connection containing edges to RelaySite.
+type RelaySiteConnection struct {
+	Edges      []*RelaySiteEdge `json:"edges"`
+	PageInfo   PageInfo         `json:"pageInfo"`
+	TotalCount int              `json:"totalCount"`
+}
+
+func (c *RelaySiteConnection) build(nodes []*RelaySite, pager *relaysitePager, after *Cursor, first *int, before *Cursor, last *int) {
+	c.PageInfo.HasNextPage = before != nil
+	c.PageInfo.HasPreviousPage = after != nil
+	if first != nil && *first+1 == len(nodes) {
+		c.PageInfo.HasNextPage = true
+		nodes = nodes[:len(nodes)-1]
+	} else if last != nil && *last+1 == len(nodes) {
+		c.PageInfo.HasPreviousPage = true
+		nodes = nodes[:len(nodes)-1]
+	}
+	var nodeAt func(int) *RelaySite
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *RelaySite {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *RelaySite {
+			return nodes[i]
+		}
+	}
+	c.Edges = make([]*RelaySiteEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		c.Edges[i] = &RelaySiteEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+	if l := len(c.Edges); l > 0 {
+		c.PageInfo.StartCursor = &c.Edges[0].Cursor
+		c.PageInfo.EndCursor = &c.Edges[l-1].Cursor
+	}
+	if c.TotalCount == 0 {
+		c.TotalCount = len(nodes)
+	}
+}
+
+// RelaySitePaginateOption enables pagination customization.
+type RelaySitePaginateOption func(*relaysitePager) error
+
+// WithRelaySiteOrder configures pagination ordering.
+func WithRelaySiteOrder(order *RelaySiteOrder) RelaySitePaginateOption {
+	if order == nil {
+		order = DefaultRelaySiteOrder
+	}
+	o := *order
+	return func(pager *relaysitePager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultRelaySiteOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithRelaySiteFilter configures pagination filter.
+func WithRelaySiteFilter(filter func(*RelaySiteQuery) (*RelaySiteQuery, error)) RelaySitePaginateOption {
+	return func(pager *relaysitePager) error {
+		if filter == nil {
+			return errors.New("RelaySiteQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type relaysitePager struct {
+	reverse bool
+	order   *RelaySiteOrder
+	filter  func(*RelaySiteQuery) (*RelaySiteQuery, error)
+}
+
+func newRelaySitePager(opts []RelaySitePaginateOption, reverse bool) (*relaysitePager, error) {
+	pager := &relaysitePager{reverse: reverse}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultRelaySiteOrder
+	}
+	return pager, nil
+}
+
+func (p *relaysitePager) applyFilter(query *RelaySiteQuery) (*RelaySiteQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *relaysitePager) toCursor(_m *RelaySite) Cursor {
+	return p.order.Field.toCursor(_m)
+}
+
+func (p *relaysitePager) applyCursors(query *RelaySiteQuery, after, before *Cursor) (*RelaySiteQuery, error) {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	for _, predicate := range entgql.CursorsPredicate(after, before, DefaultRelaySiteOrder.Field.column, p.order.Field.column, direction) {
+		query = query.Where(predicate)
+	}
+	return query, nil
+}
+
+func (p *relaysitePager) applyOrder(query *RelaySiteQuery) *RelaySiteQuery {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	query = query.Order(p.order.Field.toTerm(direction.OrderTermOption()))
+	if p.order.Field != DefaultRelaySiteOrder.Field {
+		query = query.Order(DefaultRelaySiteOrder.Field.toTerm(direction.OrderTermOption()))
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return query
+}
+
+func (p *relaysitePager) orderExpr(query *RelaySiteQuery) sql.Querier {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return sql.ExprFunc(func(b *sql.Builder) {
+		b.Ident(p.order.Field.column).Pad().WriteString(string(direction))
+		if p.order.Field != DefaultRelaySiteOrder.Field {
+			b.Comma().Ident(DefaultRelaySiteOrder.Field.column).Pad().WriteString(string(direction))
+		}
+	})
+}
+
+// Paginate executes the query and returns a relay based cursor connection to RelaySite.
+func (_m *RelaySiteQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...RelaySitePaginateOption,
+) (*RelaySiteConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newRelaySitePager(opts, last != nil)
+	if err != nil {
+		return nil, err
+	}
+	if _m, err = pager.applyFilter(_m); err != nil {
+		return nil, err
+	}
+	conn := &RelaySiteConnection{Edges: []*RelaySiteEdge{}}
+	ignoredEdges := !hasCollectedField(ctx, edgesField)
+	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
+		hasPagination := after != nil || first != nil || before != nil || last != nil
+		if hasPagination || ignoredEdges {
+			c := _m.Clone()
+			c.ctx.Fields = nil
+			if conn.TotalCount, err = c.Count(ctx); err != nil {
+				return nil, err
+			}
+			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
+			conn.PageInfo.HasPreviousPage = last != nil && conn.TotalCount > 0
+		}
+	}
+	if ignoredEdges || (first != nil && *first == 0) || (last != nil && *last == 0) {
+		return conn, nil
+	}
+	if _m, err = pager.applyCursors(_m, after, before); err != nil {
+		return nil, err
+	}
+	limit := paginateLimit(first, last)
+	if limit != 0 {
+		_m.Limit(limit)
+	}
+	if field := collectedField(ctx, edgesField, nodeField); field != nil {
+		if err := _m.collectField(ctx, limit == 1, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+			return nil, err
+		}
+	}
+	_m = pager.applyOrder(_m)
+	nodes, err := _m.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	conn.build(nodes, pager, after, first, before, last)
+	return conn, nil
+}
+
+var (
+	// RelaySiteOrderFieldCreatedAt orders RelaySite by created_at.
+	RelaySiteOrderFieldCreatedAt = &RelaySiteOrderField{
+		Value: func(_m *RelaySite) (ent.Value, error) {
+			return _m.CreatedAt, nil
+		},
+		column: relaysite.FieldCreatedAt,
+		toTerm: relaysite.ByCreatedAt,
+		toCursor: func(_m *RelaySite) Cursor {
+			return Cursor{
+				ID:    _m.ID,
+				Value: _m.CreatedAt,
+			}
+		},
+	}
+	// RelaySiteOrderFieldUpdatedAt orders RelaySite by updated_at.
+	RelaySiteOrderFieldUpdatedAt = &RelaySiteOrderField{
+		Value: func(_m *RelaySite) (ent.Value, error) {
+			return _m.UpdatedAt, nil
+		},
+		column: relaysite.FieldUpdatedAt,
+		toTerm: relaysite.ByUpdatedAt,
+		toCursor: func(_m *RelaySite) Cursor {
+			return Cursor{
+				ID:    _m.ID,
+				Value: _m.UpdatedAt,
+			}
+		},
+	}
+	// RelaySiteOrderFieldName orders RelaySite by name.
+	RelaySiteOrderFieldName = &RelaySiteOrderField{
+		Value: func(_m *RelaySite) (ent.Value, error) {
+			return _m.Name, nil
+		},
+		column: relaysite.FieldName,
+		toTerm: relaysite.ByName,
+		toCursor: func(_m *RelaySite) Cursor {
+			return Cursor{
+				ID:    _m.ID,
+				Value: _m.Name,
+			}
+		},
+	}
+	// RelaySiteOrderFieldType orders RelaySite by type.
+	RelaySiteOrderFieldType = &RelaySiteOrderField{
+		Value: func(_m *RelaySite) (ent.Value, error) {
+			return _m.Type, nil
+		},
+		column: relaysite.FieldType,
+		toTerm: relaysite.ByType,
+		toCursor: func(_m *RelaySite) Cursor {
+			return Cursor{
+				ID:    _m.ID,
+				Value: _m.Type,
+			}
+		},
+	}
+	// RelaySiteOrderFieldStatus orders RelaySite by status.
+	RelaySiteOrderFieldStatus = &RelaySiteOrderField{
+		Value: func(_m *RelaySite) (ent.Value, error) {
+			return _m.Status, nil
+		},
+		column: relaysite.FieldStatus,
+		toTerm: relaysite.ByStatus,
+		toCursor: func(_m *RelaySite) Cursor {
+			return Cursor{
+				ID:    _m.ID,
+				Value: _m.Status,
+			}
+		},
+	}
+	// RelaySiteOrderFieldAutoCheckinEnabled orders RelaySite by auto_checkin_enabled.
+	RelaySiteOrderFieldAutoCheckinEnabled = &RelaySiteOrderField{
+		Value: func(_m *RelaySite) (ent.Value, error) {
+			return _m.AutoCheckinEnabled, nil
+		},
+		column: relaysite.FieldAutoCheckinEnabled,
+		toTerm: relaysite.ByAutoCheckinEnabled,
+		toCursor: func(_m *RelaySite) Cursor {
+			return Cursor{
+				ID:    _m.ID,
+				Value: _m.AutoCheckinEnabled,
+			}
+		},
+	}
+	// RelaySiteOrderFieldLastSyncedAt orders RelaySite by last_synced_at.
+	RelaySiteOrderFieldLastSyncedAt = &RelaySiteOrderField{
+		Value: func(_m *RelaySite) (ent.Value, error) {
+			return _m.LastSyncedAt, nil
+		},
+		column: relaysite.FieldLastSyncedAt,
+		toTerm: relaysite.ByLastSyncedAt,
+		toCursor: func(_m *RelaySite) Cursor {
+			return Cursor{
+				ID:    _m.ID,
+				Value: _m.LastSyncedAt,
+			}
+		},
+	}
+	// RelaySiteOrderFieldLastCheckinAt orders RelaySite by last_checkin_at.
+	RelaySiteOrderFieldLastCheckinAt = &RelaySiteOrderField{
+		Value: func(_m *RelaySite) (ent.Value, error) {
+			return _m.LastCheckinAt, nil
+		},
+		column: relaysite.FieldLastCheckinAt,
+		toTerm: relaysite.ByLastCheckinAt,
+		toCursor: func(_m *RelaySite) Cursor {
+			return Cursor{
+				ID:    _m.ID,
+				Value: _m.LastCheckinAt,
+			}
+		},
+	}
+)
+
+// String implement fmt.Stringer interface.
+func (f RelaySiteOrderField) String() string {
+	var str string
+	switch f.column {
+	case RelaySiteOrderFieldCreatedAt.column:
+		str = "CREATED_AT"
+	case RelaySiteOrderFieldUpdatedAt.column:
+		str = "UPDATED_AT"
+	case RelaySiteOrderFieldName.column:
+		str = "NAME"
+	case RelaySiteOrderFieldType.column:
+		str = "TYPE"
+	case RelaySiteOrderFieldStatus.column:
+		str = "STATUS"
+	case RelaySiteOrderFieldAutoCheckinEnabled.column:
+		str = "AUTO_CHECKIN_ENABLED"
+	case RelaySiteOrderFieldLastSyncedAt.column:
+		str = "LAST_SYNCED_AT"
+	case RelaySiteOrderFieldLastCheckinAt.column:
+		str = "LAST_CHECKIN_AT"
+	}
+	return str
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (f RelaySiteOrderField) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(f.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (f *RelaySiteOrderField) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("RelaySiteOrderField %T must be a string", v)
+	}
+	switch str {
+	case "CREATED_AT":
+		*f = *RelaySiteOrderFieldCreatedAt
+	case "UPDATED_AT":
+		*f = *RelaySiteOrderFieldUpdatedAt
+	case "NAME":
+		*f = *RelaySiteOrderFieldName
+	case "TYPE":
+		*f = *RelaySiteOrderFieldType
+	case "STATUS":
+		*f = *RelaySiteOrderFieldStatus
+	case "AUTO_CHECKIN_ENABLED":
+		*f = *RelaySiteOrderFieldAutoCheckinEnabled
+	case "LAST_SYNCED_AT":
+		*f = *RelaySiteOrderFieldLastSyncedAt
+	case "LAST_CHECKIN_AT":
+		*f = *RelaySiteOrderFieldLastCheckinAt
+	default:
+		return fmt.Errorf("%s is not a valid RelaySiteOrderField", str)
+	}
+	return nil
+}
+
+// RelaySiteOrderField defines the ordering field of RelaySite.
+type RelaySiteOrderField struct {
+	// Value extracts the ordering value from the given RelaySite.
+	Value    func(*RelaySite) (ent.Value, error)
+	column   string // field or computed.
+	toTerm   func(...sql.OrderTermOption) relaysite.OrderOption
+	toCursor func(*RelaySite) Cursor
+}
+
+// RelaySiteOrder defines the ordering of RelaySite.
+type RelaySiteOrder struct {
+	Direction OrderDirection       `json:"direction"`
+	Field     *RelaySiteOrderField `json:"field"`
+}
+
+// DefaultRelaySiteOrder is the default ordering of RelaySite.
+var DefaultRelaySiteOrder = &RelaySiteOrder{
+	Direction: entgql.OrderDirectionAsc,
+	Field: &RelaySiteOrderField{
+		Value: func(_m *RelaySite) (ent.Value, error) {
+			return _m.ID, nil
+		},
+		column: relaysite.FieldID,
+		toTerm: relaysite.ByID,
+		toCursor: func(_m *RelaySite) Cursor {
+			return Cursor{ID: _m.ID}
+		},
+	},
+}
+
+// ToEdge converts RelaySite into RelaySiteEdge.
+func (_m *RelaySite) ToEdge(order *RelaySiteOrder) *RelaySiteEdge {
+	if order == nil {
+		order = DefaultRelaySiteOrder
+	}
+	return &RelaySiteEdge{
+		Node:   _m,
+		Cursor: order.Field.toCursor(_m),
+	}
+}
+
+// RelaySiteAPIKeyEdge is the edge representation of RelaySiteAPIKey.
+type RelaySiteAPIKeyEdge struct {
+	Node   *RelaySiteAPIKey `json:"node"`
+	Cursor Cursor           `json:"cursor"`
+}
+
+// RelaySiteAPIKeyConnection is the connection containing edges to RelaySiteAPIKey.
+type RelaySiteAPIKeyConnection struct {
+	Edges      []*RelaySiteAPIKeyEdge `json:"edges"`
+	PageInfo   PageInfo               `json:"pageInfo"`
+	TotalCount int                    `json:"totalCount"`
+}
+
+func (c *RelaySiteAPIKeyConnection) build(nodes []*RelaySiteAPIKey, pager *relaysiteapikeyPager, after *Cursor, first *int, before *Cursor, last *int) {
+	c.PageInfo.HasNextPage = before != nil
+	c.PageInfo.HasPreviousPage = after != nil
+	if first != nil && *first+1 == len(nodes) {
+		c.PageInfo.HasNextPage = true
+		nodes = nodes[:len(nodes)-1]
+	} else if last != nil && *last+1 == len(nodes) {
+		c.PageInfo.HasPreviousPage = true
+		nodes = nodes[:len(nodes)-1]
+	}
+	var nodeAt func(int) *RelaySiteAPIKey
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *RelaySiteAPIKey {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *RelaySiteAPIKey {
+			return nodes[i]
+		}
+	}
+	c.Edges = make([]*RelaySiteAPIKeyEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		c.Edges[i] = &RelaySiteAPIKeyEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+	if l := len(c.Edges); l > 0 {
+		c.PageInfo.StartCursor = &c.Edges[0].Cursor
+		c.PageInfo.EndCursor = &c.Edges[l-1].Cursor
+	}
+	if c.TotalCount == 0 {
+		c.TotalCount = len(nodes)
+	}
+}
+
+// RelaySiteAPIKeyPaginateOption enables pagination customization.
+type RelaySiteAPIKeyPaginateOption func(*relaysiteapikeyPager) error
+
+// WithRelaySiteAPIKeyOrder configures pagination ordering.
+func WithRelaySiteAPIKeyOrder(order *RelaySiteAPIKeyOrder) RelaySiteAPIKeyPaginateOption {
+	if order == nil {
+		order = DefaultRelaySiteAPIKeyOrder
+	}
+	o := *order
+	return func(pager *relaysiteapikeyPager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultRelaySiteAPIKeyOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithRelaySiteAPIKeyFilter configures pagination filter.
+func WithRelaySiteAPIKeyFilter(filter func(*RelaySiteAPIKeyQuery) (*RelaySiteAPIKeyQuery, error)) RelaySiteAPIKeyPaginateOption {
+	return func(pager *relaysiteapikeyPager) error {
+		if filter == nil {
+			return errors.New("RelaySiteAPIKeyQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type relaysiteapikeyPager struct {
+	reverse bool
+	order   *RelaySiteAPIKeyOrder
+	filter  func(*RelaySiteAPIKeyQuery) (*RelaySiteAPIKeyQuery, error)
+}
+
+func newRelaySiteAPIKeyPager(opts []RelaySiteAPIKeyPaginateOption, reverse bool) (*relaysiteapikeyPager, error) {
+	pager := &relaysiteapikeyPager{reverse: reverse}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultRelaySiteAPIKeyOrder
+	}
+	return pager, nil
+}
+
+func (p *relaysiteapikeyPager) applyFilter(query *RelaySiteAPIKeyQuery) (*RelaySiteAPIKeyQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *relaysiteapikeyPager) toCursor(_m *RelaySiteAPIKey) Cursor {
+	return p.order.Field.toCursor(_m)
+}
+
+func (p *relaysiteapikeyPager) applyCursors(query *RelaySiteAPIKeyQuery, after, before *Cursor) (*RelaySiteAPIKeyQuery, error) {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	for _, predicate := range entgql.CursorsPredicate(after, before, DefaultRelaySiteAPIKeyOrder.Field.column, p.order.Field.column, direction) {
+		query = query.Where(predicate)
+	}
+	return query, nil
+}
+
+func (p *relaysiteapikeyPager) applyOrder(query *RelaySiteAPIKeyQuery) *RelaySiteAPIKeyQuery {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	query = query.Order(p.order.Field.toTerm(direction.OrderTermOption()))
+	if p.order.Field != DefaultRelaySiteAPIKeyOrder.Field {
+		query = query.Order(DefaultRelaySiteAPIKeyOrder.Field.toTerm(direction.OrderTermOption()))
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return query
+}
+
+func (p *relaysiteapikeyPager) orderExpr(query *RelaySiteAPIKeyQuery) sql.Querier {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return sql.ExprFunc(func(b *sql.Builder) {
+		b.Ident(p.order.Field.column).Pad().WriteString(string(direction))
+		if p.order.Field != DefaultRelaySiteAPIKeyOrder.Field {
+			b.Comma().Ident(DefaultRelaySiteAPIKeyOrder.Field.column).Pad().WriteString(string(direction))
+		}
+	})
+}
+
+// Paginate executes the query and returns a relay based cursor connection to RelaySiteAPIKey.
+func (_m *RelaySiteAPIKeyQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...RelaySiteAPIKeyPaginateOption,
+) (*RelaySiteAPIKeyConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newRelaySiteAPIKeyPager(opts, last != nil)
+	if err != nil {
+		return nil, err
+	}
+	if _m, err = pager.applyFilter(_m); err != nil {
+		return nil, err
+	}
+	conn := &RelaySiteAPIKeyConnection{Edges: []*RelaySiteAPIKeyEdge{}}
+	ignoredEdges := !hasCollectedField(ctx, edgesField)
+	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
+		hasPagination := after != nil || first != nil || before != nil || last != nil
+		if hasPagination || ignoredEdges {
+			c := _m.Clone()
+			c.ctx.Fields = nil
+			if conn.TotalCount, err = c.Count(ctx); err != nil {
+				return nil, err
+			}
+			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
+			conn.PageInfo.HasPreviousPage = last != nil && conn.TotalCount > 0
+		}
+	}
+	if ignoredEdges || (first != nil && *first == 0) || (last != nil && *last == 0) {
+		return conn, nil
+	}
+	if _m, err = pager.applyCursors(_m, after, before); err != nil {
+		return nil, err
+	}
+	limit := paginateLimit(first, last)
+	if limit != 0 {
+		_m.Limit(limit)
+	}
+	if field := collectedField(ctx, edgesField, nodeField); field != nil {
+		if err := _m.collectField(ctx, limit == 1, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+			return nil, err
+		}
+	}
+	_m = pager.applyOrder(_m)
+	nodes, err := _m.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	conn.build(nodes, pager, after, first, before, last)
+	return conn, nil
+}
+
+var (
+	// RelaySiteAPIKeyOrderFieldCreatedAt orders RelaySiteAPIKey by created_at.
+	RelaySiteAPIKeyOrderFieldCreatedAt = &RelaySiteAPIKeyOrderField{
+		Value: func(_m *RelaySiteAPIKey) (ent.Value, error) {
+			return _m.CreatedAt, nil
+		},
+		column: relaysiteapikey.FieldCreatedAt,
+		toTerm: relaysiteapikey.ByCreatedAt,
+		toCursor: func(_m *RelaySiteAPIKey) Cursor {
+			return Cursor{
+				ID:    _m.ID,
+				Value: _m.CreatedAt,
+			}
+		},
+	}
+	// RelaySiteAPIKeyOrderFieldUpdatedAt orders RelaySiteAPIKey by updated_at.
+	RelaySiteAPIKeyOrderFieldUpdatedAt = &RelaySiteAPIKeyOrderField{
+		Value: func(_m *RelaySiteAPIKey) (ent.Value, error) {
+			return _m.UpdatedAt, nil
+		},
+		column: relaysiteapikey.FieldUpdatedAt,
+		toTerm: relaysiteapikey.ByUpdatedAt,
+		toCursor: func(_m *RelaySiteAPIKey) Cursor {
+			return Cursor{
+				ID:    _m.ID,
+				Value: _m.UpdatedAt,
+			}
+		},
+	}
+)
+
+// String implement fmt.Stringer interface.
+func (f RelaySiteAPIKeyOrderField) String() string {
+	var str string
+	switch f.column {
+	case RelaySiteAPIKeyOrderFieldCreatedAt.column:
+		str = "CREATED_AT"
+	case RelaySiteAPIKeyOrderFieldUpdatedAt.column:
+		str = "UPDATED_AT"
+	}
+	return str
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (f RelaySiteAPIKeyOrderField) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(f.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (f *RelaySiteAPIKeyOrderField) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("RelaySiteAPIKeyOrderField %T must be a string", v)
+	}
+	switch str {
+	case "CREATED_AT":
+		*f = *RelaySiteAPIKeyOrderFieldCreatedAt
+	case "UPDATED_AT":
+		*f = *RelaySiteAPIKeyOrderFieldUpdatedAt
+	default:
+		return fmt.Errorf("%s is not a valid RelaySiteAPIKeyOrderField", str)
+	}
+	return nil
+}
+
+// RelaySiteAPIKeyOrderField defines the ordering field of RelaySiteAPIKey.
+type RelaySiteAPIKeyOrderField struct {
+	// Value extracts the ordering value from the given RelaySiteAPIKey.
+	Value    func(*RelaySiteAPIKey) (ent.Value, error)
+	column   string // field or computed.
+	toTerm   func(...sql.OrderTermOption) relaysiteapikey.OrderOption
+	toCursor func(*RelaySiteAPIKey) Cursor
+}
+
+// RelaySiteAPIKeyOrder defines the ordering of RelaySiteAPIKey.
+type RelaySiteAPIKeyOrder struct {
+	Direction OrderDirection             `json:"direction"`
+	Field     *RelaySiteAPIKeyOrderField `json:"field"`
+}
+
+// DefaultRelaySiteAPIKeyOrder is the default ordering of RelaySiteAPIKey.
+var DefaultRelaySiteAPIKeyOrder = &RelaySiteAPIKeyOrder{
+	Direction: entgql.OrderDirectionAsc,
+	Field: &RelaySiteAPIKeyOrderField{
+		Value: func(_m *RelaySiteAPIKey) (ent.Value, error) {
+			return _m.ID, nil
+		},
+		column: relaysiteapikey.FieldID,
+		toTerm: relaysiteapikey.ByID,
+		toCursor: func(_m *RelaySiteAPIKey) Cursor {
+			return Cursor{ID: _m.ID}
+		},
+	},
+}
+
+// ToEdge converts RelaySiteAPIKey into RelaySiteAPIKeyEdge.
+func (_m *RelaySiteAPIKey) ToEdge(order *RelaySiteAPIKeyOrder) *RelaySiteAPIKeyEdge {
+	if order == nil {
+		order = DefaultRelaySiteAPIKeyOrder
+	}
+	return &RelaySiteAPIKeyEdge{
+		Node:   _m,
+		Cursor: order.Field.toCursor(_m),
+	}
+}
+
+// RelaySiteAnnouncementEdge is the edge representation of RelaySiteAnnouncement.
+type RelaySiteAnnouncementEdge struct {
+	Node   *RelaySiteAnnouncement `json:"node"`
+	Cursor Cursor                 `json:"cursor"`
+}
+
+// RelaySiteAnnouncementConnection is the connection containing edges to RelaySiteAnnouncement.
+type RelaySiteAnnouncementConnection struct {
+	Edges      []*RelaySiteAnnouncementEdge `json:"edges"`
+	PageInfo   PageInfo                     `json:"pageInfo"`
+	TotalCount int                          `json:"totalCount"`
+}
+
+func (c *RelaySiteAnnouncementConnection) build(nodes []*RelaySiteAnnouncement, pager *relaysiteannouncementPager, after *Cursor, first *int, before *Cursor, last *int) {
+	c.PageInfo.HasNextPage = before != nil
+	c.PageInfo.HasPreviousPage = after != nil
+	if first != nil && *first+1 == len(nodes) {
+		c.PageInfo.HasNextPage = true
+		nodes = nodes[:len(nodes)-1]
+	} else if last != nil && *last+1 == len(nodes) {
+		c.PageInfo.HasPreviousPage = true
+		nodes = nodes[:len(nodes)-1]
+	}
+	var nodeAt func(int) *RelaySiteAnnouncement
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *RelaySiteAnnouncement {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *RelaySiteAnnouncement {
+			return nodes[i]
+		}
+	}
+	c.Edges = make([]*RelaySiteAnnouncementEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		c.Edges[i] = &RelaySiteAnnouncementEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+	if l := len(c.Edges); l > 0 {
+		c.PageInfo.StartCursor = &c.Edges[0].Cursor
+		c.PageInfo.EndCursor = &c.Edges[l-1].Cursor
+	}
+	if c.TotalCount == 0 {
+		c.TotalCount = len(nodes)
+	}
+}
+
+// RelaySiteAnnouncementPaginateOption enables pagination customization.
+type RelaySiteAnnouncementPaginateOption func(*relaysiteannouncementPager) error
+
+// WithRelaySiteAnnouncementOrder configures pagination ordering.
+func WithRelaySiteAnnouncementOrder(order *RelaySiteAnnouncementOrder) RelaySiteAnnouncementPaginateOption {
+	if order == nil {
+		order = DefaultRelaySiteAnnouncementOrder
+	}
+	o := *order
+	return func(pager *relaysiteannouncementPager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultRelaySiteAnnouncementOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithRelaySiteAnnouncementFilter configures pagination filter.
+func WithRelaySiteAnnouncementFilter(filter func(*RelaySiteAnnouncementQuery) (*RelaySiteAnnouncementQuery, error)) RelaySiteAnnouncementPaginateOption {
+	return func(pager *relaysiteannouncementPager) error {
+		if filter == nil {
+			return errors.New("RelaySiteAnnouncementQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type relaysiteannouncementPager struct {
+	reverse bool
+	order   *RelaySiteAnnouncementOrder
+	filter  func(*RelaySiteAnnouncementQuery) (*RelaySiteAnnouncementQuery, error)
+}
+
+func newRelaySiteAnnouncementPager(opts []RelaySiteAnnouncementPaginateOption, reverse bool) (*relaysiteannouncementPager, error) {
+	pager := &relaysiteannouncementPager{reverse: reverse}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultRelaySiteAnnouncementOrder
+	}
+	return pager, nil
+}
+
+func (p *relaysiteannouncementPager) applyFilter(query *RelaySiteAnnouncementQuery) (*RelaySiteAnnouncementQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *relaysiteannouncementPager) toCursor(_m *RelaySiteAnnouncement) Cursor {
+	return p.order.Field.toCursor(_m)
+}
+
+func (p *relaysiteannouncementPager) applyCursors(query *RelaySiteAnnouncementQuery, after, before *Cursor) (*RelaySiteAnnouncementQuery, error) {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	for _, predicate := range entgql.CursorsPredicate(after, before, DefaultRelaySiteAnnouncementOrder.Field.column, p.order.Field.column, direction) {
+		query = query.Where(predicate)
+	}
+	return query, nil
+}
+
+func (p *relaysiteannouncementPager) applyOrder(query *RelaySiteAnnouncementQuery) *RelaySiteAnnouncementQuery {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	query = query.Order(p.order.Field.toTerm(direction.OrderTermOption()))
+	if p.order.Field != DefaultRelaySiteAnnouncementOrder.Field {
+		query = query.Order(DefaultRelaySiteAnnouncementOrder.Field.toTerm(direction.OrderTermOption()))
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return query
+}
+
+func (p *relaysiteannouncementPager) orderExpr(query *RelaySiteAnnouncementQuery) sql.Querier {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return sql.ExprFunc(func(b *sql.Builder) {
+		b.Ident(p.order.Field.column).Pad().WriteString(string(direction))
+		if p.order.Field != DefaultRelaySiteAnnouncementOrder.Field {
+			b.Comma().Ident(DefaultRelaySiteAnnouncementOrder.Field.column).Pad().WriteString(string(direction))
+		}
+	})
+}
+
+// Paginate executes the query and returns a relay based cursor connection to RelaySiteAnnouncement.
+func (_m *RelaySiteAnnouncementQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...RelaySiteAnnouncementPaginateOption,
+) (*RelaySiteAnnouncementConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newRelaySiteAnnouncementPager(opts, last != nil)
+	if err != nil {
+		return nil, err
+	}
+	if _m, err = pager.applyFilter(_m); err != nil {
+		return nil, err
+	}
+	conn := &RelaySiteAnnouncementConnection{Edges: []*RelaySiteAnnouncementEdge{}}
+	ignoredEdges := !hasCollectedField(ctx, edgesField)
+	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
+		hasPagination := after != nil || first != nil || before != nil || last != nil
+		if hasPagination || ignoredEdges {
+			c := _m.Clone()
+			c.ctx.Fields = nil
+			if conn.TotalCount, err = c.Count(ctx); err != nil {
+				return nil, err
+			}
+			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
+			conn.PageInfo.HasPreviousPage = last != nil && conn.TotalCount > 0
+		}
+	}
+	if ignoredEdges || (first != nil && *first == 0) || (last != nil && *last == 0) {
+		return conn, nil
+	}
+	if _m, err = pager.applyCursors(_m, after, before); err != nil {
+		return nil, err
+	}
+	limit := paginateLimit(first, last)
+	if limit != 0 {
+		_m.Limit(limit)
+	}
+	if field := collectedField(ctx, edgesField, nodeField); field != nil {
+		if err := _m.collectField(ctx, limit == 1, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+			return nil, err
+		}
+	}
+	_m = pager.applyOrder(_m)
+	nodes, err := _m.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	conn.build(nodes, pager, after, first, before, last)
+	return conn, nil
+}
+
+var (
+	// RelaySiteAnnouncementOrderFieldCreatedAt orders RelaySiteAnnouncement by created_at.
+	RelaySiteAnnouncementOrderFieldCreatedAt = &RelaySiteAnnouncementOrderField{
+		Value: func(_m *RelaySiteAnnouncement) (ent.Value, error) {
+			return _m.CreatedAt, nil
+		},
+		column: relaysiteannouncement.FieldCreatedAt,
+		toTerm: relaysiteannouncement.ByCreatedAt,
+		toCursor: func(_m *RelaySiteAnnouncement) Cursor {
+			return Cursor{
+				ID:    _m.ID,
+				Value: _m.CreatedAt,
+			}
+		},
+	}
+	// RelaySiteAnnouncementOrderFieldUpdatedAt orders RelaySiteAnnouncement by updated_at.
+	RelaySiteAnnouncementOrderFieldUpdatedAt = &RelaySiteAnnouncementOrderField{
+		Value: func(_m *RelaySiteAnnouncement) (ent.Value, error) {
+			return _m.UpdatedAt, nil
+		},
+		column: relaysiteannouncement.FieldUpdatedAt,
+		toTerm: relaysiteannouncement.ByUpdatedAt,
+		toCursor: func(_m *RelaySiteAnnouncement) Cursor {
+			return Cursor{
+				ID:    _m.ID,
+				Value: _m.UpdatedAt,
+			}
+		},
+	}
+)
+
+// String implement fmt.Stringer interface.
+func (f RelaySiteAnnouncementOrderField) String() string {
+	var str string
+	switch f.column {
+	case RelaySiteAnnouncementOrderFieldCreatedAt.column:
+		str = "CREATED_AT"
+	case RelaySiteAnnouncementOrderFieldUpdatedAt.column:
+		str = "UPDATED_AT"
+	}
+	return str
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (f RelaySiteAnnouncementOrderField) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(f.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (f *RelaySiteAnnouncementOrderField) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("RelaySiteAnnouncementOrderField %T must be a string", v)
+	}
+	switch str {
+	case "CREATED_AT":
+		*f = *RelaySiteAnnouncementOrderFieldCreatedAt
+	case "UPDATED_AT":
+		*f = *RelaySiteAnnouncementOrderFieldUpdatedAt
+	default:
+		return fmt.Errorf("%s is not a valid RelaySiteAnnouncementOrderField", str)
+	}
+	return nil
+}
+
+// RelaySiteAnnouncementOrderField defines the ordering field of RelaySiteAnnouncement.
+type RelaySiteAnnouncementOrderField struct {
+	// Value extracts the ordering value from the given RelaySiteAnnouncement.
+	Value    func(*RelaySiteAnnouncement) (ent.Value, error)
+	column   string // field or computed.
+	toTerm   func(...sql.OrderTermOption) relaysiteannouncement.OrderOption
+	toCursor func(*RelaySiteAnnouncement) Cursor
+}
+
+// RelaySiteAnnouncementOrder defines the ordering of RelaySiteAnnouncement.
+type RelaySiteAnnouncementOrder struct {
+	Direction OrderDirection                   `json:"direction"`
+	Field     *RelaySiteAnnouncementOrderField `json:"field"`
+}
+
+// DefaultRelaySiteAnnouncementOrder is the default ordering of RelaySiteAnnouncement.
+var DefaultRelaySiteAnnouncementOrder = &RelaySiteAnnouncementOrder{
+	Direction: entgql.OrderDirectionAsc,
+	Field: &RelaySiteAnnouncementOrderField{
+		Value: func(_m *RelaySiteAnnouncement) (ent.Value, error) {
+			return _m.ID, nil
+		},
+		column: relaysiteannouncement.FieldID,
+		toTerm: relaysiteannouncement.ByID,
+		toCursor: func(_m *RelaySiteAnnouncement) Cursor {
+			return Cursor{ID: _m.ID}
+		},
+	},
+}
+
+// ToEdge converts RelaySiteAnnouncement into RelaySiteAnnouncementEdge.
+func (_m *RelaySiteAnnouncement) ToEdge(order *RelaySiteAnnouncementOrder) *RelaySiteAnnouncementEdge {
+	if order == nil {
+		order = DefaultRelaySiteAnnouncementOrder
+	}
+	return &RelaySiteAnnouncementEdge{
+		Node:   _m,
+		Cursor: order.Field.toCursor(_m),
+	}
+}
+
+// RelaySiteBalanceSnapshotEdge is the edge representation of RelaySiteBalanceSnapshot.
+type RelaySiteBalanceSnapshotEdge struct {
+	Node   *RelaySiteBalanceSnapshot `json:"node"`
+	Cursor Cursor                    `json:"cursor"`
+}
+
+// RelaySiteBalanceSnapshotConnection is the connection containing edges to RelaySiteBalanceSnapshot.
+type RelaySiteBalanceSnapshotConnection struct {
+	Edges      []*RelaySiteBalanceSnapshotEdge `json:"edges"`
+	PageInfo   PageInfo                        `json:"pageInfo"`
+	TotalCount int                             `json:"totalCount"`
+}
+
+func (c *RelaySiteBalanceSnapshotConnection) build(nodes []*RelaySiteBalanceSnapshot, pager *relaysitebalancesnapshotPager, after *Cursor, first *int, before *Cursor, last *int) {
+	c.PageInfo.HasNextPage = before != nil
+	c.PageInfo.HasPreviousPage = after != nil
+	if first != nil && *first+1 == len(nodes) {
+		c.PageInfo.HasNextPage = true
+		nodes = nodes[:len(nodes)-1]
+	} else if last != nil && *last+1 == len(nodes) {
+		c.PageInfo.HasPreviousPage = true
+		nodes = nodes[:len(nodes)-1]
+	}
+	var nodeAt func(int) *RelaySiteBalanceSnapshot
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *RelaySiteBalanceSnapshot {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *RelaySiteBalanceSnapshot {
+			return nodes[i]
+		}
+	}
+	c.Edges = make([]*RelaySiteBalanceSnapshotEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		c.Edges[i] = &RelaySiteBalanceSnapshotEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+	if l := len(c.Edges); l > 0 {
+		c.PageInfo.StartCursor = &c.Edges[0].Cursor
+		c.PageInfo.EndCursor = &c.Edges[l-1].Cursor
+	}
+	if c.TotalCount == 0 {
+		c.TotalCount = len(nodes)
+	}
+}
+
+// RelaySiteBalanceSnapshotPaginateOption enables pagination customization.
+type RelaySiteBalanceSnapshotPaginateOption func(*relaysitebalancesnapshotPager) error
+
+// WithRelaySiteBalanceSnapshotOrder configures pagination ordering.
+func WithRelaySiteBalanceSnapshotOrder(order *RelaySiteBalanceSnapshotOrder) RelaySiteBalanceSnapshotPaginateOption {
+	if order == nil {
+		order = DefaultRelaySiteBalanceSnapshotOrder
+	}
+	o := *order
+	return func(pager *relaysitebalancesnapshotPager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultRelaySiteBalanceSnapshotOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithRelaySiteBalanceSnapshotFilter configures pagination filter.
+func WithRelaySiteBalanceSnapshotFilter(filter func(*RelaySiteBalanceSnapshotQuery) (*RelaySiteBalanceSnapshotQuery, error)) RelaySiteBalanceSnapshotPaginateOption {
+	return func(pager *relaysitebalancesnapshotPager) error {
+		if filter == nil {
+			return errors.New("RelaySiteBalanceSnapshotQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type relaysitebalancesnapshotPager struct {
+	reverse bool
+	order   *RelaySiteBalanceSnapshotOrder
+	filter  func(*RelaySiteBalanceSnapshotQuery) (*RelaySiteBalanceSnapshotQuery, error)
+}
+
+func newRelaySiteBalanceSnapshotPager(opts []RelaySiteBalanceSnapshotPaginateOption, reverse bool) (*relaysitebalancesnapshotPager, error) {
+	pager := &relaysitebalancesnapshotPager{reverse: reverse}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultRelaySiteBalanceSnapshotOrder
+	}
+	return pager, nil
+}
+
+func (p *relaysitebalancesnapshotPager) applyFilter(query *RelaySiteBalanceSnapshotQuery) (*RelaySiteBalanceSnapshotQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *relaysitebalancesnapshotPager) toCursor(_m *RelaySiteBalanceSnapshot) Cursor {
+	return p.order.Field.toCursor(_m)
+}
+
+func (p *relaysitebalancesnapshotPager) applyCursors(query *RelaySiteBalanceSnapshotQuery, after, before *Cursor) (*RelaySiteBalanceSnapshotQuery, error) {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	for _, predicate := range entgql.CursorsPredicate(after, before, DefaultRelaySiteBalanceSnapshotOrder.Field.column, p.order.Field.column, direction) {
+		query = query.Where(predicate)
+	}
+	return query, nil
+}
+
+func (p *relaysitebalancesnapshotPager) applyOrder(query *RelaySiteBalanceSnapshotQuery) *RelaySiteBalanceSnapshotQuery {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	query = query.Order(p.order.Field.toTerm(direction.OrderTermOption()))
+	if p.order.Field != DefaultRelaySiteBalanceSnapshotOrder.Field {
+		query = query.Order(DefaultRelaySiteBalanceSnapshotOrder.Field.toTerm(direction.OrderTermOption()))
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return query
+}
+
+func (p *relaysitebalancesnapshotPager) orderExpr(query *RelaySiteBalanceSnapshotQuery) sql.Querier {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return sql.ExprFunc(func(b *sql.Builder) {
+		b.Ident(p.order.Field.column).Pad().WriteString(string(direction))
+		if p.order.Field != DefaultRelaySiteBalanceSnapshotOrder.Field {
+			b.Comma().Ident(DefaultRelaySiteBalanceSnapshotOrder.Field.column).Pad().WriteString(string(direction))
+		}
+	})
+}
+
+// Paginate executes the query and returns a relay based cursor connection to RelaySiteBalanceSnapshot.
+func (_m *RelaySiteBalanceSnapshotQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...RelaySiteBalanceSnapshotPaginateOption,
+) (*RelaySiteBalanceSnapshotConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newRelaySiteBalanceSnapshotPager(opts, last != nil)
+	if err != nil {
+		return nil, err
+	}
+	if _m, err = pager.applyFilter(_m); err != nil {
+		return nil, err
+	}
+	conn := &RelaySiteBalanceSnapshotConnection{Edges: []*RelaySiteBalanceSnapshotEdge{}}
+	ignoredEdges := !hasCollectedField(ctx, edgesField)
+	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
+		hasPagination := after != nil || first != nil || before != nil || last != nil
+		if hasPagination || ignoredEdges {
+			c := _m.Clone()
+			c.ctx.Fields = nil
+			if conn.TotalCount, err = c.Count(ctx); err != nil {
+				return nil, err
+			}
+			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
+			conn.PageInfo.HasPreviousPage = last != nil && conn.TotalCount > 0
+		}
+	}
+	if ignoredEdges || (first != nil && *first == 0) || (last != nil && *last == 0) {
+		return conn, nil
+	}
+	if _m, err = pager.applyCursors(_m, after, before); err != nil {
+		return nil, err
+	}
+	limit := paginateLimit(first, last)
+	if limit != 0 {
+		_m.Limit(limit)
+	}
+	if field := collectedField(ctx, edgesField, nodeField); field != nil {
+		if err := _m.collectField(ctx, limit == 1, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+			return nil, err
+		}
+	}
+	_m = pager.applyOrder(_m)
+	nodes, err := _m.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	conn.build(nodes, pager, after, first, before, last)
+	return conn, nil
+}
+
+var (
+	// RelaySiteBalanceSnapshotOrderFieldCreatedAt orders RelaySiteBalanceSnapshot by created_at.
+	RelaySiteBalanceSnapshotOrderFieldCreatedAt = &RelaySiteBalanceSnapshotOrderField{
+		Value: func(_m *RelaySiteBalanceSnapshot) (ent.Value, error) {
+			return _m.CreatedAt, nil
+		},
+		column: relaysitebalancesnapshot.FieldCreatedAt,
+		toTerm: relaysitebalancesnapshot.ByCreatedAt,
+		toCursor: func(_m *RelaySiteBalanceSnapshot) Cursor {
+			return Cursor{
+				ID:    _m.ID,
+				Value: _m.CreatedAt,
+			}
+		},
+	}
+	// RelaySiteBalanceSnapshotOrderFieldUpdatedAt orders RelaySiteBalanceSnapshot by updated_at.
+	RelaySiteBalanceSnapshotOrderFieldUpdatedAt = &RelaySiteBalanceSnapshotOrderField{
+		Value: func(_m *RelaySiteBalanceSnapshot) (ent.Value, error) {
+			return _m.UpdatedAt, nil
+		},
+		column: relaysitebalancesnapshot.FieldUpdatedAt,
+		toTerm: relaysitebalancesnapshot.ByUpdatedAt,
+		toCursor: func(_m *RelaySiteBalanceSnapshot) Cursor {
+			return Cursor{
+				ID:    _m.ID,
+				Value: _m.UpdatedAt,
+			}
+		},
+	}
+)
+
+// String implement fmt.Stringer interface.
+func (f RelaySiteBalanceSnapshotOrderField) String() string {
+	var str string
+	switch f.column {
+	case RelaySiteBalanceSnapshotOrderFieldCreatedAt.column:
+		str = "CREATED_AT"
+	case RelaySiteBalanceSnapshotOrderFieldUpdatedAt.column:
+		str = "UPDATED_AT"
+	}
+	return str
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (f RelaySiteBalanceSnapshotOrderField) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(f.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (f *RelaySiteBalanceSnapshotOrderField) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("RelaySiteBalanceSnapshotOrderField %T must be a string", v)
+	}
+	switch str {
+	case "CREATED_AT":
+		*f = *RelaySiteBalanceSnapshotOrderFieldCreatedAt
+	case "UPDATED_AT":
+		*f = *RelaySiteBalanceSnapshotOrderFieldUpdatedAt
+	default:
+		return fmt.Errorf("%s is not a valid RelaySiteBalanceSnapshotOrderField", str)
+	}
+	return nil
+}
+
+// RelaySiteBalanceSnapshotOrderField defines the ordering field of RelaySiteBalanceSnapshot.
+type RelaySiteBalanceSnapshotOrderField struct {
+	// Value extracts the ordering value from the given RelaySiteBalanceSnapshot.
+	Value    func(*RelaySiteBalanceSnapshot) (ent.Value, error)
+	column   string // field or computed.
+	toTerm   func(...sql.OrderTermOption) relaysitebalancesnapshot.OrderOption
+	toCursor func(*RelaySiteBalanceSnapshot) Cursor
+}
+
+// RelaySiteBalanceSnapshotOrder defines the ordering of RelaySiteBalanceSnapshot.
+type RelaySiteBalanceSnapshotOrder struct {
+	Direction OrderDirection                      `json:"direction"`
+	Field     *RelaySiteBalanceSnapshotOrderField `json:"field"`
+}
+
+// DefaultRelaySiteBalanceSnapshotOrder is the default ordering of RelaySiteBalanceSnapshot.
+var DefaultRelaySiteBalanceSnapshotOrder = &RelaySiteBalanceSnapshotOrder{
+	Direction: entgql.OrderDirectionAsc,
+	Field: &RelaySiteBalanceSnapshotOrderField{
+		Value: func(_m *RelaySiteBalanceSnapshot) (ent.Value, error) {
+			return _m.ID, nil
+		},
+		column: relaysitebalancesnapshot.FieldID,
+		toTerm: relaysitebalancesnapshot.ByID,
+		toCursor: func(_m *RelaySiteBalanceSnapshot) Cursor {
+			return Cursor{ID: _m.ID}
+		},
+	},
+}
+
+// ToEdge converts RelaySiteBalanceSnapshot into RelaySiteBalanceSnapshotEdge.
+func (_m *RelaySiteBalanceSnapshot) ToEdge(order *RelaySiteBalanceSnapshotOrder) *RelaySiteBalanceSnapshotEdge {
+	if order == nil {
+		order = DefaultRelaySiteBalanceSnapshotOrder
+	}
+	return &RelaySiteBalanceSnapshotEdge{
+		Node:   _m,
+		Cursor: order.Field.toCursor(_m),
+	}
+}
+
+// RelaySiteCheckinLogEdge is the edge representation of RelaySiteCheckinLog.
+type RelaySiteCheckinLogEdge struct {
+	Node   *RelaySiteCheckinLog `json:"node"`
+	Cursor Cursor               `json:"cursor"`
+}
+
+// RelaySiteCheckinLogConnection is the connection containing edges to RelaySiteCheckinLog.
+type RelaySiteCheckinLogConnection struct {
+	Edges      []*RelaySiteCheckinLogEdge `json:"edges"`
+	PageInfo   PageInfo                   `json:"pageInfo"`
+	TotalCount int                        `json:"totalCount"`
+}
+
+func (c *RelaySiteCheckinLogConnection) build(nodes []*RelaySiteCheckinLog, pager *relaysitecheckinlogPager, after *Cursor, first *int, before *Cursor, last *int) {
+	c.PageInfo.HasNextPage = before != nil
+	c.PageInfo.HasPreviousPage = after != nil
+	if first != nil && *first+1 == len(nodes) {
+		c.PageInfo.HasNextPage = true
+		nodes = nodes[:len(nodes)-1]
+	} else if last != nil && *last+1 == len(nodes) {
+		c.PageInfo.HasPreviousPage = true
+		nodes = nodes[:len(nodes)-1]
+	}
+	var nodeAt func(int) *RelaySiteCheckinLog
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *RelaySiteCheckinLog {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *RelaySiteCheckinLog {
+			return nodes[i]
+		}
+	}
+	c.Edges = make([]*RelaySiteCheckinLogEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		c.Edges[i] = &RelaySiteCheckinLogEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+	if l := len(c.Edges); l > 0 {
+		c.PageInfo.StartCursor = &c.Edges[0].Cursor
+		c.PageInfo.EndCursor = &c.Edges[l-1].Cursor
+	}
+	if c.TotalCount == 0 {
+		c.TotalCount = len(nodes)
+	}
+}
+
+// RelaySiteCheckinLogPaginateOption enables pagination customization.
+type RelaySiteCheckinLogPaginateOption func(*relaysitecheckinlogPager) error
+
+// WithRelaySiteCheckinLogOrder configures pagination ordering.
+func WithRelaySiteCheckinLogOrder(order *RelaySiteCheckinLogOrder) RelaySiteCheckinLogPaginateOption {
+	if order == nil {
+		order = DefaultRelaySiteCheckinLogOrder
+	}
+	o := *order
+	return func(pager *relaysitecheckinlogPager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultRelaySiteCheckinLogOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithRelaySiteCheckinLogFilter configures pagination filter.
+func WithRelaySiteCheckinLogFilter(filter func(*RelaySiteCheckinLogQuery) (*RelaySiteCheckinLogQuery, error)) RelaySiteCheckinLogPaginateOption {
+	return func(pager *relaysitecheckinlogPager) error {
+		if filter == nil {
+			return errors.New("RelaySiteCheckinLogQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type relaysitecheckinlogPager struct {
+	reverse bool
+	order   *RelaySiteCheckinLogOrder
+	filter  func(*RelaySiteCheckinLogQuery) (*RelaySiteCheckinLogQuery, error)
+}
+
+func newRelaySiteCheckinLogPager(opts []RelaySiteCheckinLogPaginateOption, reverse bool) (*relaysitecheckinlogPager, error) {
+	pager := &relaysitecheckinlogPager{reverse: reverse}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultRelaySiteCheckinLogOrder
+	}
+	return pager, nil
+}
+
+func (p *relaysitecheckinlogPager) applyFilter(query *RelaySiteCheckinLogQuery) (*RelaySiteCheckinLogQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *relaysitecheckinlogPager) toCursor(_m *RelaySiteCheckinLog) Cursor {
+	return p.order.Field.toCursor(_m)
+}
+
+func (p *relaysitecheckinlogPager) applyCursors(query *RelaySiteCheckinLogQuery, after, before *Cursor) (*RelaySiteCheckinLogQuery, error) {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	for _, predicate := range entgql.CursorsPredicate(after, before, DefaultRelaySiteCheckinLogOrder.Field.column, p.order.Field.column, direction) {
+		query = query.Where(predicate)
+	}
+	return query, nil
+}
+
+func (p *relaysitecheckinlogPager) applyOrder(query *RelaySiteCheckinLogQuery) *RelaySiteCheckinLogQuery {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	query = query.Order(p.order.Field.toTerm(direction.OrderTermOption()))
+	if p.order.Field != DefaultRelaySiteCheckinLogOrder.Field {
+		query = query.Order(DefaultRelaySiteCheckinLogOrder.Field.toTerm(direction.OrderTermOption()))
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return query
+}
+
+func (p *relaysitecheckinlogPager) orderExpr(query *RelaySiteCheckinLogQuery) sql.Querier {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return sql.ExprFunc(func(b *sql.Builder) {
+		b.Ident(p.order.Field.column).Pad().WriteString(string(direction))
+		if p.order.Field != DefaultRelaySiteCheckinLogOrder.Field {
+			b.Comma().Ident(DefaultRelaySiteCheckinLogOrder.Field.column).Pad().WriteString(string(direction))
+		}
+	})
+}
+
+// Paginate executes the query and returns a relay based cursor connection to RelaySiteCheckinLog.
+func (_m *RelaySiteCheckinLogQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...RelaySiteCheckinLogPaginateOption,
+) (*RelaySiteCheckinLogConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newRelaySiteCheckinLogPager(opts, last != nil)
+	if err != nil {
+		return nil, err
+	}
+	if _m, err = pager.applyFilter(_m); err != nil {
+		return nil, err
+	}
+	conn := &RelaySiteCheckinLogConnection{Edges: []*RelaySiteCheckinLogEdge{}}
+	ignoredEdges := !hasCollectedField(ctx, edgesField)
+	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
+		hasPagination := after != nil || first != nil || before != nil || last != nil
+		if hasPagination || ignoredEdges {
+			c := _m.Clone()
+			c.ctx.Fields = nil
+			if conn.TotalCount, err = c.Count(ctx); err != nil {
+				return nil, err
+			}
+			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
+			conn.PageInfo.HasPreviousPage = last != nil && conn.TotalCount > 0
+		}
+	}
+	if ignoredEdges || (first != nil && *first == 0) || (last != nil && *last == 0) {
+		return conn, nil
+	}
+	if _m, err = pager.applyCursors(_m, after, before); err != nil {
+		return nil, err
+	}
+	limit := paginateLimit(first, last)
+	if limit != 0 {
+		_m.Limit(limit)
+	}
+	if field := collectedField(ctx, edgesField, nodeField); field != nil {
+		if err := _m.collectField(ctx, limit == 1, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+			return nil, err
+		}
+	}
+	_m = pager.applyOrder(_m)
+	nodes, err := _m.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	conn.build(nodes, pager, after, first, before, last)
+	return conn, nil
+}
+
+var (
+	// RelaySiteCheckinLogOrderFieldCreatedAt orders RelaySiteCheckinLog by created_at.
+	RelaySiteCheckinLogOrderFieldCreatedAt = &RelaySiteCheckinLogOrderField{
+		Value: func(_m *RelaySiteCheckinLog) (ent.Value, error) {
+			return _m.CreatedAt, nil
+		},
+		column: relaysitecheckinlog.FieldCreatedAt,
+		toTerm: relaysitecheckinlog.ByCreatedAt,
+		toCursor: func(_m *RelaySiteCheckinLog) Cursor {
+			return Cursor{
+				ID:    _m.ID,
+				Value: _m.CreatedAt,
+			}
+		},
+	}
+	// RelaySiteCheckinLogOrderFieldUpdatedAt orders RelaySiteCheckinLog by updated_at.
+	RelaySiteCheckinLogOrderFieldUpdatedAt = &RelaySiteCheckinLogOrderField{
+		Value: func(_m *RelaySiteCheckinLog) (ent.Value, error) {
+			return _m.UpdatedAt, nil
+		},
+		column: relaysitecheckinlog.FieldUpdatedAt,
+		toTerm: relaysitecheckinlog.ByUpdatedAt,
+		toCursor: func(_m *RelaySiteCheckinLog) Cursor {
+			return Cursor{
+				ID:    _m.ID,
+				Value: _m.UpdatedAt,
+			}
+		},
+	}
+)
+
+// String implement fmt.Stringer interface.
+func (f RelaySiteCheckinLogOrderField) String() string {
+	var str string
+	switch f.column {
+	case RelaySiteCheckinLogOrderFieldCreatedAt.column:
+		str = "CREATED_AT"
+	case RelaySiteCheckinLogOrderFieldUpdatedAt.column:
+		str = "UPDATED_AT"
+	}
+	return str
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (f RelaySiteCheckinLogOrderField) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(f.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (f *RelaySiteCheckinLogOrderField) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("RelaySiteCheckinLogOrderField %T must be a string", v)
+	}
+	switch str {
+	case "CREATED_AT":
+		*f = *RelaySiteCheckinLogOrderFieldCreatedAt
+	case "UPDATED_AT":
+		*f = *RelaySiteCheckinLogOrderFieldUpdatedAt
+	default:
+		return fmt.Errorf("%s is not a valid RelaySiteCheckinLogOrderField", str)
+	}
+	return nil
+}
+
+// RelaySiteCheckinLogOrderField defines the ordering field of RelaySiteCheckinLog.
+type RelaySiteCheckinLogOrderField struct {
+	// Value extracts the ordering value from the given RelaySiteCheckinLog.
+	Value    func(*RelaySiteCheckinLog) (ent.Value, error)
+	column   string // field or computed.
+	toTerm   func(...sql.OrderTermOption) relaysitecheckinlog.OrderOption
+	toCursor func(*RelaySiteCheckinLog) Cursor
+}
+
+// RelaySiteCheckinLogOrder defines the ordering of RelaySiteCheckinLog.
+type RelaySiteCheckinLogOrder struct {
+	Direction OrderDirection                 `json:"direction"`
+	Field     *RelaySiteCheckinLogOrderField `json:"field"`
+}
+
+// DefaultRelaySiteCheckinLogOrder is the default ordering of RelaySiteCheckinLog.
+var DefaultRelaySiteCheckinLogOrder = &RelaySiteCheckinLogOrder{
+	Direction: entgql.OrderDirectionAsc,
+	Field: &RelaySiteCheckinLogOrderField{
+		Value: func(_m *RelaySiteCheckinLog) (ent.Value, error) {
+			return _m.ID, nil
+		},
+		column: relaysitecheckinlog.FieldID,
+		toTerm: relaysitecheckinlog.ByID,
+		toCursor: func(_m *RelaySiteCheckinLog) Cursor {
+			return Cursor{ID: _m.ID}
+		},
+	},
+}
+
+// ToEdge converts RelaySiteCheckinLog into RelaySiteCheckinLogEdge.
+func (_m *RelaySiteCheckinLog) ToEdge(order *RelaySiteCheckinLogOrder) *RelaySiteCheckinLogEdge {
+	if order == nil {
+		order = DefaultRelaySiteCheckinLogOrder
+	}
+	return &RelaySiteCheckinLogEdge{
+		Node:   _m,
+		Cursor: order.Field.toCursor(_m),
+	}
+}
+
+// RelaySiteGroupEdge is the edge representation of RelaySiteGroup.
+type RelaySiteGroupEdge struct {
+	Node   *RelaySiteGroup `json:"node"`
+	Cursor Cursor          `json:"cursor"`
+}
+
+// RelaySiteGroupConnection is the connection containing edges to RelaySiteGroup.
+type RelaySiteGroupConnection struct {
+	Edges      []*RelaySiteGroupEdge `json:"edges"`
+	PageInfo   PageInfo              `json:"pageInfo"`
+	TotalCount int                   `json:"totalCount"`
+}
+
+func (c *RelaySiteGroupConnection) build(nodes []*RelaySiteGroup, pager *relaysitegroupPager, after *Cursor, first *int, before *Cursor, last *int) {
+	c.PageInfo.HasNextPage = before != nil
+	c.PageInfo.HasPreviousPage = after != nil
+	if first != nil && *first+1 == len(nodes) {
+		c.PageInfo.HasNextPage = true
+		nodes = nodes[:len(nodes)-1]
+	} else if last != nil && *last+1 == len(nodes) {
+		c.PageInfo.HasPreviousPage = true
+		nodes = nodes[:len(nodes)-1]
+	}
+	var nodeAt func(int) *RelaySiteGroup
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *RelaySiteGroup {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *RelaySiteGroup {
+			return nodes[i]
+		}
+	}
+	c.Edges = make([]*RelaySiteGroupEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		c.Edges[i] = &RelaySiteGroupEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+	if l := len(c.Edges); l > 0 {
+		c.PageInfo.StartCursor = &c.Edges[0].Cursor
+		c.PageInfo.EndCursor = &c.Edges[l-1].Cursor
+	}
+	if c.TotalCount == 0 {
+		c.TotalCount = len(nodes)
+	}
+}
+
+// RelaySiteGroupPaginateOption enables pagination customization.
+type RelaySiteGroupPaginateOption func(*relaysitegroupPager) error
+
+// WithRelaySiteGroupOrder configures pagination ordering.
+func WithRelaySiteGroupOrder(order *RelaySiteGroupOrder) RelaySiteGroupPaginateOption {
+	if order == nil {
+		order = DefaultRelaySiteGroupOrder
+	}
+	o := *order
+	return func(pager *relaysitegroupPager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultRelaySiteGroupOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithRelaySiteGroupFilter configures pagination filter.
+func WithRelaySiteGroupFilter(filter func(*RelaySiteGroupQuery) (*RelaySiteGroupQuery, error)) RelaySiteGroupPaginateOption {
+	return func(pager *relaysitegroupPager) error {
+		if filter == nil {
+			return errors.New("RelaySiteGroupQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type relaysitegroupPager struct {
+	reverse bool
+	order   *RelaySiteGroupOrder
+	filter  func(*RelaySiteGroupQuery) (*RelaySiteGroupQuery, error)
+}
+
+func newRelaySiteGroupPager(opts []RelaySiteGroupPaginateOption, reverse bool) (*relaysitegroupPager, error) {
+	pager := &relaysitegroupPager{reverse: reverse}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultRelaySiteGroupOrder
+	}
+	return pager, nil
+}
+
+func (p *relaysitegroupPager) applyFilter(query *RelaySiteGroupQuery) (*RelaySiteGroupQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *relaysitegroupPager) toCursor(_m *RelaySiteGroup) Cursor {
+	return p.order.Field.toCursor(_m)
+}
+
+func (p *relaysitegroupPager) applyCursors(query *RelaySiteGroupQuery, after, before *Cursor) (*RelaySiteGroupQuery, error) {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	for _, predicate := range entgql.CursorsPredicate(after, before, DefaultRelaySiteGroupOrder.Field.column, p.order.Field.column, direction) {
+		query = query.Where(predicate)
+	}
+	return query, nil
+}
+
+func (p *relaysitegroupPager) applyOrder(query *RelaySiteGroupQuery) *RelaySiteGroupQuery {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	query = query.Order(p.order.Field.toTerm(direction.OrderTermOption()))
+	if p.order.Field != DefaultRelaySiteGroupOrder.Field {
+		query = query.Order(DefaultRelaySiteGroupOrder.Field.toTerm(direction.OrderTermOption()))
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return query
+}
+
+func (p *relaysitegroupPager) orderExpr(query *RelaySiteGroupQuery) sql.Querier {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return sql.ExprFunc(func(b *sql.Builder) {
+		b.Ident(p.order.Field.column).Pad().WriteString(string(direction))
+		if p.order.Field != DefaultRelaySiteGroupOrder.Field {
+			b.Comma().Ident(DefaultRelaySiteGroupOrder.Field.column).Pad().WriteString(string(direction))
+		}
+	})
+}
+
+// Paginate executes the query and returns a relay based cursor connection to RelaySiteGroup.
+func (_m *RelaySiteGroupQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...RelaySiteGroupPaginateOption,
+) (*RelaySiteGroupConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newRelaySiteGroupPager(opts, last != nil)
+	if err != nil {
+		return nil, err
+	}
+	if _m, err = pager.applyFilter(_m); err != nil {
+		return nil, err
+	}
+	conn := &RelaySiteGroupConnection{Edges: []*RelaySiteGroupEdge{}}
+	ignoredEdges := !hasCollectedField(ctx, edgesField)
+	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
+		hasPagination := after != nil || first != nil || before != nil || last != nil
+		if hasPagination || ignoredEdges {
+			c := _m.Clone()
+			c.ctx.Fields = nil
+			if conn.TotalCount, err = c.Count(ctx); err != nil {
+				return nil, err
+			}
+			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
+			conn.PageInfo.HasPreviousPage = last != nil && conn.TotalCount > 0
+		}
+	}
+	if ignoredEdges || (first != nil && *first == 0) || (last != nil && *last == 0) {
+		return conn, nil
+	}
+	if _m, err = pager.applyCursors(_m, after, before); err != nil {
+		return nil, err
+	}
+	limit := paginateLimit(first, last)
+	if limit != 0 {
+		_m.Limit(limit)
+	}
+	if field := collectedField(ctx, edgesField, nodeField); field != nil {
+		if err := _m.collectField(ctx, limit == 1, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+			return nil, err
+		}
+	}
+	_m = pager.applyOrder(_m)
+	nodes, err := _m.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	conn.build(nodes, pager, after, first, before, last)
+	return conn, nil
+}
+
+var (
+	// RelaySiteGroupOrderFieldCreatedAt orders RelaySiteGroup by created_at.
+	RelaySiteGroupOrderFieldCreatedAt = &RelaySiteGroupOrderField{
+		Value: func(_m *RelaySiteGroup) (ent.Value, error) {
+			return _m.CreatedAt, nil
+		},
+		column: relaysitegroup.FieldCreatedAt,
+		toTerm: relaysitegroup.ByCreatedAt,
+		toCursor: func(_m *RelaySiteGroup) Cursor {
+			return Cursor{
+				ID:    _m.ID,
+				Value: _m.CreatedAt,
+			}
+		},
+	}
+	// RelaySiteGroupOrderFieldUpdatedAt orders RelaySiteGroup by updated_at.
+	RelaySiteGroupOrderFieldUpdatedAt = &RelaySiteGroupOrderField{
+		Value: func(_m *RelaySiteGroup) (ent.Value, error) {
+			return _m.UpdatedAt, nil
+		},
+		column: relaysitegroup.FieldUpdatedAt,
+		toTerm: relaysitegroup.ByUpdatedAt,
+		toCursor: func(_m *RelaySiteGroup) Cursor {
+			return Cursor{
+				ID:    _m.ID,
+				Value: _m.UpdatedAt,
+			}
+		},
+	}
+)
+
+// String implement fmt.Stringer interface.
+func (f RelaySiteGroupOrderField) String() string {
+	var str string
+	switch f.column {
+	case RelaySiteGroupOrderFieldCreatedAt.column:
+		str = "CREATED_AT"
+	case RelaySiteGroupOrderFieldUpdatedAt.column:
+		str = "UPDATED_AT"
+	}
+	return str
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (f RelaySiteGroupOrderField) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(f.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (f *RelaySiteGroupOrderField) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("RelaySiteGroupOrderField %T must be a string", v)
+	}
+	switch str {
+	case "CREATED_AT":
+		*f = *RelaySiteGroupOrderFieldCreatedAt
+	case "UPDATED_AT":
+		*f = *RelaySiteGroupOrderFieldUpdatedAt
+	default:
+		return fmt.Errorf("%s is not a valid RelaySiteGroupOrderField", str)
+	}
+	return nil
+}
+
+// RelaySiteGroupOrderField defines the ordering field of RelaySiteGroup.
+type RelaySiteGroupOrderField struct {
+	// Value extracts the ordering value from the given RelaySiteGroup.
+	Value    func(*RelaySiteGroup) (ent.Value, error)
+	column   string // field or computed.
+	toTerm   func(...sql.OrderTermOption) relaysitegroup.OrderOption
+	toCursor func(*RelaySiteGroup) Cursor
+}
+
+// RelaySiteGroupOrder defines the ordering of RelaySiteGroup.
+type RelaySiteGroupOrder struct {
+	Direction OrderDirection            `json:"direction"`
+	Field     *RelaySiteGroupOrderField `json:"field"`
+}
+
+// DefaultRelaySiteGroupOrder is the default ordering of RelaySiteGroup.
+var DefaultRelaySiteGroupOrder = &RelaySiteGroupOrder{
+	Direction: entgql.OrderDirectionAsc,
+	Field: &RelaySiteGroupOrderField{
+		Value: func(_m *RelaySiteGroup) (ent.Value, error) {
+			return _m.ID, nil
+		},
+		column: relaysitegroup.FieldID,
+		toTerm: relaysitegroup.ByID,
+		toCursor: func(_m *RelaySiteGroup) Cursor {
+			return Cursor{ID: _m.ID}
+		},
+	},
+}
+
+// ToEdge converts RelaySiteGroup into RelaySiteGroupEdge.
+func (_m *RelaySiteGroup) ToEdge(order *RelaySiteGroupOrder) *RelaySiteGroupEdge {
+	if order == nil {
+		order = DefaultRelaySiteGroupOrder
+	}
+	return &RelaySiteGroupEdge{
+		Node:   _m,
+		Cursor: order.Field.toCursor(_m),
+	}
+}
+
+// RelaySiteModelPriceEdge is the edge representation of RelaySiteModelPrice.
+type RelaySiteModelPriceEdge struct {
+	Node   *RelaySiteModelPrice `json:"node"`
+	Cursor Cursor               `json:"cursor"`
+}
+
+// RelaySiteModelPriceConnection is the connection containing edges to RelaySiteModelPrice.
+type RelaySiteModelPriceConnection struct {
+	Edges      []*RelaySiteModelPriceEdge `json:"edges"`
+	PageInfo   PageInfo                   `json:"pageInfo"`
+	TotalCount int                        `json:"totalCount"`
+}
+
+func (c *RelaySiteModelPriceConnection) build(nodes []*RelaySiteModelPrice, pager *relaysitemodelpricePager, after *Cursor, first *int, before *Cursor, last *int) {
+	c.PageInfo.HasNextPage = before != nil
+	c.PageInfo.HasPreviousPage = after != nil
+	if first != nil && *first+1 == len(nodes) {
+		c.PageInfo.HasNextPage = true
+		nodes = nodes[:len(nodes)-1]
+	} else if last != nil && *last+1 == len(nodes) {
+		c.PageInfo.HasPreviousPage = true
+		nodes = nodes[:len(nodes)-1]
+	}
+	var nodeAt func(int) *RelaySiteModelPrice
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *RelaySiteModelPrice {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *RelaySiteModelPrice {
+			return nodes[i]
+		}
+	}
+	c.Edges = make([]*RelaySiteModelPriceEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		c.Edges[i] = &RelaySiteModelPriceEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+	if l := len(c.Edges); l > 0 {
+		c.PageInfo.StartCursor = &c.Edges[0].Cursor
+		c.PageInfo.EndCursor = &c.Edges[l-1].Cursor
+	}
+	if c.TotalCount == 0 {
+		c.TotalCount = len(nodes)
+	}
+}
+
+// RelaySiteModelPricePaginateOption enables pagination customization.
+type RelaySiteModelPricePaginateOption func(*relaysitemodelpricePager) error
+
+// WithRelaySiteModelPriceOrder configures pagination ordering.
+func WithRelaySiteModelPriceOrder(order *RelaySiteModelPriceOrder) RelaySiteModelPricePaginateOption {
+	if order == nil {
+		order = DefaultRelaySiteModelPriceOrder
+	}
+	o := *order
+	return func(pager *relaysitemodelpricePager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultRelaySiteModelPriceOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithRelaySiteModelPriceFilter configures pagination filter.
+func WithRelaySiteModelPriceFilter(filter func(*RelaySiteModelPriceQuery) (*RelaySiteModelPriceQuery, error)) RelaySiteModelPricePaginateOption {
+	return func(pager *relaysitemodelpricePager) error {
+		if filter == nil {
+			return errors.New("RelaySiteModelPriceQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type relaysitemodelpricePager struct {
+	reverse bool
+	order   *RelaySiteModelPriceOrder
+	filter  func(*RelaySiteModelPriceQuery) (*RelaySiteModelPriceQuery, error)
+}
+
+func newRelaySiteModelPricePager(opts []RelaySiteModelPricePaginateOption, reverse bool) (*relaysitemodelpricePager, error) {
+	pager := &relaysitemodelpricePager{reverse: reverse}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultRelaySiteModelPriceOrder
+	}
+	return pager, nil
+}
+
+func (p *relaysitemodelpricePager) applyFilter(query *RelaySiteModelPriceQuery) (*RelaySiteModelPriceQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *relaysitemodelpricePager) toCursor(_m *RelaySiteModelPrice) Cursor {
+	return p.order.Field.toCursor(_m)
+}
+
+func (p *relaysitemodelpricePager) applyCursors(query *RelaySiteModelPriceQuery, after, before *Cursor) (*RelaySiteModelPriceQuery, error) {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	for _, predicate := range entgql.CursorsPredicate(after, before, DefaultRelaySiteModelPriceOrder.Field.column, p.order.Field.column, direction) {
+		query = query.Where(predicate)
+	}
+	return query, nil
+}
+
+func (p *relaysitemodelpricePager) applyOrder(query *RelaySiteModelPriceQuery) *RelaySiteModelPriceQuery {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	query = query.Order(p.order.Field.toTerm(direction.OrderTermOption()))
+	if p.order.Field != DefaultRelaySiteModelPriceOrder.Field {
+		query = query.Order(DefaultRelaySiteModelPriceOrder.Field.toTerm(direction.OrderTermOption()))
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return query
+}
+
+func (p *relaysitemodelpricePager) orderExpr(query *RelaySiteModelPriceQuery) sql.Querier {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return sql.ExprFunc(func(b *sql.Builder) {
+		b.Ident(p.order.Field.column).Pad().WriteString(string(direction))
+		if p.order.Field != DefaultRelaySiteModelPriceOrder.Field {
+			b.Comma().Ident(DefaultRelaySiteModelPriceOrder.Field.column).Pad().WriteString(string(direction))
+		}
+	})
+}
+
+// Paginate executes the query and returns a relay based cursor connection to RelaySiteModelPrice.
+func (_m *RelaySiteModelPriceQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...RelaySiteModelPricePaginateOption,
+) (*RelaySiteModelPriceConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newRelaySiteModelPricePager(opts, last != nil)
+	if err != nil {
+		return nil, err
+	}
+	if _m, err = pager.applyFilter(_m); err != nil {
+		return nil, err
+	}
+	conn := &RelaySiteModelPriceConnection{Edges: []*RelaySiteModelPriceEdge{}}
+	ignoredEdges := !hasCollectedField(ctx, edgesField)
+	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
+		hasPagination := after != nil || first != nil || before != nil || last != nil
+		if hasPagination || ignoredEdges {
+			c := _m.Clone()
+			c.ctx.Fields = nil
+			if conn.TotalCount, err = c.Count(ctx); err != nil {
+				return nil, err
+			}
+			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
+			conn.PageInfo.HasPreviousPage = last != nil && conn.TotalCount > 0
+		}
+	}
+	if ignoredEdges || (first != nil && *first == 0) || (last != nil && *last == 0) {
+		return conn, nil
+	}
+	if _m, err = pager.applyCursors(_m, after, before); err != nil {
+		return nil, err
+	}
+	limit := paginateLimit(first, last)
+	if limit != 0 {
+		_m.Limit(limit)
+	}
+	if field := collectedField(ctx, edgesField, nodeField); field != nil {
+		if err := _m.collectField(ctx, limit == 1, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+			return nil, err
+		}
+	}
+	_m = pager.applyOrder(_m)
+	nodes, err := _m.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	conn.build(nodes, pager, after, first, before, last)
+	return conn, nil
+}
+
+var (
+	// RelaySiteModelPriceOrderFieldCreatedAt orders RelaySiteModelPrice by created_at.
+	RelaySiteModelPriceOrderFieldCreatedAt = &RelaySiteModelPriceOrderField{
+		Value: func(_m *RelaySiteModelPrice) (ent.Value, error) {
+			return _m.CreatedAt, nil
+		},
+		column: relaysitemodelprice.FieldCreatedAt,
+		toTerm: relaysitemodelprice.ByCreatedAt,
+		toCursor: func(_m *RelaySiteModelPrice) Cursor {
+			return Cursor{
+				ID:    _m.ID,
+				Value: _m.CreatedAt,
+			}
+		},
+	}
+	// RelaySiteModelPriceOrderFieldUpdatedAt orders RelaySiteModelPrice by updated_at.
+	RelaySiteModelPriceOrderFieldUpdatedAt = &RelaySiteModelPriceOrderField{
+		Value: func(_m *RelaySiteModelPrice) (ent.Value, error) {
+			return _m.UpdatedAt, nil
+		},
+		column: relaysitemodelprice.FieldUpdatedAt,
+		toTerm: relaysitemodelprice.ByUpdatedAt,
+		toCursor: func(_m *RelaySiteModelPrice) Cursor {
+			return Cursor{
+				ID:    _m.ID,
+				Value: _m.UpdatedAt,
+			}
+		},
+	}
+)
+
+// String implement fmt.Stringer interface.
+func (f RelaySiteModelPriceOrderField) String() string {
+	var str string
+	switch f.column {
+	case RelaySiteModelPriceOrderFieldCreatedAt.column:
+		str = "CREATED_AT"
+	case RelaySiteModelPriceOrderFieldUpdatedAt.column:
+		str = "UPDATED_AT"
+	}
+	return str
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (f RelaySiteModelPriceOrderField) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(f.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (f *RelaySiteModelPriceOrderField) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("RelaySiteModelPriceOrderField %T must be a string", v)
+	}
+	switch str {
+	case "CREATED_AT":
+		*f = *RelaySiteModelPriceOrderFieldCreatedAt
+	case "UPDATED_AT":
+		*f = *RelaySiteModelPriceOrderFieldUpdatedAt
+	default:
+		return fmt.Errorf("%s is not a valid RelaySiteModelPriceOrderField", str)
+	}
+	return nil
+}
+
+// RelaySiteModelPriceOrderField defines the ordering field of RelaySiteModelPrice.
+type RelaySiteModelPriceOrderField struct {
+	// Value extracts the ordering value from the given RelaySiteModelPrice.
+	Value    func(*RelaySiteModelPrice) (ent.Value, error)
+	column   string // field or computed.
+	toTerm   func(...sql.OrderTermOption) relaysitemodelprice.OrderOption
+	toCursor func(*RelaySiteModelPrice) Cursor
+}
+
+// RelaySiteModelPriceOrder defines the ordering of RelaySiteModelPrice.
+type RelaySiteModelPriceOrder struct {
+	Direction OrderDirection                 `json:"direction"`
+	Field     *RelaySiteModelPriceOrderField `json:"field"`
+}
+
+// DefaultRelaySiteModelPriceOrder is the default ordering of RelaySiteModelPrice.
+var DefaultRelaySiteModelPriceOrder = &RelaySiteModelPriceOrder{
+	Direction: entgql.OrderDirectionAsc,
+	Field: &RelaySiteModelPriceOrderField{
+		Value: func(_m *RelaySiteModelPrice) (ent.Value, error) {
+			return _m.ID, nil
+		},
+		column: relaysitemodelprice.FieldID,
+		toTerm: relaysitemodelprice.ByID,
+		toCursor: func(_m *RelaySiteModelPrice) Cursor {
+			return Cursor{ID: _m.ID}
+		},
+	},
+}
+
+// ToEdge converts RelaySiteModelPrice into RelaySiteModelPriceEdge.
+func (_m *RelaySiteModelPrice) ToEdge(order *RelaySiteModelPriceOrder) *RelaySiteModelPriceEdge {
+	if order == nil {
+		order = DefaultRelaySiteModelPriceOrder
+	}
+	return &RelaySiteModelPriceEdge{
 		Node:   _m,
 		Cursor: order.Field.toCursor(_m),
 	}
