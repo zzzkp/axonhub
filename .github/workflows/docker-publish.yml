@@ -57,7 +57,7 @@ jobs:
         uses: docker/metadata-action@v6
         with:
           images: |
-            looplj/axonhub
+            ${{ secrets.DOCKERHUB_USERNAME }}/axonhub
 
       - name: Build & push single-arch (to both registries)
         uses: docker/build-push-action@v7
@@ -66,8 +66,8 @@ jobs:
           platforms: ${{ matrix.platform }}
           push: true
           tags: |
-            looplj/axonhub:${{ env.TAG }}-${{ matrix.arch }}
-            looplj/axonhub:latest-${{ matrix.arch }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/axonhub:${{ env.TAG }}-${{ matrix.arch }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/axonhub:latest-${{ matrix.arch }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -92,13 +92,13 @@ jobs:
       - name: Create & push manifest (Docker Hub - version)
         run: |
           docker buildx imagetools create \
-            -t looplj/axonhub:${TAG} \
-            looplj/axonhub:${TAG}-amd64 \
-            looplj/axonhub:${TAG}-arm64
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/axonhub:${TAG} \
+            ${{ secrets.DOCKERHUB_USERNAME }}/axonhub:${TAG}-amd64 \
+            ${{ secrets.DOCKERHUB_USERNAME }}/axonhub:${TAG}-arm64
 
       - name: Create & push manifest (Docker Hub - latest)
         run: |
           docker buildx imagetools create \
-            -t looplj/axonhub:latest \
-            looplj/axonhub:latest-amd64 \
-            looplj/axonhub:latest-arm64
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/axonhub:latest \
+            ${{ secrets.DOCKERHUB_USERNAME }}/axonhub:latest-amd64 \
+            ${{ secrets.DOCKERHUB_USERNAME }}/axonhub:latest-arm64
