@@ -44,6 +44,10 @@ const (
 	FieldLastCheckinAt = "last_checkin_at"
 	// FieldLastCheckinResult holds the string denoting the last_checkin_result field in the database.
 	FieldLastCheckinResult = "last_checkin_result"
+	// FieldCheckinPageURL holds the string denoting the checkin_page_url field in the database.
+	FieldCheckinPageURL = "checkin_page_url"
+	// FieldExternalCheckinPageURL holds the string denoting the external_checkin_page_url field in the database.
+	FieldExternalCheckinPageURL = "external_checkin_page_url"
 	// EdgeCredential holds the string denoting the credential edge name in mutations.
 	EdgeCredential = "credential"
 	// EdgeAPIKeys holds the string denoting the api_keys edge name in mutations.
@@ -127,6 +131,8 @@ var Columns = []string{
 	FieldLastSyncError,
 	FieldLastCheckinAt,
 	FieldLastCheckinResult,
+	FieldCheckinPageURL,
+	FieldExternalCheckinPageURL,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -283,6 +289,16 @@ func ByLastCheckinAt(opts ...sql.OrderTermOption) OrderOption {
 // ByLastCheckinResult orders the results by the last_checkin_result field.
 func ByLastCheckinResult(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldLastCheckinResult, opts...).ToFunc()
+}
+
+// ByCheckinPageURL orders the results by the checkin_page_url field.
+func ByCheckinPageURL(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCheckinPageURL, opts...).ToFunc()
+}
+
+// ByExternalCheckinPageURL orders the results by the external_checkin_page_url field.
+func ByExternalCheckinPageURL(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldExternalCheckinPageURL, opts...).ToFunc()
 }
 
 // ByCredentialField orders the results by credential field.

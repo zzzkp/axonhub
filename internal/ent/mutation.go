@@ -16244,47 +16244,49 @@ func (m *ProviderQuotaStatusMutation) ResetEdge(name string) error {
 // RelaySiteMutation represents an operation that mutates the RelaySite nodes in the graph.
 type RelaySiteMutation struct {
 	config
-	op                       Op
-	typ                      string
-	id                       *int
-	created_at               *time.Time
-	updated_at               *time.Time
-	deleted_at               *int
-	adddeleted_at            *int
-	name                     *string
-	_type                    *relaysite.Type
-	base_url                 *string
-	status                   *relaysite.Status
-	auto_checkin_enabled     *bool
-	remark                   *string
-	last_synced_at           *time.Time
-	last_sync_error          *string
-	last_checkin_at          *time.Time
-	last_checkin_result      *string
-	clearedFields            map[string]struct{}
-	credential               *int
-	clearedcredential        bool
-	api_keys                 map[int]struct{}
-	removedapi_keys          map[int]struct{}
-	clearedapi_keys          bool
-	groups                   map[int]struct{}
-	removedgroups            map[int]struct{}
-	clearedgroups            bool
-	balance_snapshots        map[int]struct{}
-	removedbalance_snapshots map[int]struct{}
-	clearedbalance_snapshots bool
-	model_prices             map[int]struct{}
-	removedmodel_prices      map[int]struct{}
-	clearedmodel_prices      bool
-	checkin_logs             map[int]struct{}
-	removedcheckin_logs      map[int]struct{}
-	clearedcheckin_logs      bool
-	announcements            map[int]struct{}
-	removedannouncements     map[int]struct{}
-	clearedannouncements     bool
-	done                     bool
-	oldValue                 func(context.Context) (*RelaySite, error)
-	predicates               []predicate.RelaySite
+	op                        Op
+	typ                       string
+	id                        *int
+	created_at                *time.Time
+	updated_at                *time.Time
+	deleted_at                *int
+	adddeleted_at             *int
+	name                      *string
+	_type                     *relaysite.Type
+	base_url                  *string
+	status                    *relaysite.Status
+	auto_checkin_enabled      *bool
+	remark                    *string
+	last_synced_at            *time.Time
+	last_sync_error           *string
+	last_checkin_at           *time.Time
+	last_checkin_result       *string
+	checkin_page_url          *string
+	external_checkin_page_url *string
+	clearedFields             map[string]struct{}
+	credential                *int
+	clearedcredential         bool
+	api_keys                  map[int]struct{}
+	removedapi_keys           map[int]struct{}
+	clearedapi_keys           bool
+	groups                    map[int]struct{}
+	removedgroups             map[int]struct{}
+	clearedgroups             bool
+	balance_snapshots         map[int]struct{}
+	removedbalance_snapshots  map[int]struct{}
+	clearedbalance_snapshots  bool
+	model_prices              map[int]struct{}
+	removedmodel_prices       map[int]struct{}
+	clearedmodel_prices       bool
+	checkin_logs              map[int]struct{}
+	removedcheckin_logs       map[int]struct{}
+	clearedcheckin_logs       bool
+	announcements             map[int]struct{}
+	removedannouncements      map[int]struct{}
+	clearedannouncements      bool
+	done                      bool
+	oldValue                  func(context.Context) (*RelaySite, error)
+	predicates                []predicate.RelaySite
 }
 
 var _ ent.Mutation = (*RelaySiteMutation)(nil)
@@ -16938,6 +16940,104 @@ func (m *RelaySiteMutation) ResetLastCheckinResult() {
 	delete(m.clearedFields, relaysite.FieldLastCheckinResult)
 }
 
+// SetCheckinPageURL sets the "checkin_page_url" field.
+func (m *RelaySiteMutation) SetCheckinPageURL(s string) {
+	m.checkin_page_url = &s
+}
+
+// CheckinPageURL returns the value of the "checkin_page_url" field in the mutation.
+func (m *RelaySiteMutation) CheckinPageURL() (r string, exists bool) {
+	v := m.checkin_page_url
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCheckinPageURL returns the old "checkin_page_url" field's value of the RelaySite entity.
+// If the RelaySite object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RelaySiteMutation) OldCheckinPageURL(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCheckinPageURL is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCheckinPageURL requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCheckinPageURL: %w", err)
+	}
+	return oldValue.CheckinPageURL, nil
+}
+
+// ClearCheckinPageURL clears the value of the "checkin_page_url" field.
+func (m *RelaySiteMutation) ClearCheckinPageURL() {
+	m.checkin_page_url = nil
+	m.clearedFields[relaysite.FieldCheckinPageURL] = struct{}{}
+}
+
+// CheckinPageURLCleared returns if the "checkin_page_url" field was cleared in this mutation.
+func (m *RelaySiteMutation) CheckinPageURLCleared() bool {
+	_, ok := m.clearedFields[relaysite.FieldCheckinPageURL]
+	return ok
+}
+
+// ResetCheckinPageURL resets all changes to the "checkin_page_url" field.
+func (m *RelaySiteMutation) ResetCheckinPageURL() {
+	m.checkin_page_url = nil
+	delete(m.clearedFields, relaysite.FieldCheckinPageURL)
+}
+
+// SetExternalCheckinPageURL sets the "external_checkin_page_url" field.
+func (m *RelaySiteMutation) SetExternalCheckinPageURL(s string) {
+	m.external_checkin_page_url = &s
+}
+
+// ExternalCheckinPageURL returns the value of the "external_checkin_page_url" field in the mutation.
+func (m *RelaySiteMutation) ExternalCheckinPageURL() (r string, exists bool) {
+	v := m.external_checkin_page_url
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldExternalCheckinPageURL returns the old "external_checkin_page_url" field's value of the RelaySite entity.
+// If the RelaySite object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RelaySiteMutation) OldExternalCheckinPageURL(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldExternalCheckinPageURL is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldExternalCheckinPageURL requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldExternalCheckinPageURL: %w", err)
+	}
+	return oldValue.ExternalCheckinPageURL, nil
+}
+
+// ClearExternalCheckinPageURL clears the value of the "external_checkin_page_url" field.
+func (m *RelaySiteMutation) ClearExternalCheckinPageURL() {
+	m.external_checkin_page_url = nil
+	m.clearedFields[relaysite.FieldExternalCheckinPageURL] = struct{}{}
+}
+
+// ExternalCheckinPageURLCleared returns if the "external_checkin_page_url" field was cleared in this mutation.
+func (m *RelaySiteMutation) ExternalCheckinPageURLCleared() bool {
+	_, ok := m.clearedFields[relaysite.FieldExternalCheckinPageURL]
+	return ok
+}
+
+// ResetExternalCheckinPageURL resets all changes to the "external_checkin_page_url" field.
+func (m *RelaySiteMutation) ResetExternalCheckinPageURL() {
+	m.external_checkin_page_url = nil
+	delete(m.clearedFields, relaysite.FieldExternalCheckinPageURL)
+}
+
 // SetCredentialID sets the "credential" edge to the RelaySiteCredential entity by id.
 func (m *RelaySiteMutation) SetCredentialID(id int) {
 	m.credential = &id
@@ -17335,7 +17435,7 @@ func (m *RelaySiteMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *RelaySiteMutation) Fields() []string {
-	fields := make([]string, 0, 13)
+	fields := make([]string, 0, 15)
 	if m.created_at != nil {
 		fields = append(fields, relaysite.FieldCreatedAt)
 	}
@@ -17375,6 +17475,12 @@ func (m *RelaySiteMutation) Fields() []string {
 	if m.last_checkin_result != nil {
 		fields = append(fields, relaysite.FieldLastCheckinResult)
 	}
+	if m.checkin_page_url != nil {
+		fields = append(fields, relaysite.FieldCheckinPageURL)
+	}
+	if m.external_checkin_page_url != nil {
+		fields = append(fields, relaysite.FieldExternalCheckinPageURL)
+	}
 	return fields
 }
 
@@ -17409,6 +17515,10 @@ func (m *RelaySiteMutation) Field(name string) (ent.Value, bool) {
 		return m.LastCheckinAt()
 	case relaysite.FieldLastCheckinResult:
 		return m.LastCheckinResult()
+	case relaysite.FieldCheckinPageURL:
+		return m.CheckinPageURL()
+	case relaysite.FieldExternalCheckinPageURL:
+		return m.ExternalCheckinPageURL()
 	}
 	return nil, false
 }
@@ -17444,6 +17554,10 @@ func (m *RelaySiteMutation) OldField(ctx context.Context, name string) (ent.Valu
 		return m.OldLastCheckinAt(ctx)
 	case relaysite.FieldLastCheckinResult:
 		return m.OldLastCheckinResult(ctx)
+	case relaysite.FieldCheckinPageURL:
+		return m.OldCheckinPageURL(ctx)
+	case relaysite.FieldExternalCheckinPageURL:
+		return m.OldExternalCheckinPageURL(ctx)
 	}
 	return nil, fmt.Errorf("unknown RelaySite field %s", name)
 }
@@ -17544,6 +17658,20 @@ func (m *RelaySiteMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetLastCheckinResult(v)
 		return nil
+	case relaysite.FieldCheckinPageURL:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCheckinPageURL(v)
+		return nil
+	case relaysite.FieldExternalCheckinPageURL:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetExternalCheckinPageURL(v)
+		return nil
 	}
 	return fmt.Errorf("unknown RelaySite field %s", name)
 }
@@ -17604,6 +17732,12 @@ func (m *RelaySiteMutation) ClearedFields() []string {
 	if m.FieldCleared(relaysite.FieldLastCheckinResult) {
 		fields = append(fields, relaysite.FieldLastCheckinResult)
 	}
+	if m.FieldCleared(relaysite.FieldCheckinPageURL) {
+		fields = append(fields, relaysite.FieldCheckinPageURL)
+	}
+	if m.FieldCleared(relaysite.FieldExternalCheckinPageURL) {
+		fields = append(fields, relaysite.FieldExternalCheckinPageURL)
+	}
 	return fields
 }
 
@@ -17632,6 +17766,12 @@ func (m *RelaySiteMutation) ClearField(name string) error {
 		return nil
 	case relaysite.FieldLastCheckinResult:
 		m.ClearLastCheckinResult()
+		return nil
+	case relaysite.FieldCheckinPageURL:
+		m.ClearCheckinPageURL()
+		return nil
+	case relaysite.FieldExternalCheckinPageURL:
+		m.ClearExternalCheckinPageURL()
 		return nil
 	}
 	return fmt.Errorf("unknown RelaySite nullable field %s", name)
@@ -17679,6 +17819,12 @@ func (m *RelaySiteMutation) ResetField(name string) error {
 		return nil
 	case relaysite.FieldLastCheckinResult:
 		m.ResetLastCheckinResult()
+		return nil
+	case relaysite.FieldCheckinPageURL:
+		m.ResetCheckinPageURL()
+		return nil
+	case relaysite.FieldExternalCheckinPageURL:
+		m.ResetExternalCheckinPageURL()
 		return nil
 	}
 	return fmt.Errorf("unknown RelaySite field %s", name)

@@ -59,6 +59,8 @@ func (RelaySite) Fields() []ent.Field {
 			Annotations(entgql.OrderField("LAST_CHECKIN_AT"), entgql.Skip(entgql.SkipMutationCreateInput, entgql.SkipMutationUpdateInput)),
 		field.String("last_checkin_result").Optional().Nillable().
 			Annotations(entgql.Skip(entgql.SkipMutationCreateInput, entgql.SkipMutationUpdateInput)),
+		field.String("checkin_page_url").Optional().Nillable(),
+		field.String("external_checkin_page_url").Optional().Nillable(),
 	}
 }
 

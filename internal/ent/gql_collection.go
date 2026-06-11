@@ -4075,6 +4075,16 @@ func (_q *RelaySiteQuery) collectField(ctx context.Context, oneNode bool, opCtx 
 				selectedFields = append(selectedFields, relaysite.FieldLastCheckinResult)
 				fieldSeen[relaysite.FieldLastCheckinResult] = struct{}{}
 			}
+		case "checkinPageURL":
+			if _, ok := fieldSeen[relaysite.FieldCheckinPageURL]; !ok {
+				selectedFields = append(selectedFields, relaysite.FieldCheckinPageURL)
+				fieldSeen[relaysite.FieldCheckinPageURL] = struct{}{}
+			}
+		case "externalCheckinPageURL":
+			if _, ok := fieldSeen[relaysite.FieldExternalCheckinPageURL]; !ok {
+				selectedFields = append(selectedFields, relaysite.FieldExternalCheckinPageURL)
+				fieldSeen[relaysite.FieldExternalCheckinPageURL] = struct{}{}
+			}
 		case "id":
 		case "__typename":
 		default:

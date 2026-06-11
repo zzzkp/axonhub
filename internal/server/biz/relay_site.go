@@ -48,21 +48,25 @@ type RelaySiteService struct {
 }
 
 type CreateRelaySiteConfigInput struct {
-	Name               string
-	BaseURL            string
-	Status             *relaysite.Status
-	AutoCheckinEnabled *bool
-	Remark             *string
-	Credential         objects.RelaySiteCredential
+	Name                   string
+	BaseURL                string
+	Status                 *relaysite.Status
+	AutoCheckinEnabled     *bool
+	Remark                 *string
+	Credential             objects.RelaySiteCredential
+	CheckinPageURL         *string
+	ExternalCheckinPageURL *string
 }
 
 type UpdateRelaySiteConfigInput struct {
-	Name               *string
-	BaseURL            *string
-	Status             *relaysite.Status
-	AutoCheckinEnabled *bool
-	Remark             *string
-	Credential         *objects.RelaySiteCredential
+	Name                   *string
+	BaseURL                *string
+	Status                 *relaysite.Status
+	AutoCheckinEnabled     *bool
+	Remark                 *string
+	Credential             *objects.RelaySiteCredential
+	CheckinPageURL         *string
+	ExternalCheckinPageURL *string
 }
 
 type ImportRelaySiteAPIKeyToChannelInput struct {
@@ -99,7 +103,9 @@ func (s *RelaySiteService) CreateSite(ctx context.Context, input CreateRelaySite
 			SetBaseURL(input.BaseURL).
 			SetNillableStatus(input.Status).
 			SetNillableAutoCheckinEnabled(input.AutoCheckinEnabled).
-			SetNillableRemark(input.Remark)
+			SetNillableRemark(input.Remark).
+			SetNillableCheckinPageURL(input.CheckinPageURL).
+			SetNillableExternalCheckinPageURL(input.ExternalCheckinPageURL)
 
 		var saveErr error
 		site, saveErr = create.Save(ctx)
@@ -146,7 +152,9 @@ func (s *RelaySiteService) UpdateSite(ctx context.Context, id int, input UpdateR
 			SetNillableBaseURL(input.BaseURL).
 			SetNillableStatus(input.Status).
 			SetNillableAutoCheckinEnabled(input.AutoCheckinEnabled).
-			SetNillableRemark(input.Remark)
+			SetNillableRemark(input.Remark).
+			SetNillableCheckinPageURL(input.CheckinPageURL).
+			SetNillableExternalCheckinPageURL(input.ExternalCheckinPageURL)
 
 		var saveErr error
 		site, saveErr = update.Save(ctx)
@@ -717,7 +725,7 @@ func (s *RelaySiteService) CheckinSite(ctx context.Context, id int) (*ent.RelayS
 
 			_, createErr = client.RelaySite.UpdateOneID(id).
 				SetLastCheckinAt(now).
-				SetLastCheckinResult("failed").
+				SetLastCheckinResult(err.Error()).
 				Save(ctx)
 			if createErr != nil {
 				return fmt.Errorf("failed to update relay site checkin status: %w", createErr)
@@ -823,12 +831,19 @@ func (s *RelaySiteService) ImportAPIKeyToChannel(ctx context.Context, relaySiteA
 	}
 	channelInput.Tags = appendRelaySiteChannelTags(channelInput.Tags, apiKey.RelaySiteID, apiKey.ID)
 
-	channel, err := s.channelService.CreateChannel(ctx, channelInput)
+	createdChannel, err := s.channelService.CreateChannel(ctx, channelInput)
 	if err != nil {
 		return nil, fmt.Errorf("failed to import relay site api key to channel: %w", err)
 	}
 
-	return channel, nil
+	// 导入后立即启用 Channel（CreateChannelInput 不支持 Status 字段，需要单独更新）
+	err = s.entFromContext(ctx).Channel.UpdateOneID(createdChannel.ID).SetStatus(channel.StatusEnabled).Exec(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to enable imported channel: %w", err)
+	}
+	createdChannel.Status = channel.StatusEnabled
+
+	return createdChannel, nil
 }
 
 func (s *RelaySiteService) CreateAPIKey(ctx context.Context, relaySiteID int, input RelaySiteAPIKeyConfigInput) (*ent.RelaySite, error) {

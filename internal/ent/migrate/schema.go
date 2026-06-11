@@ -543,6 +543,8 @@ var (
 		{Name: "last_sync_error", Type: field.TypeString, Nullable: true},
 		{Name: "last_checkin_at", Type: field.TypeTime, Nullable: true},
 		{Name: "last_checkin_result", Type: field.TypeString, Nullable: true},
+		{Name: "checkin_page_url", Type: field.TypeString, Nullable: true},
+		{Name: "external_checkin_page_url", Type: field.TypeString, Nullable: true},
 	}
 	// RelaySitesTable holds the schema information for the "relay_sites" table.
 	RelaySitesTable = &schema.Table{
