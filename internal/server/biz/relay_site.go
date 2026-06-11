@@ -820,9 +820,12 @@ func (s *RelaySiteService) ImportAPIKeyToChannel(ctx context.Context, relaySiteA
 		return nil, fmt.Errorf("failed to get relay site api key: %w", err)
 	}
 
-	fullKey, err := s.adapterAPIKey(ctx, apiKey.RelaySiteID, apiKey.RemoteID)
-	if err != nil {
-		return nil, err
+	fullKey := relaySiteAPIKeyValueFromMetadata(apiKey.Metadata)
+	if fullKey == "" {
+		fullKey, err = s.adapterAPIKey(ctx, apiKey.RelaySiteID, apiKey.RemoteID)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	channelInput, err := buildRelaySiteChannelInput(input, fullKey)
@@ -1024,6 +1027,15 @@ func relaySiteScopedChannelTag(relaySiteID int) string {
 	return fmt.Sprintf("relay-site:%d", relaySiteID)
 }
 
+func relaySiteAPIKeyValueFromMetadata(metadata objects.RelaySiteAPIKeyMetadata) string {
+	key, _ := metadata.Raw["key"].(string)
+	key = strings.TrimSpace(key)
+	if key == "" || strings.Contains(key, "*") {
+		return ""
+	}
+	return key
+}
+
 func normalizeRelaySiteAPIKeyConfigInput(input RelaySiteAPIKeyConfigInput) (RelaySiteAPIKeyConfigInput, error) {
 	input.Name = strings.TrimSpace(input.Name)
 	if input.Name == "" {
@@ -1071,14 +1083,15 @@ func buildRelaySiteChannelInput(input ImportRelaySiteAPIKeyToChannelInput, apiKe
 	}
 
 	return ent.CreateChannelInput{
-		Type:             input.Type,
-		BaseURL:          &baseURL,
-		Name:             name,
-		Credentials:      objects.ChannelCredentials{APIKey: apiKey},
-		SupportedModels:  supportedModels,
-		ManualModels:     []string{},
-		Tags:             tags,
-		DefaultTestModel: defaultTestModel,
+		Type:                    input.Type,
+		BaseURL:                 &baseURL,
+		Name:                    name,
+		Credentials:             objects.ChannelCredentials{APIKey: apiKey},
+		SupportedModels:         supportedModels,
+		AutoSyncSupportedModels: lo.ToPtr(true),
+		ManualModels:            []string{},
+		Tags:                    tags,
+		DefaultTestModel:        defaultTestModel,
 		Settings: &objects.ChannelSettings{
 			ModelMappings: []objects.ModelMapping{},
 		},

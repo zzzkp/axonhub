@@ -33,6 +33,20 @@ func (r *mutationResolver) DeleteRelaySiteConfig(ctx context.Context, id objects
 	return r.relaySiteService.DeleteSite(ctx, id.ID)
 }
 
+// ExportRelaySitesBackup is the resolver for the exportRelaySitesBackup field.
+func (r *mutationResolver) ExportRelaySitesBackup(ctx context.Context) (string, error) {
+	return r.relaySiteService.ExportBackup(ctx)
+}
+
+// ImportRelaySitesBackup is the resolver for the importRelaySitesBackup field.
+func (r *mutationResolver) ImportRelaySitesBackup(ctx context.Context, payload string) (bool, error) {
+	if err := r.relaySiteService.ImportBackup(ctx, payload); err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
 // SyncRelaySite is the resolver for the syncRelaySite field.
 func (r *mutationResolver) SyncRelaySite(ctx context.Context, id objects.GUID) (*ent.RelaySite, error) {
 	if err := r.relaySiteService.SyncSite(ctx, id.ID); err != nil {
@@ -213,18 +227,6 @@ func (r *createRelaySiteConfigInputResolver) Credential(ctx context.Context, obj
 	return nil
 }
 
-// CheckinPageURL is the resolver for the checkinPageURL field.
-func (r *createRelaySiteConfigInputResolver) CheckinPageURL(ctx context.Context, obj *biz.CreateRelaySiteConfigInput, data *string) error {
-	obj.CheckinPageURL = data
-	return nil
-}
-
-// ExternalCheckinPageURL is the resolver for the externalCheckinPageURL field.
-func (r *createRelaySiteConfigInputResolver) ExternalCheckinPageURL(ctx context.Context, obj *biz.CreateRelaySiteConfigInput, data *string) error {
-	obj.ExternalCheckinPageURL = data
-	return nil
-}
-
 // Credential is the resolver for the credential field.
 func (r *updateRelaySiteConfigInputResolver) Credential(ctx context.Context, obj *biz.UpdateRelaySiteConfigInput, data *RelaySiteCredentialInput) error {
 	if data == nil {
@@ -250,18 +252,6 @@ func (r *updateRelaySiteConfigInputResolver) Credential(ctx context.Context, obj
 
 	obj.Credential = &credential
 
-	return nil
-}
-
-// CheckinPageURL is the resolver for the checkinPageURL field.
-func (r *updateRelaySiteConfigInputResolver) CheckinPageURL(ctx context.Context, obj *biz.UpdateRelaySiteConfigInput, data *string) error {
-	obj.CheckinPageURL = data
-	return nil
-}
-
-// ExternalCheckinPageURL is the resolver for the externalCheckinPageURL field.
-func (r *updateRelaySiteConfigInputResolver) ExternalCheckinPageURL(ctx context.Context, obj *biz.UpdateRelaySiteConfigInput, data *string) error {
-	obj.ExternalCheckinPageURL = data
 	return nil
 }
 
