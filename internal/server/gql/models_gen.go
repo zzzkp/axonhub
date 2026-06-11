@@ -340,19 +340,23 @@ type QueryModelsInput struct {
 }
 
 type RelaySiteCredentialInput struct {
-	AuthType RelaySiteCredentialAuthType `json:"authType"`
-	Token    *string                     `json:"token,omitempty"`
-	UserID   *int                        `json:"userId,omitempty"`
-	Username *string                     `json:"username,omitempty"`
-	Password *string                     `json:"password,omitempty"`
+	AuthType       RelaySiteCredentialAuthType `json:"authType"`
+	Token          *string                     `json:"token,omitempty"`
+	UserID         *int                        `json:"userId,omitempty"`
+	Username       *string                     `json:"username,omitempty"`
+	Password       *string                     `json:"password,omitempty"`
+	RefreshToken   *string                     `json:"refreshToken,omitempty"`
+	TokenExpiresAt *time.Time                  `json:"tokenExpiresAt,omitempty"`
 }
 
 type RelaySiteDisplayCredential struct {
-	AuthType RelaySiteCredentialAuthType `json:"authType"`
-	Token    *string                     `json:"token,omitempty"`
-	UserID   *int                        `json:"userId,omitempty"`
-	Username *string                     `json:"username,omitempty"`
-	Password *string                     `json:"password,omitempty"`
+	AuthType       RelaySiteCredentialAuthType `json:"authType"`
+	Token          *string                     `json:"token,omitempty"`
+	UserID         *int                        `json:"userId,omitempty"`
+	Username       *string                     `json:"username,omitempty"`
+	Password       *string                     `json:"password,omitempty"`
+	RefreshToken   *string                     `json:"refreshToken,omitempty"`
+	TokenExpiresAt *time.Time                  `json:"tokenExpiresAt,omitempty"`
 }
 
 type RemoveUserFromProjectInput struct {
@@ -695,16 +699,18 @@ type RelaySiteCredentialAuthType string
 const (
 	RelaySiteCredentialAuthTypeToken    RelaySiteCredentialAuthType = "token"
 	RelaySiteCredentialAuthTypePassword RelaySiteCredentialAuthType = "password"
+	RelaySiteCredentialAuthTypeJwt      RelaySiteCredentialAuthType = "jwt"
 )
 
 var AllRelaySiteCredentialAuthType = []RelaySiteCredentialAuthType{
 	RelaySiteCredentialAuthTypeToken,
 	RelaySiteCredentialAuthTypePassword,
+	RelaySiteCredentialAuthTypeJwt,
 }
 
 func (e RelaySiteCredentialAuthType) IsValid() bool {
 	switch e {
-	case RelaySiteCredentialAuthTypeToken, RelaySiteCredentialAuthTypePassword:
+	case RelaySiteCredentialAuthTypeToken, RelaySiteCredentialAuthTypePassword, RelaySiteCredentialAuthTypeJwt:
 		return true
 	}
 	return false

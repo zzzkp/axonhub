@@ -1,10 +1,10 @@
 # 中转站实现说明
 
-本文说明 AxonHub 中转站模块的实现结构和维护边界。中转站当前首期支持 `new-api` 类型站点，用于管理外部 new-api 后台资源，不直接参与模型请求转发链路。
+本文说明 AxonHub 中转站模块的实现结构和维护边界。中转站当前支持 `new-api` 和 `sub2api` 类型站点，用于管理外部中转站后台资源，不直接参与模型请求转发链路。
 
 ## 模块边界
 
-中转站模块负责保存外部站点配置、保护访问凭据、调用远端 new-api 管理接口、同步远端 API Key、分组、余额、模型价格和站点公告，并记录签到和同步结果。
+中转站模块负责保存外部站点配置、保护访问凭据、调用远端管理接口、同步远端 API Key、分组、余额、模型数据和站点公告，并记录签到和同步结果。
 
 中转站模块不直接替代 `Channel`，也不在请求期间实时依赖远端中转站后台接口。与 `Channel` 的关系只通过显式导入动作建立：用户选择某个远端 API Key 快照后，由中转站服务获取明文 key，并调用现有 `ChannelService.CreateChannel` 创建普通渠道。
 
@@ -17,7 +17,7 @@
 | 实体 | 作用 |
 |------|------|
 | `RelaySite` | 站点主表，保存名称、类型、Base URL、状态、备注、最近同步状态和自动签到开关 |
-| `RelaySiteCredential` | 站点凭据，保存认证方式和 token、账号密码等敏感字段 |
+| `RelaySiteCredential` | 站点凭据，保存认证方式和 token、账号密码、JWT 等敏感字段 |
 | `RelaySiteAPIKey` | 远端 API Key 快照，保存 key 标识、名称、状态、额度、所属分组等 |
 | `RelaySiteGroup` | 远端 group 快照，保存 group 名称和相关配置 |
 | `RelaySiteBalanceSnapshot` | 余额快照，保存余额、单位、原始 quota 和拉取时间 |
@@ -51,7 +51,7 @@
 
 ## Adapter 设计
 
-统一适配器接口位于 `internal/server/biz/relay_site_adapter.go`。站点类型通过 adapter factory 路由到具体实现，当前实现为 `new-api`。
+统一适配器接口位于 `internal/server/biz/relay_site_adapter.go`。站点类型通过 adapter factory 路由到具体实现，当前实现包括 `new-api` 和 `sub2api`。
 
 adapter 负责屏蔽不同中转站后台接口差异，向 service 提供统一能力：
 
@@ -88,6 +88,28 @@ RelaySiteAdapter
 new-api 返回的内部 quota 按 `500000 quota = 1 USD` 换算为 USD 展示，同时保留原始 quota 便于核对。
 
 公告通过 `GET /api/status` 获取，该接口不携带站点凭据。适配器读取 `announcements_enabled` 和 `announcements` 字段；当 `announcements_enabled` 为 `false` 时，本地公告快照会按空列表同步。公告发布时间使用远端 `publishDate` 字段解析为 UTC 时间。
+
+`sub2api` 适配实现位于 `internal/server/biz/relay_site_sub2api.go`。当前调用的远端接口包括：
+
+- `GET /api/v1/keys`
+- `GET /api/v1/keys/:id`
+- `POST /api/v1/keys`
+- `PUT /api/v1/keys/:id`
+- `DELETE /api/v1/keys/:id`
+- `GET /api/v1/groups/available`
+- `GET /api/v1/groups/rates`
+- `GET /api/v1/auth/me`
+- `GET /api/v1/user/profile`
+- `GET /api/v1/announcements`
+- `GET /v1/models`
+
+sub2api 使用 dashboard JWT 凭据，站点凭据类型为 `jwt`。`token` 保存 access token，`refreshToken` 和 `tokenExpiresAt` 作为后续刷新能力的预留字段，当前不会自动刷新 access token。
+
+sub2api 的远端 API Key 使用数字 `group_id`，本地快照会把它映射为分组名称，避免前端分组筛选和导入 Channel 时出现 ID 与名称不一致。创建或更新远端 API Key 时，adapter 会把表单中的分组名称解析回远端 `group_id` 后提交。
+
+部分 sub2api 站点不提供 pricing 接口。sub2api adapter 不依赖 pricing 接口同步模型数据，而是使用已同步到的远端 API Key 调用 OpenAI 兼容的 `GET /v1/models`，并按该 key 所属分组写入模型快照的 `enable_groups`。单个 key 的模型接口失败会被跳过，不会导致整个站点同步失败。
+
+sub2api 当前不支持内置签到；调用签到能力时返回“不支持”。模型快照主要用于模型选择和 Channel 导入，不包含 new-api 那类价格倍率数据。
 
 ## GraphQL 接口
 
@@ -163,10 +185,10 @@ GraphQL schema 和 resolver 位于：
 
 ## 扩展新站点类型
 
-新增 `one-api` 等站点类型时，应优先复用现有边界：
+新增 `done-hub` 等站点类型时，应优先复用现有边界：
 
 - 保持 `RelaySite` 系列 Ent 模型稳定。
-- 在 adapter factory 中新增站点类型分发，当前 `new-api` 对应内部类型值为 `new_api`。
+- 在 adapter factory 中新增站点类型分发，当前 `new-api` 对应内部类型值为 `new_api`，`sub2api` 对应内部类型值为 `sub2api`。
 - 新增具体 adapter 实现远端接口差异。
 - 仅在确有差异时扩展凭据或快照字段。
 - 不把中转站逻辑接入 `llm`、orchestrator、request 或 Channel 请求转发链路。

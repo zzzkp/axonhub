@@ -49,6 +49,7 @@ type RelaySiteService struct {
 
 type CreateRelaySiteConfigInput struct {
 	Name                   string
+	Type                   *relaysite.Type
 	BaseURL                string
 	Status                 *relaysite.Status
 	AutoCheckinEnabled     *bool
@@ -88,7 +89,11 @@ func NewRelaySiteService(params RelaySiteServiceParams) *RelaySiteService {
 }
 
 func (s *RelaySiteService) CreateSite(ctx context.Context, input CreateRelaySiteConfigInput) (*ent.RelaySite, error) {
-	authType, credential, err := normalizeRelaySiteCredential(input.Credential)
+	siteType := relaysite.TypeNewAPI
+	if input.Type != nil {
+		siteType = *input.Type
+	}
+	authType, credential, err := normalizeRelaySiteCredential(siteType, input.Credential)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +104,7 @@ func (s *RelaySiteService) CreateSite(ctx context.Context, input CreateRelaySite
 
 		create := client.RelaySite.Create().
 			SetName(input.Name).
-			SetType(relaysite.TypeNewAPI).
+			SetType(siteType).
 			SetBaseURL(input.BaseURL).
 			SetNillableStatus(input.Status).
 			SetNillableAutoCheckinEnabled(input.AutoCheckinEnabled).
@@ -136,7 +141,11 @@ func (s *RelaySiteService) UpdateSite(ctx context.Context, id int, input UpdateR
 	var credential objects.RelaySiteCredential
 	var err error
 	if input.Credential != nil {
-		authType, credential, err = normalizeRelaySiteCredential(*input.Credential)
+		existing, getErr := s.entFromContext(ctx).RelaySite.Get(ctx, id)
+		if getErr != nil {
+			return nil, fmt.Errorf("failed to get relay site: %w", getErr)
+		}
+		authType, credential, err = normalizeRelaySiteCredential(existing.Type, *input.Credential)
 		if err != nil {
 			return nil, err
 		}
@@ -1155,9 +1164,12 @@ func (s *RelaySiteService) recordSyncFailure(ctx context.Context, id int, cause 
 	return cause
 }
 
-func normalizeRelaySiteCredential(input objects.RelaySiteCredential) (relaysitecredential.AuthType, objects.RelaySiteCredential, error) {
+func normalizeRelaySiteCredential(siteType relaysite.Type, input objects.RelaySiteCredential) (relaysitecredential.AuthType, objects.RelaySiteCredential, error) {
 	switch input.AuthType {
 	case "token":
+		if siteType == relaysite.TypeSub2api {
+			return "", input, fmt.Errorf("sub2api relay site requires jwt credential")
+		}
 		if input.Token == "" {
 			return "", input, fmt.Errorf("relay site token credential requires token")
 		}
@@ -1166,13 +1178,32 @@ func normalizeRelaySiteCredential(input objects.RelaySiteCredential) (relaysitec
 		}
 		input.Username = ""
 		input.Password = ""
+		input.RefreshToken = ""
+		input.TokenExpiresAt = nil
 		return relaysitecredential.AuthTypeToken, input, nil
 	case "password":
+		if siteType == relaysite.TypeSub2api {
+			return "", input, fmt.Errorf("sub2api relay site requires jwt credential")
+		}
 		if input.Username == "" || input.Password == "" {
 			return "", input, fmt.Errorf("relay site password credential requires username and password")
 		}
 		input.Token = ""
+		input.UserID = 0
+		input.RefreshToken = ""
+		input.TokenExpiresAt = nil
 		return relaysitecredential.AuthTypePassword, input, nil
+	case "jwt":
+		if siteType != relaysite.TypeSub2api {
+			return "", input, fmt.Errorf("jwt credential is only supported for sub2api relay sites")
+		}
+		if input.Token == "" {
+			return "", input, fmt.Errorf("sub2api jwt credential requires access token")
+		}
+		input.UserID = 0
+		input.Username = ""
+		input.Password = ""
+		return relaysitecredential.AuthTypeJwt, input, nil
 	default:
 		return "", input, fmt.Errorf("unsupported relay site credential auth type: %s", input.AuthType)
 	}

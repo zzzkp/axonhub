@@ -129,11 +129,13 @@ func (r *relaySiteResolver) DisplayCredential(ctx context.Context, obj *ent.Rela
 
 	stored := credential.Credential
 	return &RelaySiteDisplayCredential{
-		AuthType: RelaySiteCredentialAuthType(stored.AuthType),
-		Token:    stringPtrOrNil(stored.Token),
-		UserID:   intPtrOrNil(stored.UserID),
-		Username: stringPtrOrNil(stored.Username),
-		Password: stringPtrOrNil(stored.Password),
+		AuthType:       RelaySiteCredentialAuthType(stored.AuthType),
+		Token:          stringPtrOrNil(stored.Token),
+		UserID:         intPtrOrNil(stored.UserID),
+		Username:       stringPtrOrNil(stored.Username),
+		Password:       stringPtrOrNil(stored.Password),
+		RefreshToken:   stringPtrOrNil(stored.RefreshToken),
+		TokenExpiresAt: stored.TokenExpiresAt,
 	}, nil
 }
 
@@ -221,6 +223,12 @@ func (r *createRelaySiteConfigInputResolver) Credential(ctx context.Context, obj
 	if data.Password != nil {
 		credential.Password = *data.Password
 	}
+	if data.RefreshToken != nil {
+		credential.RefreshToken = *data.RefreshToken
+	}
+	if data.TokenExpiresAt != nil {
+		credential.TokenExpiresAt = data.TokenExpiresAt
+	}
 
 	obj.Credential = credential
 
@@ -248,6 +256,12 @@ func (r *updateRelaySiteConfigInputResolver) Credential(ctx context.Context, obj
 	}
 	if data.Password != nil {
 		credential.Password = *data.Password
+	}
+	if data.RefreshToken != nil {
+		credential.RefreshToken = *data.RefreshToken
+	}
+	if data.TokenExpiresAt != nil {
+		credential.TokenExpiresAt = data.TokenExpiresAt
 	}
 
 	obj.Credential = &credential

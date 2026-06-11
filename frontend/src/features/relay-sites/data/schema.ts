@@ -3,8 +3,8 @@ import { pageInfoSchema } from '@/gql/pagination';
 import { channelTypeSchema } from '@/features/channels/data/schema';
 
 export const relaySiteStatusSchema = z.enum(['enabled', 'disabled', 'archived']);
-export const relaySiteTypeSchema = z.enum(['new_api']);
-export const relaySiteCredentialAuthTypeSchema = z.enum(['token', 'password']);
+export const relaySiteTypeSchema = z.enum(['new_api', 'sub2api']);
+export const relaySiteCredentialAuthTypeSchema = z.enum(['token', 'password', 'jwt']);
 
 export const relaySiteAPIKeySchema = z.object({
   id: z.string(),
@@ -41,6 +41,8 @@ export const relaySiteDisplayCredentialSchema = z.object({
   userId: z.number().nullable().optional(),
   username: z.string().nullable().optional(),
   password: z.string().nullable().optional(),
+  refreshToken: z.string().nullable().optional(),
+  tokenExpiresAt: z.string().nullable().optional(),
 }).nullable().optional();
 export type RelaySiteDisplayCredential = z.infer<typeof relaySiteDisplayCredentialSchema>;
 
@@ -157,6 +159,8 @@ export const relaySiteCredentialInputSchema = z.object({
   userId: z.number().optional(),
   username: z.string().optional(),
   password: z.string().optional(),
+  refreshToken: z.string().optional(),
+  tokenExpiresAt: z.string().optional(),
 });
 export type RelaySiteCredentialInput = z.infer<typeof relaySiteCredentialInputSchema>;
 
@@ -173,6 +177,7 @@ export type ImportedRelaySiteChannel = z.infer<typeof importedRelaySiteChannelSc
 
 export const createRelaySiteInputSchema = z.object({
   name: z.string().min(1),
+  type: relaySiteTypeSchema.optional(),
   baseURL: z.string().min(1),
   status: relaySiteStatusSchema.optional(),
   autoCheckinEnabled: z.boolean().optional(),

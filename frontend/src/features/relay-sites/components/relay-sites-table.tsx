@@ -208,7 +208,14 @@ export function RelaySitesTable({
                         <span>{relaySite.name}</span>
                         {relaySite.hasUnreadAnnouncements && <Badge variant='destructive'>{t('relaySites.announcements.unread')}</Badge>}
                       </div>
-                      <div className='truncate font-mono text-xs text-muted-foreground'>{relaySite.baseURL}</div>
+                      <a
+                        href={relaySite.baseURL}
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        className='block truncate font-mono text-xs text-muted-foreground hover:text-foreground hover:underline'
+                      >
+                        {relaySite.baseURL}
+                      </a>
                     </TableCell>
                     <TableCell className='border-0'><Badge variant='outline'>{t(`relaySites.types.${relaySite.type}`)}</Badge></TableCell>
                     <TableCell className='border-0'><StatusSwitch relaySite={relaySite} canWrite={canWrite} /></TableCell>
