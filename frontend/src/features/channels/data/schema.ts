@@ -110,6 +110,8 @@ export const channelTypeSchema = z.enum([
   'opencode_go',
   'opencode_go_anthropic',
   'ollama',
+  'evolink',
+  'evolink_anthropic',
 ]);
 export type ChannelType = z.infer<typeof channelTypeSchema>;
 
@@ -224,6 +226,7 @@ export const channelSettingsSchema = z.object({
   passThroughUserAgent: z.boolean().optional().nullable(),
   passThroughBody: z.boolean().optional().nullable(),
   rateLimit: channelRateLimitSchema.optional().nullable(),
+  retryableStatusCodes: z.array(z.number().int().min(400).max(599)).optional().nullable(),
 });
 
 export type ChannelSettings = z.infer<typeof channelSettingsSchema>;
