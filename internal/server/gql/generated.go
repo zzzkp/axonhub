@@ -88,6 +88,7 @@ type ResolverRoot interface {
 	RelaySiteAPIKey() RelaySiteAPIKeyResolver
 	RelaySiteAnnouncement() RelaySiteAnnouncementResolver
 	RelaySiteBalanceSnapshot() RelaySiteBalanceSnapshotResolver
+	RelaySiteBatchOperationFailure() RelaySiteBatchOperationFailureResolver
 	RelaySiteCheckinLog() RelaySiteCheckinLogResolver
 	RelaySiteGroup() RelaySiteGroupResolver
 	RelaySiteModelPrice() RelaySiteModelPriceResolver
@@ -1427,6 +1428,19 @@ type ComplexityRoot struct {
 		Node   func(childComplexity int) int
 	}
 
+	RelaySiteBatchOperationFailure struct {
+		ErrorMessage  func(childComplexity int) int
+		RelaySiteID   func(childComplexity int) int
+		RelaySiteName func(childComplexity int) int
+	}
+
+	RelaySiteBatchOperationResult struct {
+		FailedCount  func(childComplexity int) int
+		Failures     func(childComplexity int) int
+		SuccessCount func(childComplexity int) int
+		TotalCount   func(childComplexity int) int
+	}
+
 	RelaySiteCheckinLog struct {
 		CreatedAt    func(childComplexity int) int
 		ErrorMessage func(childComplexity int) int
@@ -2355,9 +2369,9 @@ type MutationResolver interface {
 	ExportRelaySitesBackup(ctx context.Context) (string, error)
 	ImportRelaySitesBackup(ctx context.Context, payload string) (bool, error)
 	SyncRelaySite(ctx context.Context, id objects.GUID) (*ent.RelaySite, error)
-	SyncAllRelaySites(ctx context.Context) (bool, error)
+	SyncAllRelaySites(ctx context.Context) (*biz.RelaySiteBatchOperationResult, error)
 	CheckinRelaySite(ctx context.Context, id objects.GUID) (*ent.RelaySiteCheckinLog, error)
-	CheckinAllRelaySites(ctx context.Context) (bool, error)
+	CheckinAllRelaySites(ctx context.Context) (*biz.RelaySiteBatchOperationResult, error)
 	RefreshRelaySiteAnnouncements(ctx context.Context, id objects.GUID) (*ent.RelaySite, error)
 	MarkRelaySiteAnnouncementsRead(ctx context.Context, id objects.GUID) (*ent.RelaySite, error)
 	CreateRelaySiteAPIKey(ctx context.Context, relaySiteID objects.GUID, input biz.RelaySiteAPIKeyConfigInput) (*ent.RelaySite, error)
@@ -2483,6 +2497,9 @@ type RelaySiteBalanceSnapshotResolver interface {
 	ID(ctx context.Context, obj *ent.RelaySiteBalanceSnapshot) (*objects.GUID, error)
 
 	RelaySiteID(ctx context.Context, obj *ent.RelaySiteBalanceSnapshot) (*objects.GUID, error)
+}
+type RelaySiteBatchOperationFailureResolver interface {
+	RelaySiteID(ctx context.Context, obj *biz.RelaySiteBatchOperationFailure) (*objects.GUID, error)
 }
 type RelaySiteCheckinLogResolver interface {
 	ID(ctx context.Context, obj *ent.RelaySiteCheckinLog) (*objects.GUID, error)
@@ -8870,6 +8887,50 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.RelaySiteBalanceSnapshotEdge.Node(childComplexity), true
+
+	case "RelaySiteBatchOperationFailure.errorMessage":
+		if e.complexity.RelaySiteBatchOperationFailure.ErrorMessage == nil {
+			break
+		}
+
+		return e.complexity.RelaySiteBatchOperationFailure.ErrorMessage(childComplexity), true
+	case "RelaySiteBatchOperationFailure.relaySiteID":
+		if e.complexity.RelaySiteBatchOperationFailure.RelaySiteID == nil {
+			break
+		}
+
+		return e.complexity.RelaySiteBatchOperationFailure.RelaySiteID(childComplexity), true
+	case "RelaySiteBatchOperationFailure.relaySiteName":
+		if e.complexity.RelaySiteBatchOperationFailure.RelaySiteName == nil {
+			break
+		}
+
+		return e.complexity.RelaySiteBatchOperationFailure.RelaySiteName(childComplexity), true
+
+	case "RelaySiteBatchOperationResult.failedCount":
+		if e.complexity.RelaySiteBatchOperationResult.FailedCount == nil {
+			break
+		}
+
+		return e.complexity.RelaySiteBatchOperationResult.FailedCount(childComplexity), true
+	case "RelaySiteBatchOperationResult.failures":
+		if e.complexity.RelaySiteBatchOperationResult.Failures == nil {
+			break
+		}
+
+		return e.complexity.RelaySiteBatchOperationResult.Failures(childComplexity), true
+	case "RelaySiteBatchOperationResult.successCount":
+		if e.complexity.RelaySiteBatchOperationResult.SuccessCount == nil {
+			break
+		}
+
+		return e.complexity.RelaySiteBatchOperationResult.SuccessCount(childComplexity), true
+	case "RelaySiteBatchOperationResult.totalCount":
+		if e.complexity.RelaySiteBatchOperationResult.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.RelaySiteBatchOperationResult.TotalCount(childComplexity), true
 
 	case "RelaySiteCheckinLog.createdAt":
 		if e.complexity.RelaySiteCheckinLog.CreatedAt == nil {
@@ -36760,7 +36821,7 @@ func (ec *executionContext) _Mutation_syncAllRelaySites(ctx context.Context, fie
 			return ec.resolvers.Mutation().SyncAllRelaySites(ctx)
 		},
 		nil,
-		ec.marshalNBoolean2bool,
+		ec.marshalNRelaySiteBatchOperationResult2ᚖgithubᚗcomᚋloopljᚋaxonhubᚋinternalᚋserverᚋbizᚐRelaySiteBatchOperationResult,
 		true,
 		true,
 	)
@@ -36773,7 +36834,17 @@ func (ec *executionContext) fieldContext_Mutation_syncAllRelaySites(_ context.Co
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
+			switch field.Name {
+			case "totalCount":
+				return ec.fieldContext_RelaySiteBatchOperationResult_totalCount(ctx, field)
+			case "successCount":
+				return ec.fieldContext_RelaySiteBatchOperationResult_successCount(ctx, field)
+			case "failedCount":
+				return ec.fieldContext_RelaySiteBatchOperationResult_failedCount(ctx, field)
+			case "failures":
+				return ec.fieldContext_RelaySiteBatchOperationResult_failures(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type RelaySiteBatchOperationResult", field.Name)
 		},
 	}
 	return fc, nil
@@ -36850,7 +36921,7 @@ func (ec *executionContext) _Mutation_checkinAllRelaySites(ctx context.Context, 
 			return ec.resolvers.Mutation().CheckinAllRelaySites(ctx)
 		},
 		nil,
-		ec.marshalNBoolean2bool,
+		ec.marshalNRelaySiteBatchOperationResult2ᚖgithubᚗcomᚋloopljᚋaxonhubᚋinternalᚋserverᚋbizᚐRelaySiteBatchOperationResult,
 		true,
 		true,
 	)
@@ -36863,7 +36934,17 @@ func (ec *executionContext) fieldContext_Mutation_checkinAllRelaySites(_ context
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
+			switch field.Name {
+			case "totalCount":
+				return ec.fieldContext_RelaySiteBatchOperationResult_totalCount(ctx, field)
+			case "successCount":
+				return ec.fieldContext_RelaySiteBatchOperationResult_successCount(ctx, field)
+			case "failedCount":
+				return ec.fieldContext_RelaySiteBatchOperationResult_failedCount(ctx, field)
+			case "failures":
+				return ec.fieldContext_RelaySiteBatchOperationResult_failures(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type RelaySiteBatchOperationResult", field.Name)
 		},
 	}
 	return fc, nil
@@ -48318,6 +48399,217 @@ func (ec *executionContext) fieldContext_RelaySiteBalanceSnapshotEdge_cursor(_ c
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Cursor does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _RelaySiteBatchOperationFailure_relaySiteID(ctx context.Context, field graphql.CollectedField, obj *biz.RelaySiteBatchOperationFailure) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_RelaySiteBatchOperationFailure_relaySiteID,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.RelaySiteBatchOperationFailure().RelaySiteID(ctx, obj)
+		},
+		nil,
+		ec.marshalNID2ᚖgithubᚗcomᚋloopljᚋaxonhubᚋinternalᚋobjectsᚐGUID,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_RelaySiteBatchOperationFailure_relaySiteID(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "RelaySiteBatchOperationFailure",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _RelaySiteBatchOperationFailure_relaySiteName(ctx context.Context, field graphql.CollectedField, obj *biz.RelaySiteBatchOperationFailure) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_RelaySiteBatchOperationFailure_relaySiteName,
+		func(ctx context.Context) (any, error) {
+			return obj.RelaySiteName, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_RelaySiteBatchOperationFailure_relaySiteName(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "RelaySiteBatchOperationFailure",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _RelaySiteBatchOperationFailure_errorMessage(ctx context.Context, field graphql.CollectedField, obj *biz.RelaySiteBatchOperationFailure) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_RelaySiteBatchOperationFailure_errorMessage,
+		func(ctx context.Context) (any, error) {
+			return obj.ErrorMessage, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_RelaySiteBatchOperationFailure_errorMessage(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "RelaySiteBatchOperationFailure",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _RelaySiteBatchOperationResult_totalCount(ctx context.Context, field graphql.CollectedField, obj *biz.RelaySiteBatchOperationResult) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_RelaySiteBatchOperationResult_totalCount,
+		func(ctx context.Context) (any, error) {
+			return obj.TotalCount, nil
+		},
+		nil,
+		ec.marshalNInt2int,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_RelaySiteBatchOperationResult_totalCount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "RelaySiteBatchOperationResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _RelaySiteBatchOperationResult_successCount(ctx context.Context, field graphql.CollectedField, obj *biz.RelaySiteBatchOperationResult) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_RelaySiteBatchOperationResult_successCount,
+		func(ctx context.Context) (any, error) {
+			return obj.SuccessCount, nil
+		},
+		nil,
+		ec.marshalNInt2int,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_RelaySiteBatchOperationResult_successCount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "RelaySiteBatchOperationResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _RelaySiteBatchOperationResult_failedCount(ctx context.Context, field graphql.CollectedField, obj *biz.RelaySiteBatchOperationResult) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_RelaySiteBatchOperationResult_failedCount,
+		func(ctx context.Context) (any, error) {
+			return obj.FailedCount, nil
+		},
+		nil,
+		ec.marshalNInt2int,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_RelaySiteBatchOperationResult_failedCount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "RelaySiteBatchOperationResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _RelaySiteBatchOperationResult_failures(ctx context.Context, field graphql.CollectedField, obj *biz.RelaySiteBatchOperationResult) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_RelaySiteBatchOperationResult_failures,
+		func(ctx context.Context) (any, error) {
+			return obj.Failures, nil
+		},
+		nil,
+		ec.marshalNRelaySiteBatchOperationFailure2ᚕᚖgithubᚗcomᚋloopljᚋaxonhubᚋinternalᚋserverᚋbizᚐRelaySiteBatchOperationFailureᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_RelaySiteBatchOperationResult_failures(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "RelaySiteBatchOperationResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "relaySiteID":
+				return ec.fieldContext_RelaySiteBatchOperationFailure_relaySiteID(ctx, field)
+			case "relaySiteName":
+				return ec.fieldContext_RelaySiteBatchOperationFailure_relaySiteName(ctx, field)
+			case "errorMessage":
+				return ec.fieldContext_RelaySiteBatchOperationFailure_errorMessage(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type RelaySiteBatchOperationFailure", field.Name)
 		},
 	}
 	return fc, nil
@@ -109988,6 +110280,140 @@ func (ec *executionContext) _RelaySiteBalanceSnapshotEdge(ctx context.Context, s
 	return out
 }
 
+var relaySiteBatchOperationFailureImplementors = []string{"RelaySiteBatchOperationFailure"}
+
+func (ec *executionContext) _RelaySiteBatchOperationFailure(ctx context.Context, sel ast.SelectionSet, obj *biz.RelaySiteBatchOperationFailure) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, relaySiteBatchOperationFailureImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("RelaySiteBatchOperationFailure")
+		case "relaySiteID":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._RelaySiteBatchOperationFailure_relaySiteID(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "relaySiteName":
+			out.Values[i] = ec._RelaySiteBatchOperationFailure_relaySiteName(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "errorMessage":
+			out.Values[i] = ec._RelaySiteBatchOperationFailure_errorMessage(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var relaySiteBatchOperationResultImplementors = []string{"RelaySiteBatchOperationResult"}
+
+func (ec *executionContext) _RelaySiteBatchOperationResult(ctx context.Context, sel ast.SelectionSet, obj *biz.RelaySiteBatchOperationResult) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, relaySiteBatchOperationResultImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("RelaySiteBatchOperationResult")
+		case "totalCount":
+			out.Values[i] = ec._RelaySiteBatchOperationResult_totalCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "successCount":
+			out.Values[i] = ec._RelaySiteBatchOperationResult_successCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "failedCount":
+			out.Values[i] = ec._RelaySiteBatchOperationResult_failedCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "failures":
+			out.Values[i] = ec._RelaySiteBatchOperationResult_failures(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var relaySiteCheckinLogImplementors = []string{"RelaySiteCheckinLog", "Node"}
 
 func (ec *executionContext) _RelaySiteCheckinLog(ctx context.Context, sel ast.SelectionSet, obj *ent.RelaySiteCheckinLog) graphql.Marshaler {
@@ -122536,6 +122962,74 @@ func (ec *executionContext) marshalNRelaySiteBalanceSnapshotOrderField2ᚖgithub
 func (ec *executionContext) unmarshalNRelaySiteBalanceSnapshotWhereInput2ᚖgithubᚗcomᚋloopljᚋaxonhubᚋinternalᚋentᚐRelaySiteBalanceSnapshotWhereInput(ctx context.Context, v any) (*ent.RelaySiteBalanceSnapshotWhereInput, error) {
 	res, err := ec.unmarshalInputRelaySiteBalanceSnapshotWhereInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNRelaySiteBatchOperationFailure2ᚕᚖgithubᚗcomᚋloopljᚋaxonhubᚋinternalᚋserverᚋbizᚐRelaySiteBatchOperationFailureᚄ(ctx context.Context, sel ast.SelectionSet, v []*biz.RelaySiteBatchOperationFailure) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNRelaySiteBatchOperationFailure2ᚖgithubᚗcomᚋloopljᚋaxonhubᚋinternalᚋserverᚋbizᚐRelaySiteBatchOperationFailure(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNRelaySiteBatchOperationFailure2ᚖgithubᚗcomᚋloopljᚋaxonhubᚋinternalᚋserverᚋbizᚐRelaySiteBatchOperationFailure(ctx context.Context, sel ast.SelectionSet, v *biz.RelaySiteBatchOperationFailure) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._RelaySiteBatchOperationFailure(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNRelaySiteBatchOperationResult2githubᚗcomᚋloopljᚋaxonhubᚋinternalᚋserverᚋbizᚐRelaySiteBatchOperationResult(ctx context.Context, sel ast.SelectionSet, v biz.RelaySiteBatchOperationResult) graphql.Marshaler {
+	return ec._RelaySiteBatchOperationResult(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNRelaySiteBatchOperationResult2ᚖgithubᚗcomᚋloopljᚋaxonhubᚋinternalᚋserverᚋbizᚐRelaySiteBatchOperationResult(ctx context.Context, sel ast.SelectionSet, v *biz.RelaySiteBatchOperationResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._RelaySiteBatchOperationResult(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNRelaySiteCheckinLog2githubᚗcomᚋloopljᚋaxonhubᚋinternalᚋentᚐRelaySiteCheckinLog(ctx context.Context, sel ast.SelectionSet, v ent.RelaySiteCheckinLog) graphql.Marshaler {

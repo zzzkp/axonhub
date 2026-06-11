@@ -80,6 +80,19 @@ type ImportRelaySiteAPIKeyToChannelInput struct {
 	Remark           *string
 }
 
+type RelaySiteBatchOperationFailure struct {
+	RelaySiteID   int    `json:"relaySiteID"`
+	RelaySiteName string `json:"relaySiteName"`
+	ErrorMessage  string `json:"errorMessage"`
+}
+
+type RelaySiteBatchOperationResult struct {
+	TotalCount   int                               `json:"totalCount"`
+	SuccessCount int                               `json:"successCount"`
+	FailedCount  int                               `json:"failedCount"`
+	Failures     []*RelaySiteBatchOperationFailure `json:"failures"`
+}
+
 func NewRelaySiteService(params RelaySiteServiceParams) *RelaySiteService {
 	return &RelaySiteService{
 		AbstractService: &AbstractService{db: params.Ent},
@@ -281,47 +294,60 @@ func (s *RelaySiteService) DeleteSite(ctx context.Context, id int) (*ent.RelaySi
 	return site, nil
 }
 
-func (s *RelaySiteService) SyncAllSites(ctx context.Context) error {
-	sites, err := s.listActiveSites(ctx)
+func (s *RelaySiteService) SyncAllSites(ctx context.Context) (*RelaySiteBatchOperationResult, error) {
+	sites, err := s.listAllSites(ctx)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	failures := make([]string, 0)
+	result := newRelaySiteBatchOperationResult(len(sites))
 	for _, site := range sites {
 		if err := s.SyncSite(ctx, site.ID); err != nil {
-			failures = append(failures, fmt.Sprintf("%s(%d): %v", site.Name, site.ID, err))
+			result.addFailure(site, err)
+			continue
 		}
-	}
-	if len(failures) > 0 {
-		return fmt.Errorf("failed to sync relay sites: %s", strings.Join(failures, "; "))
+		result.SuccessCount++
 	}
 
-	return nil
+	return result, nil
 }
 
-func (s *RelaySiteService) CheckinAllSites(ctx context.Context) error {
-	sites, err := s.listActiveSites(ctx)
+func (s *RelaySiteService) CheckinAllSites(ctx context.Context) (*RelaySiteBatchOperationResult, error) {
+	sites, err := s.listAllSites(ctx)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	failures := make([]string, 0)
+	result := newRelaySiteBatchOperationResult(len(sites))
 	for _, site := range sites {
 		if _, err := s.CheckinSite(ctx, site.ID); err != nil {
-			failures = append(failures, fmt.Sprintf("%s(%d): %v", site.Name, site.ID, err))
+			result.addFailure(site, err)
+			continue
 		}
-	}
-	if len(failures) > 0 {
-		return fmt.Errorf("failed to check in relay sites: %s", strings.Join(failures, "; "))
+		result.SuccessCount++
 	}
 
-	return nil
+	return result, nil
 }
 
-func (s *RelaySiteService) listActiveSites(ctx context.Context) ([]*ent.RelaySite, error) {
+func newRelaySiteBatchOperationResult(totalCount int) *RelaySiteBatchOperationResult {
+	return &RelaySiteBatchOperationResult{
+		TotalCount: totalCount,
+		Failures:   make([]*RelaySiteBatchOperationFailure, 0),
+	}
+}
+
+func (r *RelaySiteBatchOperationResult) addFailure(site *ent.RelaySite, err error) {
+	r.FailedCount++
+	r.Failures = append(r.Failures, &RelaySiteBatchOperationFailure{
+		RelaySiteID:   site.ID,
+		RelaySiteName: site.Name,
+		ErrorMessage:  err.Error(),
+	})
+}
+
+func (s *RelaySiteService) listAllSites(ctx context.Context) ([]*ent.RelaySite, error) {
 	sites, err := s.entFromContext(ctx).RelaySite.Query().
-		Where(relaysite.StatusEQ(relaysite.StatusEnabled)).
 		All(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list relay sites: %w", err)

@@ -57,12 +57,8 @@ func (r *mutationResolver) SyncRelaySite(ctx context.Context, id objects.GUID) (
 }
 
 // SyncAllRelaySites is the resolver for the syncAllRelaySites field.
-func (r *mutationResolver) SyncAllRelaySites(ctx context.Context) (bool, error) {
-	if err := r.relaySiteService.SyncAllSites(ctx); err != nil {
-		return false, err
-	}
-
-	return true, nil
+func (r *mutationResolver) SyncAllRelaySites(ctx context.Context) (*biz.RelaySiteBatchOperationResult, error) {
+	return r.relaySiteService.SyncAllSites(ctx)
 }
 
 // CheckinRelaySite is the resolver for the checkinRelaySite field.
@@ -71,12 +67,8 @@ func (r *mutationResolver) CheckinRelaySite(ctx context.Context, id objects.GUID
 }
 
 // CheckinAllRelaySites is the resolver for the checkinAllRelaySites field.
-func (r *mutationResolver) CheckinAllRelaySites(ctx context.Context) (bool, error) {
-	if err := r.relaySiteService.CheckinAllSites(ctx); err != nil {
-		return false, err
-	}
-
-	return true, nil
+func (r *mutationResolver) CheckinAllRelaySites(ctx context.Context) (*biz.RelaySiteBatchOperationResult, error) {
+	return r.relaySiteService.CheckinAllSites(ctx)
 }
 
 // RefreshRelaySiteAnnouncements is the resolver for the refreshRelaySiteAnnouncements field.
@@ -144,6 +136,11 @@ func (r *relaySiteResolver) HasUnreadAnnouncements(ctx context.Context, obj *ent
 	return r.client.RelaySiteAnnouncement.Query().
 		Where(relaysiteannouncement.RelaySiteIDEQ(obj.ID), relaysiteannouncement.ReadAtIsNil()).
 		Exist(ctx)
+}
+
+// RelaySiteID is the resolver for the relaySiteID field.
+func (r *relaySiteBatchOperationFailureResolver) RelaySiteID(ctx context.Context, obj *biz.RelaySiteBatchOperationFailure) (*objects.GUID, error) {
+	return &objects.GUID{Type: ent.TypeRelaySite, ID: obj.RelaySiteID}, nil
 }
 
 // PromptPrice is the resolver for the promptPrice field.
@@ -269,6 +266,11 @@ func (r *updateRelaySiteConfigInputResolver) Credential(ctx context.Context, obj
 	return nil
 }
 
+// RelaySiteBatchOperationFailure returns RelaySiteBatchOperationFailureResolver implementation.
+func (r *Resolver) RelaySiteBatchOperationFailure() RelaySiteBatchOperationFailureResolver {
+	return &relaySiteBatchOperationFailureResolver{r}
+}
+
 // CreateRelaySiteConfigInput returns CreateRelaySiteConfigInputResolver implementation.
 func (r *Resolver) CreateRelaySiteConfigInput() CreateRelaySiteConfigInputResolver {
 	return &createRelaySiteConfigInputResolver{r}
@@ -279,5 +281,6 @@ func (r *Resolver) UpdateRelaySiteConfigInput() UpdateRelaySiteConfigInputResolv
 	return &updateRelaySiteConfigInputResolver{r}
 }
 
+type relaySiteBatchOperationFailureResolver struct{ *Resolver }
 type createRelaySiteConfigInputResolver struct{ *Resolver }
 type updateRelaySiteConfigInputResolver struct{ *Resolver }
