@@ -378,19 +378,21 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		Type: "RelaySite",
 		Fields: map[string]*sqlgraph.FieldSpec{
-			relaysite.FieldCreatedAt:          {Type: field.TypeTime, Column: relaysite.FieldCreatedAt},
-			relaysite.FieldUpdatedAt:          {Type: field.TypeTime, Column: relaysite.FieldUpdatedAt},
-			relaysite.FieldDeletedAt:          {Type: field.TypeInt, Column: relaysite.FieldDeletedAt},
-			relaysite.FieldName:               {Type: field.TypeString, Column: relaysite.FieldName},
-			relaysite.FieldType:               {Type: field.TypeEnum, Column: relaysite.FieldType},
-			relaysite.FieldBaseURL:            {Type: field.TypeString, Column: relaysite.FieldBaseURL},
-			relaysite.FieldStatus:             {Type: field.TypeEnum, Column: relaysite.FieldStatus},
-			relaysite.FieldAutoCheckinEnabled: {Type: field.TypeBool, Column: relaysite.FieldAutoCheckinEnabled},
-			relaysite.FieldRemark:             {Type: field.TypeString, Column: relaysite.FieldRemark},
-			relaysite.FieldLastSyncedAt:       {Type: field.TypeTime, Column: relaysite.FieldLastSyncedAt},
-			relaysite.FieldLastSyncError:      {Type: field.TypeString, Column: relaysite.FieldLastSyncError},
-			relaysite.FieldLastCheckinAt:      {Type: field.TypeTime, Column: relaysite.FieldLastCheckinAt},
-			relaysite.FieldLastCheckinResult:  {Type: field.TypeString, Column: relaysite.FieldLastCheckinResult},
+			relaysite.FieldCreatedAt:              {Type: field.TypeTime, Column: relaysite.FieldCreatedAt},
+			relaysite.FieldUpdatedAt:              {Type: field.TypeTime, Column: relaysite.FieldUpdatedAt},
+			relaysite.FieldDeletedAt:              {Type: field.TypeInt, Column: relaysite.FieldDeletedAt},
+			relaysite.FieldName:                   {Type: field.TypeString, Column: relaysite.FieldName},
+			relaysite.FieldType:                   {Type: field.TypeEnum, Column: relaysite.FieldType},
+			relaysite.FieldBaseURL:                {Type: field.TypeString, Column: relaysite.FieldBaseURL},
+			relaysite.FieldStatus:                 {Type: field.TypeEnum, Column: relaysite.FieldStatus},
+			relaysite.FieldAutoCheckinEnabled:     {Type: field.TypeBool, Column: relaysite.FieldAutoCheckinEnabled},
+			relaysite.FieldRemark:                 {Type: field.TypeString, Column: relaysite.FieldRemark},
+			relaysite.FieldLastSyncedAt:           {Type: field.TypeTime, Column: relaysite.FieldLastSyncedAt},
+			relaysite.FieldLastSyncError:          {Type: field.TypeString, Column: relaysite.FieldLastSyncError},
+			relaysite.FieldLastCheckinAt:          {Type: field.TypeTime, Column: relaysite.FieldLastCheckinAt},
+			relaysite.FieldLastCheckinResult:      {Type: field.TypeString, Column: relaysite.FieldLastCheckinResult},
+			relaysite.FieldCheckinPageURL:         {Type: field.TypeString, Column: relaysite.FieldCheckinPageURL},
+			relaysite.FieldExternalCheckinPageURL: {Type: field.TypeString, Column: relaysite.FieldExternalCheckinPageURL},
 		},
 	}
 	graph.Nodes[15] = &sqlgraph.Node{
@@ -3486,6 +3488,16 @@ func (f *RelaySiteFilter) WhereLastCheckinAt(p entql.TimeP) {
 // WhereLastCheckinResult applies the entql string predicate on the last_checkin_result field.
 func (f *RelaySiteFilter) WhereLastCheckinResult(p entql.StringP) {
 	f.Where(p.Field(relaysite.FieldLastCheckinResult))
+}
+
+// WhereCheckinPageURL applies the entql string predicate on the checkin_page_url field.
+func (f *RelaySiteFilter) WhereCheckinPageURL(p entql.StringP) {
+	f.Where(p.Field(relaysite.FieldCheckinPageURL))
+}
+
+// WhereExternalCheckinPageURL applies the entql string predicate on the external_checkin_page_url field.
+func (f *RelaySiteFilter) WhereExternalCheckinPageURL(p entql.StringP) {
+	f.Where(p.Field(relaysite.FieldExternalCheckinPageURL))
 }
 
 // WhereHasCredential applies a predicate to check if query has an edge credential.

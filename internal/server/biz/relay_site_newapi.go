@@ -249,9 +249,6 @@ func (a *RelaySiteNewAPIAdapter) Checkin(ctx context.Context) (*RelaySiteCheckin
 	if err != nil {
 		return nil, err
 	}
-	if !resp.Success {
-		return nil, fmt.Errorf("new-api checkin failed: %s", responseMessage(resp.Message))
-	}
 
 	message := resp.Message
 	if message == "" {

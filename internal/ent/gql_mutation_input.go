@@ -910,12 +910,14 @@ func (c *PromptProtectionRuleUpdateOne) SetInput(i UpdatePromptProtectionRuleInp
 
 // CreateRelaySiteInput represents a mutation input for creating relaysites.
 type CreateRelaySiteInput struct {
-	Name               string
-	Type               *relaysite.Type
-	BaseURL            string
-	Status             *relaysite.Status
-	AutoCheckinEnabled *bool
-	Remark             *string
+	Name                   string
+	Type                   *relaysite.Type
+	BaseURL                string
+	Status                 *relaysite.Status
+	AutoCheckinEnabled     *bool
+	Remark                 *string
+	CheckinPageURL         *string
+	ExternalCheckinPageURL *string
 }
 
 // Mutate applies the CreateRelaySiteInput on the RelaySiteMutation builder.
@@ -934,6 +936,12 @@ func (i *CreateRelaySiteInput) Mutate(m *RelaySiteMutation) {
 	if v := i.Remark; v != nil {
 		m.SetRemark(*v)
 	}
+	if v := i.CheckinPageURL; v != nil {
+		m.SetCheckinPageURL(*v)
+	}
+	if v := i.ExternalCheckinPageURL; v != nil {
+		m.SetExternalCheckinPageURL(*v)
+	}
 }
 
 // SetInput applies the change-set in the CreateRelaySiteInput on the RelaySiteCreate builder.
@@ -944,13 +952,17 @@ func (c *RelaySiteCreate) SetInput(i CreateRelaySiteInput) *RelaySiteCreate {
 
 // UpdateRelaySiteInput represents a mutation input for updating relaysites.
 type UpdateRelaySiteInput struct {
-	Name               *string
-	Type               *relaysite.Type
-	BaseURL            *string
-	Status             *relaysite.Status
-	AutoCheckinEnabled *bool
-	ClearRemark        bool
-	Remark             *string
+	Name                        *string
+	Type                        *relaysite.Type
+	BaseURL                     *string
+	Status                      *relaysite.Status
+	AutoCheckinEnabled          *bool
+	ClearRemark                 bool
+	Remark                      *string
+	ClearCheckinPageURL         bool
+	CheckinPageURL              *string
+	ClearExternalCheckinPageURL bool
+	ExternalCheckinPageURL      *string
 }
 
 // Mutate applies the UpdateRelaySiteInput on the RelaySiteMutation builder.
@@ -975,6 +987,18 @@ func (i *UpdateRelaySiteInput) Mutate(m *RelaySiteMutation) {
 	}
 	if v := i.Remark; v != nil {
 		m.SetRemark(*v)
+	}
+	if i.ClearCheckinPageURL {
+		m.ClearCheckinPageURL()
+	}
+	if v := i.CheckinPageURL; v != nil {
+		m.SetCheckinPageURL(*v)
+	}
+	if i.ClearExternalCheckinPageURL {
+		m.ClearExternalCheckinPageURL()
+	}
+	if v := i.ExternalCheckinPageURL; v != nil {
+		m.SetExternalCheckinPageURL(*v)
 	}
 }
 

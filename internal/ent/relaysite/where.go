@@ -110,6 +110,16 @@ func LastCheckinResult(v string) predicate.RelaySite {
 	return predicate.RelaySite(sql.FieldEQ(FieldLastCheckinResult, v))
 }
 
+// CheckinPageURL applies equality check predicate on the "checkin_page_url" field. It's identical to CheckinPageURLEQ.
+func CheckinPageURL(v string) predicate.RelaySite {
+	return predicate.RelaySite(sql.FieldEQ(FieldCheckinPageURL, v))
+}
+
+// ExternalCheckinPageURL applies equality check predicate on the "external_checkin_page_url" field. It's identical to ExternalCheckinPageURLEQ.
+func ExternalCheckinPageURL(v string) predicate.RelaySite {
+	return predicate.RelaySite(sql.FieldEQ(FieldExternalCheckinPageURL, v))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.RelaySite {
 	return predicate.RelaySite(sql.FieldEQ(FieldCreatedAt, v))
@@ -733,6 +743,156 @@ func LastCheckinResultEqualFold(v string) predicate.RelaySite {
 // LastCheckinResultContainsFold applies the ContainsFold predicate on the "last_checkin_result" field.
 func LastCheckinResultContainsFold(v string) predicate.RelaySite {
 	return predicate.RelaySite(sql.FieldContainsFold(FieldLastCheckinResult, v))
+}
+
+// CheckinPageURLEQ applies the EQ predicate on the "checkin_page_url" field.
+func CheckinPageURLEQ(v string) predicate.RelaySite {
+	return predicate.RelaySite(sql.FieldEQ(FieldCheckinPageURL, v))
+}
+
+// CheckinPageURLNEQ applies the NEQ predicate on the "checkin_page_url" field.
+func CheckinPageURLNEQ(v string) predicate.RelaySite {
+	return predicate.RelaySite(sql.FieldNEQ(FieldCheckinPageURL, v))
+}
+
+// CheckinPageURLIn applies the In predicate on the "checkin_page_url" field.
+func CheckinPageURLIn(vs ...string) predicate.RelaySite {
+	return predicate.RelaySite(sql.FieldIn(FieldCheckinPageURL, vs...))
+}
+
+// CheckinPageURLNotIn applies the NotIn predicate on the "checkin_page_url" field.
+func CheckinPageURLNotIn(vs ...string) predicate.RelaySite {
+	return predicate.RelaySite(sql.FieldNotIn(FieldCheckinPageURL, vs...))
+}
+
+// CheckinPageURLGT applies the GT predicate on the "checkin_page_url" field.
+func CheckinPageURLGT(v string) predicate.RelaySite {
+	return predicate.RelaySite(sql.FieldGT(FieldCheckinPageURL, v))
+}
+
+// CheckinPageURLGTE applies the GTE predicate on the "checkin_page_url" field.
+func CheckinPageURLGTE(v string) predicate.RelaySite {
+	return predicate.RelaySite(sql.FieldGTE(FieldCheckinPageURL, v))
+}
+
+// CheckinPageURLLT applies the LT predicate on the "checkin_page_url" field.
+func CheckinPageURLLT(v string) predicate.RelaySite {
+	return predicate.RelaySite(sql.FieldLT(FieldCheckinPageURL, v))
+}
+
+// CheckinPageURLLTE applies the LTE predicate on the "checkin_page_url" field.
+func CheckinPageURLLTE(v string) predicate.RelaySite {
+	return predicate.RelaySite(sql.FieldLTE(FieldCheckinPageURL, v))
+}
+
+// CheckinPageURLContains applies the Contains predicate on the "checkin_page_url" field.
+func CheckinPageURLContains(v string) predicate.RelaySite {
+	return predicate.RelaySite(sql.FieldContains(FieldCheckinPageURL, v))
+}
+
+// CheckinPageURLHasPrefix applies the HasPrefix predicate on the "checkin_page_url" field.
+func CheckinPageURLHasPrefix(v string) predicate.RelaySite {
+	return predicate.RelaySite(sql.FieldHasPrefix(FieldCheckinPageURL, v))
+}
+
+// CheckinPageURLHasSuffix applies the HasSuffix predicate on the "checkin_page_url" field.
+func CheckinPageURLHasSuffix(v string) predicate.RelaySite {
+	return predicate.RelaySite(sql.FieldHasSuffix(FieldCheckinPageURL, v))
+}
+
+// CheckinPageURLIsNil applies the IsNil predicate on the "checkin_page_url" field.
+func CheckinPageURLIsNil() predicate.RelaySite {
+	return predicate.RelaySite(sql.FieldIsNull(FieldCheckinPageURL))
+}
+
+// CheckinPageURLNotNil applies the NotNil predicate on the "checkin_page_url" field.
+func CheckinPageURLNotNil() predicate.RelaySite {
+	return predicate.RelaySite(sql.FieldNotNull(FieldCheckinPageURL))
+}
+
+// CheckinPageURLEqualFold applies the EqualFold predicate on the "checkin_page_url" field.
+func CheckinPageURLEqualFold(v string) predicate.RelaySite {
+	return predicate.RelaySite(sql.FieldEqualFold(FieldCheckinPageURL, v))
+}
+
+// CheckinPageURLContainsFold applies the ContainsFold predicate on the "checkin_page_url" field.
+func CheckinPageURLContainsFold(v string) predicate.RelaySite {
+	return predicate.RelaySite(sql.FieldContainsFold(FieldCheckinPageURL, v))
+}
+
+// ExternalCheckinPageURLEQ applies the EQ predicate on the "external_checkin_page_url" field.
+func ExternalCheckinPageURLEQ(v string) predicate.RelaySite {
+	return predicate.RelaySite(sql.FieldEQ(FieldExternalCheckinPageURL, v))
+}
+
+// ExternalCheckinPageURLNEQ applies the NEQ predicate on the "external_checkin_page_url" field.
+func ExternalCheckinPageURLNEQ(v string) predicate.RelaySite {
+	return predicate.RelaySite(sql.FieldNEQ(FieldExternalCheckinPageURL, v))
+}
+
+// ExternalCheckinPageURLIn applies the In predicate on the "external_checkin_page_url" field.
+func ExternalCheckinPageURLIn(vs ...string) predicate.RelaySite {
+	return predicate.RelaySite(sql.FieldIn(FieldExternalCheckinPageURL, vs...))
+}
+
+// ExternalCheckinPageURLNotIn applies the NotIn predicate on the "external_checkin_page_url" field.
+func ExternalCheckinPageURLNotIn(vs ...string) predicate.RelaySite {
+	return predicate.RelaySite(sql.FieldNotIn(FieldExternalCheckinPageURL, vs...))
+}
+
+// ExternalCheckinPageURLGT applies the GT predicate on the "external_checkin_page_url" field.
+func ExternalCheckinPageURLGT(v string) predicate.RelaySite {
+	return predicate.RelaySite(sql.FieldGT(FieldExternalCheckinPageURL, v))
+}
+
+// ExternalCheckinPageURLGTE applies the GTE predicate on the "external_checkin_page_url" field.
+func ExternalCheckinPageURLGTE(v string) predicate.RelaySite {
+	return predicate.RelaySite(sql.FieldGTE(FieldExternalCheckinPageURL, v))
+}
+
+// ExternalCheckinPageURLLT applies the LT predicate on the "external_checkin_page_url" field.
+func ExternalCheckinPageURLLT(v string) predicate.RelaySite {
+	return predicate.RelaySite(sql.FieldLT(FieldExternalCheckinPageURL, v))
+}
+
+// ExternalCheckinPageURLLTE applies the LTE predicate on the "external_checkin_page_url" field.
+func ExternalCheckinPageURLLTE(v string) predicate.RelaySite {
+	return predicate.RelaySite(sql.FieldLTE(FieldExternalCheckinPageURL, v))
+}
+
+// ExternalCheckinPageURLContains applies the Contains predicate on the "external_checkin_page_url" field.
+func ExternalCheckinPageURLContains(v string) predicate.RelaySite {
+	return predicate.RelaySite(sql.FieldContains(FieldExternalCheckinPageURL, v))
+}
+
+// ExternalCheckinPageURLHasPrefix applies the HasPrefix predicate on the "external_checkin_page_url" field.
+func ExternalCheckinPageURLHasPrefix(v string) predicate.RelaySite {
+	return predicate.RelaySite(sql.FieldHasPrefix(FieldExternalCheckinPageURL, v))
+}
+
+// ExternalCheckinPageURLHasSuffix applies the HasSuffix predicate on the "external_checkin_page_url" field.
+func ExternalCheckinPageURLHasSuffix(v string) predicate.RelaySite {
+	return predicate.RelaySite(sql.FieldHasSuffix(FieldExternalCheckinPageURL, v))
+}
+
+// ExternalCheckinPageURLIsNil applies the IsNil predicate on the "external_checkin_page_url" field.
+func ExternalCheckinPageURLIsNil() predicate.RelaySite {
+	return predicate.RelaySite(sql.FieldIsNull(FieldExternalCheckinPageURL))
+}
+
+// ExternalCheckinPageURLNotNil applies the NotNil predicate on the "external_checkin_page_url" field.
+func ExternalCheckinPageURLNotNil() predicate.RelaySite {
+	return predicate.RelaySite(sql.FieldNotNull(FieldExternalCheckinPageURL))
+}
+
+// ExternalCheckinPageURLEqualFold applies the EqualFold predicate on the "external_checkin_page_url" field.
+func ExternalCheckinPageURLEqualFold(v string) predicate.RelaySite {
+	return predicate.RelaySite(sql.FieldEqualFold(FieldExternalCheckinPageURL, v))
+}
+
+// ExternalCheckinPageURLContainsFold applies the ContainsFold predicate on the "external_checkin_page_url" field.
+func ExternalCheckinPageURLContainsFold(v string) predicate.RelaySite {
+	return predicate.RelaySite(sql.FieldContainsFold(FieldExternalCheckinPageURL, v))
 }
 
 // HasCredential applies the HasEdge predicate on the "credential" edge.

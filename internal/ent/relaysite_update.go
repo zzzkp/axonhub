@@ -233,6 +233,46 @@ func (_u *RelaySiteUpdate) ClearLastCheckinResult() *RelaySiteUpdate {
 	return _u
 }
 
+// SetCheckinPageURL sets the "checkin_page_url" field.
+func (_u *RelaySiteUpdate) SetCheckinPageURL(v string) *RelaySiteUpdate {
+	_u.mutation.SetCheckinPageURL(v)
+	return _u
+}
+
+// SetNillableCheckinPageURL sets the "checkin_page_url" field if the given value is not nil.
+func (_u *RelaySiteUpdate) SetNillableCheckinPageURL(v *string) *RelaySiteUpdate {
+	if v != nil {
+		_u.SetCheckinPageURL(*v)
+	}
+	return _u
+}
+
+// ClearCheckinPageURL clears the value of the "checkin_page_url" field.
+func (_u *RelaySiteUpdate) ClearCheckinPageURL() *RelaySiteUpdate {
+	_u.mutation.ClearCheckinPageURL()
+	return _u
+}
+
+// SetExternalCheckinPageURL sets the "external_checkin_page_url" field.
+func (_u *RelaySiteUpdate) SetExternalCheckinPageURL(v string) *RelaySiteUpdate {
+	_u.mutation.SetExternalCheckinPageURL(v)
+	return _u
+}
+
+// SetNillableExternalCheckinPageURL sets the "external_checkin_page_url" field if the given value is not nil.
+func (_u *RelaySiteUpdate) SetNillableExternalCheckinPageURL(v *string) *RelaySiteUpdate {
+	if v != nil {
+		_u.SetExternalCheckinPageURL(*v)
+	}
+	return _u
+}
+
+// ClearExternalCheckinPageURL clears the value of the "external_checkin_page_url" field.
+func (_u *RelaySiteUpdate) ClearExternalCheckinPageURL() *RelaySiteUpdate {
+	_u.mutation.ClearExternalCheckinPageURL()
+	return _u
+}
+
 // SetCredentialID sets the "credential" edge to the RelaySiteCredential entity by ID.
 func (_u *RelaySiteUpdate) SetCredentialID(id int) *RelaySiteUpdate {
 	_u.mutation.SetCredentialID(id)
@@ -607,6 +647,18 @@ func (_u *RelaySiteUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if _u.mutation.LastCheckinResultCleared() {
 		_spec.ClearField(relaysite.FieldLastCheckinResult, field.TypeString)
+	}
+	if value, ok := _u.mutation.CheckinPageURL(); ok {
+		_spec.SetField(relaysite.FieldCheckinPageURL, field.TypeString, value)
+	}
+	if _u.mutation.CheckinPageURLCleared() {
+		_spec.ClearField(relaysite.FieldCheckinPageURL, field.TypeString)
+	}
+	if value, ok := _u.mutation.ExternalCheckinPageURL(); ok {
+		_spec.SetField(relaysite.FieldExternalCheckinPageURL, field.TypeString, value)
+	}
+	if _u.mutation.ExternalCheckinPageURLCleared() {
+		_spec.ClearField(relaysite.FieldExternalCheckinPageURL, field.TypeString)
 	}
 	if _u.mutation.CredentialCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -1126,6 +1178,46 @@ func (_u *RelaySiteUpdateOne) ClearLastCheckinResult() *RelaySiteUpdateOne {
 	return _u
 }
 
+// SetCheckinPageURL sets the "checkin_page_url" field.
+func (_u *RelaySiteUpdateOne) SetCheckinPageURL(v string) *RelaySiteUpdateOne {
+	_u.mutation.SetCheckinPageURL(v)
+	return _u
+}
+
+// SetNillableCheckinPageURL sets the "checkin_page_url" field if the given value is not nil.
+func (_u *RelaySiteUpdateOne) SetNillableCheckinPageURL(v *string) *RelaySiteUpdateOne {
+	if v != nil {
+		_u.SetCheckinPageURL(*v)
+	}
+	return _u
+}
+
+// ClearCheckinPageURL clears the value of the "checkin_page_url" field.
+func (_u *RelaySiteUpdateOne) ClearCheckinPageURL() *RelaySiteUpdateOne {
+	_u.mutation.ClearCheckinPageURL()
+	return _u
+}
+
+// SetExternalCheckinPageURL sets the "external_checkin_page_url" field.
+func (_u *RelaySiteUpdateOne) SetExternalCheckinPageURL(v string) *RelaySiteUpdateOne {
+	_u.mutation.SetExternalCheckinPageURL(v)
+	return _u
+}
+
+// SetNillableExternalCheckinPageURL sets the "external_checkin_page_url" field if the given value is not nil.
+func (_u *RelaySiteUpdateOne) SetNillableExternalCheckinPageURL(v *string) *RelaySiteUpdateOne {
+	if v != nil {
+		_u.SetExternalCheckinPageURL(*v)
+	}
+	return _u
+}
+
+// ClearExternalCheckinPageURL clears the value of the "external_checkin_page_url" field.
+func (_u *RelaySiteUpdateOne) ClearExternalCheckinPageURL() *RelaySiteUpdateOne {
+	_u.mutation.ClearExternalCheckinPageURL()
+	return _u
+}
+
 // SetCredentialID sets the "credential" edge to the RelaySiteCredential entity by ID.
 func (_u *RelaySiteUpdateOne) SetCredentialID(id int) *RelaySiteUpdateOne {
 	_u.mutation.SetCredentialID(id)
@@ -1530,6 +1622,18 @@ func (_u *RelaySiteUpdateOne) sqlSave(ctx context.Context) (_node *RelaySite, er
 	}
 	if _u.mutation.LastCheckinResultCleared() {
 		_spec.ClearField(relaysite.FieldLastCheckinResult, field.TypeString)
+	}
+	if value, ok := _u.mutation.CheckinPageURL(); ok {
+		_spec.SetField(relaysite.FieldCheckinPageURL, field.TypeString, value)
+	}
+	if _u.mutation.CheckinPageURLCleared() {
+		_spec.ClearField(relaysite.FieldCheckinPageURL, field.TypeString)
+	}
+	if value, ok := _u.mutation.ExternalCheckinPageURL(); ok {
+		_spec.SetField(relaysite.FieldExternalCheckinPageURL, field.TypeString, value)
+	}
+	if _u.mutation.ExternalCheckinPageURLCleared() {
+		_spec.ClearField(relaysite.FieldExternalCheckinPageURL, field.TypeString)
 	}
 	if _u.mutation.CredentialCleared() {
 		edge := &sqlgraph.EdgeSpec{

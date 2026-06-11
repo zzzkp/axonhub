@@ -26,6 +26,8 @@ input CreateRelaySiteConfigInput {
   autoCheckinEnabled: Boolean
   remark: String
   credential: RelaySiteCredentialInput!
+  checkinPageURL: String
+  externalCheckinPageURL: String
 }
 
 input UpdateRelaySiteConfigInput {
@@ -35,6 +37,8 @@ input UpdateRelaySiteConfigInput {
   autoCheckinEnabled: Boolean
   remark: String
   credential: RelaySiteCredentialInput
+  checkinPageURL: String
+  externalCheckinPageURL: String
 }
 
 input ImportRelaySiteAPIKeyToChannelInput {

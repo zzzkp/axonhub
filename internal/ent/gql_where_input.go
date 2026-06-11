@@ -6571,6 +6571,40 @@ type RelaySiteWhereInput struct {
 	LastCheckinResultEqualFold    *string  `json:"lastCheckinResultEqualFold,omitempty"`
 	LastCheckinResultContainsFold *string  `json:"lastCheckinResultContainsFold,omitempty"`
 
+	// "checkin_page_url" field predicates.
+	CheckinPageURL             *string  `json:"checkinPageURL,omitempty"`
+	CheckinPageURLNEQ          *string  `json:"checkinPageURLNEQ,omitempty"`
+	CheckinPageURLIn           []string `json:"checkinPageURLIn,omitempty"`
+	CheckinPageURLNotIn        []string `json:"checkinPageURLNotIn,omitempty"`
+	CheckinPageURLGT           *string  `json:"checkinPageURLGT,omitempty"`
+	CheckinPageURLGTE          *string  `json:"checkinPageURLGTE,omitempty"`
+	CheckinPageURLLT           *string  `json:"checkinPageURLLT,omitempty"`
+	CheckinPageURLLTE          *string  `json:"checkinPageURLLTE,omitempty"`
+	CheckinPageURLContains     *string  `json:"checkinPageURLContains,omitempty"`
+	CheckinPageURLHasPrefix    *string  `json:"checkinPageURLHasPrefix,omitempty"`
+	CheckinPageURLHasSuffix    *string  `json:"checkinPageURLHasSuffix,omitempty"`
+	CheckinPageURLIsNil        bool     `json:"checkinPageURLIsNil,omitempty"`
+	CheckinPageURLNotNil       bool     `json:"checkinPageURLNotNil,omitempty"`
+	CheckinPageURLEqualFold    *string  `json:"checkinPageURLEqualFold,omitempty"`
+	CheckinPageURLContainsFold *string  `json:"checkinPageURLContainsFold,omitempty"`
+
+	// "external_checkin_page_url" field predicates.
+	ExternalCheckinPageURL             *string  `json:"externalCheckinPageURL,omitempty"`
+	ExternalCheckinPageURLNEQ          *string  `json:"externalCheckinPageURLNEQ,omitempty"`
+	ExternalCheckinPageURLIn           []string `json:"externalCheckinPageURLIn,omitempty"`
+	ExternalCheckinPageURLNotIn        []string `json:"externalCheckinPageURLNotIn,omitempty"`
+	ExternalCheckinPageURLGT           *string  `json:"externalCheckinPageURLGT,omitempty"`
+	ExternalCheckinPageURLGTE          *string  `json:"externalCheckinPageURLGTE,omitempty"`
+	ExternalCheckinPageURLLT           *string  `json:"externalCheckinPageURLLT,omitempty"`
+	ExternalCheckinPageURLLTE          *string  `json:"externalCheckinPageURLLTE,omitempty"`
+	ExternalCheckinPageURLContains     *string  `json:"externalCheckinPageURLContains,omitempty"`
+	ExternalCheckinPageURLHasPrefix    *string  `json:"externalCheckinPageURLHasPrefix,omitempty"`
+	ExternalCheckinPageURLHasSuffix    *string  `json:"externalCheckinPageURLHasSuffix,omitempty"`
+	ExternalCheckinPageURLIsNil        bool     `json:"externalCheckinPageURLIsNil,omitempty"`
+	ExternalCheckinPageURLNotNil       bool     `json:"externalCheckinPageURLNotNil,omitempty"`
+	ExternalCheckinPageURLEqualFold    *string  `json:"externalCheckinPageURLEqualFold,omitempty"`
+	ExternalCheckinPageURLContainsFold *string  `json:"externalCheckinPageURLContainsFold,omitempty"`
+
 	// "api_keys" edge predicates.
 	HasAPIKeys     *bool                        `json:"hasAPIKeys,omitempty"`
 	HasAPIKeysWith []*RelaySiteAPIKeyWhereInput `json:"hasAPIKeysWith,omitempty"`
@@ -7041,6 +7075,96 @@ func (i *RelaySiteWhereInput) P() (predicate.RelaySite, error) {
 	}
 	if i.LastCheckinResultContainsFold != nil {
 		predicates = append(predicates, relaysite.LastCheckinResultContainsFold(*i.LastCheckinResultContainsFold))
+	}
+	if i.CheckinPageURL != nil {
+		predicates = append(predicates, relaysite.CheckinPageURLEQ(*i.CheckinPageURL))
+	}
+	if i.CheckinPageURLNEQ != nil {
+		predicates = append(predicates, relaysite.CheckinPageURLNEQ(*i.CheckinPageURLNEQ))
+	}
+	if len(i.CheckinPageURLIn) > 0 {
+		predicates = append(predicates, relaysite.CheckinPageURLIn(i.CheckinPageURLIn...))
+	}
+	if len(i.CheckinPageURLNotIn) > 0 {
+		predicates = append(predicates, relaysite.CheckinPageURLNotIn(i.CheckinPageURLNotIn...))
+	}
+	if i.CheckinPageURLGT != nil {
+		predicates = append(predicates, relaysite.CheckinPageURLGT(*i.CheckinPageURLGT))
+	}
+	if i.CheckinPageURLGTE != nil {
+		predicates = append(predicates, relaysite.CheckinPageURLGTE(*i.CheckinPageURLGTE))
+	}
+	if i.CheckinPageURLLT != nil {
+		predicates = append(predicates, relaysite.CheckinPageURLLT(*i.CheckinPageURLLT))
+	}
+	if i.CheckinPageURLLTE != nil {
+		predicates = append(predicates, relaysite.CheckinPageURLLTE(*i.CheckinPageURLLTE))
+	}
+	if i.CheckinPageURLContains != nil {
+		predicates = append(predicates, relaysite.CheckinPageURLContains(*i.CheckinPageURLContains))
+	}
+	if i.CheckinPageURLHasPrefix != nil {
+		predicates = append(predicates, relaysite.CheckinPageURLHasPrefix(*i.CheckinPageURLHasPrefix))
+	}
+	if i.CheckinPageURLHasSuffix != nil {
+		predicates = append(predicates, relaysite.CheckinPageURLHasSuffix(*i.CheckinPageURLHasSuffix))
+	}
+	if i.CheckinPageURLIsNil {
+		predicates = append(predicates, relaysite.CheckinPageURLIsNil())
+	}
+	if i.CheckinPageURLNotNil {
+		predicates = append(predicates, relaysite.CheckinPageURLNotNil())
+	}
+	if i.CheckinPageURLEqualFold != nil {
+		predicates = append(predicates, relaysite.CheckinPageURLEqualFold(*i.CheckinPageURLEqualFold))
+	}
+	if i.CheckinPageURLContainsFold != nil {
+		predicates = append(predicates, relaysite.CheckinPageURLContainsFold(*i.CheckinPageURLContainsFold))
+	}
+	if i.ExternalCheckinPageURL != nil {
+		predicates = append(predicates, relaysite.ExternalCheckinPageURLEQ(*i.ExternalCheckinPageURL))
+	}
+	if i.ExternalCheckinPageURLNEQ != nil {
+		predicates = append(predicates, relaysite.ExternalCheckinPageURLNEQ(*i.ExternalCheckinPageURLNEQ))
+	}
+	if len(i.ExternalCheckinPageURLIn) > 0 {
+		predicates = append(predicates, relaysite.ExternalCheckinPageURLIn(i.ExternalCheckinPageURLIn...))
+	}
+	if len(i.ExternalCheckinPageURLNotIn) > 0 {
+		predicates = append(predicates, relaysite.ExternalCheckinPageURLNotIn(i.ExternalCheckinPageURLNotIn...))
+	}
+	if i.ExternalCheckinPageURLGT != nil {
+		predicates = append(predicates, relaysite.ExternalCheckinPageURLGT(*i.ExternalCheckinPageURLGT))
+	}
+	if i.ExternalCheckinPageURLGTE != nil {
+		predicates = append(predicates, relaysite.ExternalCheckinPageURLGTE(*i.ExternalCheckinPageURLGTE))
+	}
+	if i.ExternalCheckinPageURLLT != nil {
+		predicates = append(predicates, relaysite.ExternalCheckinPageURLLT(*i.ExternalCheckinPageURLLT))
+	}
+	if i.ExternalCheckinPageURLLTE != nil {
+		predicates = append(predicates, relaysite.ExternalCheckinPageURLLTE(*i.ExternalCheckinPageURLLTE))
+	}
+	if i.ExternalCheckinPageURLContains != nil {
+		predicates = append(predicates, relaysite.ExternalCheckinPageURLContains(*i.ExternalCheckinPageURLContains))
+	}
+	if i.ExternalCheckinPageURLHasPrefix != nil {
+		predicates = append(predicates, relaysite.ExternalCheckinPageURLHasPrefix(*i.ExternalCheckinPageURLHasPrefix))
+	}
+	if i.ExternalCheckinPageURLHasSuffix != nil {
+		predicates = append(predicates, relaysite.ExternalCheckinPageURLHasSuffix(*i.ExternalCheckinPageURLHasSuffix))
+	}
+	if i.ExternalCheckinPageURLIsNil {
+		predicates = append(predicates, relaysite.ExternalCheckinPageURLIsNil())
+	}
+	if i.ExternalCheckinPageURLNotNil {
+		predicates = append(predicates, relaysite.ExternalCheckinPageURLNotNil())
+	}
+	if i.ExternalCheckinPageURLEqualFold != nil {
+		predicates = append(predicates, relaysite.ExternalCheckinPageURLEqualFold(*i.ExternalCheckinPageURLEqualFold))
+	}
+	if i.ExternalCheckinPageURLContainsFold != nil {
+		predicates = append(predicates, relaysite.ExternalCheckinPageURLContainsFold(*i.ExternalCheckinPageURLContainsFold))
 	}
 
 	if i.HasAPIKeys != nil {

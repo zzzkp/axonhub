@@ -122,7 +122,9 @@ The entry point is wired through:
 - `frontend/src/locales/zh-CN/relaySites.json`
 - `frontend/src/locales/en/relaySites.json`
 
-Frontend capabilities include paginated site listing, search and status filters, site creation and editing, manual sync, manual check-in, resource snapshot display, API key management dialog, check-in records dialog, announcements dialog, and import-as-Channel dialog.
+Frontend capabilities include paginated site listing, search and status filters, site creation and editing, manual sync, manual check-in, resource snapshot display, API key management dialog, models and tokens dialog, check-in records dialog, announcements dialog, and import-as-Channel dialog.
+
+The models and tokens dialog shows remote API keys and available models by group. The token list's Channel Status switch reuses the explicit import flow: it creates a normal Channel when no related Channel exists, re-enables an existing disabled Channel, or disables the related Channel when it is enabled. The token list's Endpoint Config switch reuses the existing `saveChannelEndpoints` mutation to quickly add or remove message protocol endpoints for the Channel related to that token.
 
 The announcements entry lives in the relay site list action menu. Opening the announcements dialog calls `refreshRelaySiteAnnouncements` to fetch the remote `/api/status` endpoint and refresh local snapshots. The dialog shows content, type, publish time, fetch time, and read state, and `markRelaySiteAnnouncementsRead` marks announcements for the current site as read. The site column uses `hasUnreadAnnouncements` to show an unread indicator.
 
@@ -141,7 +143,15 @@ Channel import is explicit and does not create automatic synchronization. The fl
 3. The user fills channel fields such as Channel type, Base URL, supported models, and default test model.
 4. The service calls the existing `ChannelService.CreateChannel` to create a normal channel.
 
-After import, the relay site and Channel are not strongly bound. Future request routing is still handled by the existing Channel, model association, and load balancing logic.
+After import, the relay site and Channel are not strongly bound. Future request routing is still handled by the existing Channel, model association, and load balancing logic. The frontend uses tags written during import to find the relationship between a relay site API key and a Channel for the Channel Status and Endpoint Config shortcuts in the models and tokens dialog.
+
+The Endpoint Config switch manages only message protocol endpoints. It does not change Channel default endpoints and does not change request routing protocol selection. The currently auto-managed endpoints are:
+
+- `openai/responses`
+- `anthropic/messages`
+- `gemini/contents`
+
+When Endpoint Config is enabled, the frontend keeps existing custom endpoints and appends any missing message protocol endpoints from the list above. When Endpoint Config is disabled, it removes only endpoints whose apiFormat is in the list above and whose `path`, `baseURL`, and `transport` are all empty. If the user configured a custom path, baseURL, or transport for one of these protocols in the channel endpoint settings, disabling the switch keeps that endpoint.
 
 ## Adding New Site Types
 

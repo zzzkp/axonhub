@@ -1779,6 +1779,8 @@ input CreateRelaySiteInput {
   status: RelaySiteStatus
   autoCheckinEnabled: Boolean
   remark: String
+  checkinPageURL: String
+  externalCheckinPageURL: String
 }
 """
 CreateRequestInput is used for create Request object.
@@ -4465,6 +4467,8 @@ type RelaySite implements Node {
   lastSyncError: String
   lastCheckinAt: Time
   lastCheckinResult: String
+  checkinPageURL: String
+  externalCheckinPageURL: String
   apiKeys(
     """
     Returns the elements in the list that come after the specified cursor.
@@ -5992,6 +5996,42 @@ input RelaySiteWhereInput {
   lastCheckinResultNotNil: Boolean
   lastCheckinResultEqualFold: String
   lastCheckinResultContainsFold: String
+  """
+  checkin_page_url field predicates
+  """
+  checkinPageURL: String
+  checkinPageURLNEQ: String
+  checkinPageURLIn: [String!]
+  checkinPageURLNotIn: [String!]
+  checkinPageURLGT: String
+  checkinPageURLGTE: String
+  checkinPageURLLT: String
+  checkinPageURLLTE: String
+  checkinPageURLContains: String
+  checkinPageURLHasPrefix: String
+  checkinPageURLHasSuffix: String
+  checkinPageURLIsNil: Boolean
+  checkinPageURLNotNil: Boolean
+  checkinPageURLEqualFold: String
+  checkinPageURLContainsFold: String
+  """
+  external_checkin_page_url field predicates
+  """
+  externalCheckinPageURL: String
+  externalCheckinPageURLNEQ: String
+  externalCheckinPageURLIn: [String!]
+  externalCheckinPageURLNotIn: [String!]
+  externalCheckinPageURLGT: String
+  externalCheckinPageURLGTE: String
+  externalCheckinPageURLLT: String
+  externalCheckinPageURLLTE: String
+  externalCheckinPageURLContains: String
+  externalCheckinPageURLHasPrefix: String
+  externalCheckinPageURLHasSuffix: String
+  externalCheckinPageURLIsNil: Boolean
+  externalCheckinPageURLNotNil: Boolean
+  externalCheckinPageURLEqualFold: String
+  externalCheckinPageURLContainsFold: String
   """
   api_keys edge predicates
   """
@@ -7860,6 +7900,10 @@ input UpdateRelaySiteInput {
   autoCheckinEnabled: Boolean
   remark: String
   clearRemark: Boolean
+  checkinPageURL: String
+  clearCheckinPageURL: Boolean
+  externalCheckinPageURL: String
+  clearExternalCheckinPageURL: Boolean
 }
 """
 UpdateRequestInput is used for update Request object.

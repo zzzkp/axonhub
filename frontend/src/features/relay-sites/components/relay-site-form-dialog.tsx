@@ -20,6 +20,8 @@ type RelaySiteFormValues = {
   status: 'enabled' | 'disabled' | 'archived';
   autoCheckinEnabled: boolean;
   remark: string;
+  checkinPageURL: string;
+  externalCheckinPageURL: string;
   authType: 'token' | 'password';
   token: string;
   userId: string;
@@ -51,6 +53,8 @@ const emptyRelaySiteFormValues: RelaySiteFormValues = {
   status: 'enabled',
   autoCheckinEnabled: false,
   remark: '',
+  checkinPageURL: '',
+  externalCheckinPageURL: '',
   authType: 'token',
   token: '',
   userId: '',
@@ -107,6 +111,8 @@ export function RelaySiteFormDialog({ mode }: { mode: 'create' | 'edit' }) {
         status: editingRelaySite.status,
         autoCheckinEnabled: editingRelaySite.autoCheckinEnabled,
         remark: editingRelaySite.remark ?? '',
+        checkinPageURL: editingRelaySite.checkinPageURL ?? '',
+        externalCheckinPageURL: editingRelaySite.externalCheckinPageURL ?? '',
         authType: credential?.authType ?? 'token',
         token: credential?.token ?? '',
         userId: credential?.userId ? String(credential.userId) : '',
@@ -136,6 +142,8 @@ export function RelaySiteFormDialog({ mode }: { mode: 'create' | 'edit' }) {
         status: data.status,
         autoCheckinEnabled: data.autoCheckinEnabled,
         remark: data.remark.trim(),
+        checkinPageURL: data.checkinPageURL.trim(),
+        externalCheckinPageURL: data.externalCheckinPageURL.trim(),
         credential: credential!,
       };
       await createMutation.mutateAsync(input);
@@ -150,6 +158,8 @@ export function RelaySiteFormDialog({ mode }: { mode: 'create' | 'edit' }) {
       status: data.status,
       autoCheckinEnabled: data.autoCheckinEnabled,
       remark: data.remark.trim(),
+      checkinPageURL: data.checkinPageURL.trim(),
+      externalCheckinPageURL: data.externalCheckinPageURL.trim(),
       ...(credential ? { credential } : {}),
     };
     await updateMutation.mutateAsync({ id: editingRelaySite.id, input });
@@ -199,6 +209,14 @@ export function RelaySiteFormDialog({ mode }: { mode: 'create' | 'edit' }) {
             <div className='grid gap-2'>
               <Label htmlFor={`${mode}-relay-site-remark`}>{t('relaySites.fields.remark')}</Label>
               <Textarea id={`${mode}-relay-site-remark`} rows={3} {...register('remark')} />
+            </div>
+            <div className='grid gap-2'>
+              <Label htmlFor={`${mode}-relay-site-checkin-page-url`}>{t('relaySites.fields.checkinPageURL')}</Label>
+              <Input id={`${mode}-relay-site-checkin-page-url`} placeholder='https://...' {...register('checkinPageURL')} />
+            </div>
+            <div className='grid gap-2'>
+              <Label htmlFor={`${mode}-relay-site-external-checkin-page-url`}>{t('relaySites.fields.externalCheckinPageURL')}</Label>
+              <Input id={`${mode}-relay-site-external-checkin-page-url`} placeholder='https://...' {...register('externalCheckinPageURL')} />
             </div>
             <div className='grid gap-2'>
               <Label htmlFor={`${mode}-relay-site-auth-type`}>{t('relaySites.fields.authType')}</Label>

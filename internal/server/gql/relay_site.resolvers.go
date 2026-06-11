@@ -213,6 +213,18 @@ func (r *createRelaySiteConfigInputResolver) Credential(ctx context.Context, obj
 	return nil
 }
 
+// CheckinPageURL is the resolver for the checkinPageURL field.
+func (r *createRelaySiteConfigInputResolver) CheckinPageURL(ctx context.Context, obj *biz.CreateRelaySiteConfigInput, data *string) error {
+	obj.CheckinPageURL = data
+	return nil
+}
+
+// ExternalCheckinPageURL is the resolver for the externalCheckinPageURL field.
+func (r *createRelaySiteConfigInputResolver) ExternalCheckinPageURL(ctx context.Context, obj *biz.CreateRelaySiteConfigInput, data *string) error {
+	obj.ExternalCheckinPageURL = data
+	return nil
+}
+
 // Credential is the resolver for the credential field.
 func (r *updateRelaySiteConfigInputResolver) Credential(ctx context.Context, obj *biz.UpdateRelaySiteConfigInput, data *RelaySiteCredentialInput) error {
 	if data == nil {
@@ -238,6 +250,18 @@ func (r *updateRelaySiteConfigInputResolver) Credential(ctx context.Context, obj
 
 	obj.Credential = &credential
 
+	return nil
+}
+
+// CheckinPageURL is the resolver for the checkinPageURL field.
+func (r *updateRelaySiteConfigInputResolver) CheckinPageURL(ctx context.Context, obj *biz.UpdateRelaySiteConfigInput, data *string) error {
+	obj.CheckinPageURL = data
+	return nil
+}
+
+// ExternalCheckinPageURL is the resolver for the externalCheckinPageURL field.
+func (r *updateRelaySiteConfigInputResolver) ExternalCheckinPageURL(ctx context.Context, obj *biz.UpdateRelaySiteConfigInput, data *string) error {
+	obj.ExternalCheckinPageURL = data
 	return nil
 }
 

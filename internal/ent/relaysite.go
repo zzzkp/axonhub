@@ -44,6 +44,10 @@ type RelaySite struct {
 	LastCheckinAt *time.Time `json:"last_checkin_at,omitempty"`
 	// LastCheckinResult holds the value of the "last_checkin_result" field.
 	LastCheckinResult *string `json:"last_checkin_result,omitempty"`
+	// CheckinPageURL holds the value of the "checkin_page_url" field.
+	CheckinPageURL *string `json:"checkin_page_url,omitempty"`
+	// ExternalCheckinPageURL holds the value of the "external_checkin_page_url" field.
+	ExternalCheckinPageURL *string `json:"external_checkin_page_url,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the RelaySiteQuery when eager-loading is set.
 	Edges        RelaySiteEdges `json:"edges"`
@@ -154,7 +158,7 @@ func (*RelaySite) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case relaysite.FieldID, relaysite.FieldDeletedAt:
 			values[i] = new(sql.NullInt64)
-		case relaysite.FieldName, relaysite.FieldType, relaysite.FieldBaseURL, relaysite.FieldStatus, relaysite.FieldRemark, relaysite.FieldLastSyncError, relaysite.FieldLastCheckinResult:
+		case relaysite.FieldName, relaysite.FieldType, relaysite.FieldBaseURL, relaysite.FieldStatus, relaysite.FieldRemark, relaysite.FieldLastSyncError, relaysite.FieldLastCheckinResult, relaysite.FieldCheckinPageURL, relaysite.FieldExternalCheckinPageURL:
 			values[i] = new(sql.NullString)
 		case relaysite.FieldCreatedAt, relaysite.FieldUpdatedAt, relaysite.FieldLastSyncedAt, relaysite.FieldLastCheckinAt:
 			values[i] = new(sql.NullTime)
@@ -261,6 +265,20 @@ func (_m *RelaySite) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.LastCheckinResult = new(string)
 				*_m.LastCheckinResult = value.String
+			}
+		case relaysite.FieldCheckinPageURL:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field checkin_page_url", values[i])
+			} else if value.Valid {
+				_m.CheckinPageURL = new(string)
+				*_m.CheckinPageURL = value.String
+			}
+		case relaysite.FieldExternalCheckinPageURL:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field external_checkin_page_url", values[i])
+			} else if value.Valid {
+				_m.ExternalCheckinPageURL = new(string)
+				*_m.ExternalCheckinPageURL = value.String
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
@@ -379,6 +397,16 @@ func (_m *RelaySite) String() string {
 	builder.WriteString(", ")
 	if v := _m.LastCheckinResult; v != nil {
 		builder.WriteString("last_checkin_result=")
+		builder.WriteString(*v)
+	}
+	builder.WriteString(", ")
+	if v := _m.CheckinPageURL; v != nil {
+		builder.WriteString("checkin_page_url=")
+		builder.WriteString(*v)
+	}
+	builder.WriteString(", ")
+	if v := _m.ExternalCheckinPageURL; v != nil {
+		builder.WriteString("external_checkin_page_url=")
 		builder.WriteString(*v)
 	}
 	builder.WriteByte(')')
