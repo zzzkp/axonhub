@@ -12,6 +12,7 @@ import (
 	"github.com/looplj/axonhub/internal/ent/project"
 	"github.com/looplj/axonhub/internal/ent/prompt"
 	"github.com/looplj/axonhub/internal/ent/promptprotectionrule"
+	"github.com/looplj/axonhub/internal/ent/relaysite"
 	"github.com/looplj/axonhub/internal/ent/request"
 	"github.com/looplj/axonhub/internal/ent/role"
 	"github.com/looplj/axonhub/internal/ent/usagelog"
@@ -903,6 +904,88 @@ func (c *PromptProtectionRuleUpdate) SetInput(i UpdatePromptProtectionRuleInput)
 
 // SetInput applies the change-set in the UpdatePromptProtectionRuleInput on the PromptProtectionRuleUpdateOne builder.
 func (c *PromptProtectionRuleUpdateOne) SetInput(i UpdatePromptProtectionRuleInput) *PromptProtectionRuleUpdateOne {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// CreateRelaySiteInput represents a mutation input for creating relaysites.
+type CreateRelaySiteInput struct {
+	Name               string
+	Type               *relaysite.Type
+	BaseURL            string
+	Status             *relaysite.Status
+	AutoCheckinEnabled *bool
+	Remark             *string
+}
+
+// Mutate applies the CreateRelaySiteInput on the RelaySiteMutation builder.
+func (i *CreateRelaySiteInput) Mutate(m *RelaySiteMutation) {
+	m.SetName(i.Name)
+	if v := i.Type; v != nil {
+		m.SetType(*v)
+	}
+	m.SetBaseURL(i.BaseURL)
+	if v := i.Status; v != nil {
+		m.SetStatus(*v)
+	}
+	if v := i.AutoCheckinEnabled; v != nil {
+		m.SetAutoCheckinEnabled(*v)
+	}
+	if v := i.Remark; v != nil {
+		m.SetRemark(*v)
+	}
+}
+
+// SetInput applies the change-set in the CreateRelaySiteInput on the RelaySiteCreate builder.
+func (c *RelaySiteCreate) SetInput(i CreateRelaySiteInput) *RelaySiteCreate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// UpdateRelaySiteInput represents a mutation input for updating relaysites.
+type UpdateRelaySiteInput struct {
+	Name               *string
+	Type               *relaysite.Type
+	BaseURL            *string
+	Status             *relaysite.Status
+	AutoCheckinEnabled *bool
+	ClearRemark        bool
+	Remark             *string
+}
+
+// Mutate applies the UpdateRelaySiteInput on the RelaySiteMutation builder.
+func (i *UpdateRelaySiteInput) Mutate(m *RelaySiteMutation) {
+	if v := i.Name; v != nil {
+		m.SetName(*v)
+	}
+	if v := i.Type; v != nil {
+		m.SetType(*v)
+	}
+	if v := i.BaseURL; v != nil {
+		m.SetBaseURL(*v)
+	}
+	if v := i.Status; v != nil {
+		m.SetStatus(*v)
+	}
+	if v := i.AutoCheckinEnabled; v != nil {
+		m.SetAutoCheckinEnabled(*v)
+	}
+	if i.ClearRemark {
+		m.ClearRemark()
+	}
+	if v := i.Remark; v != nil {
+		m.SetRemark(*v)
+	}
+}
+
+// SetInput applies the change-set in the UpdateRelaySiteInput on the RelaySiteUpdate builder.
+func (c *RelaySiteUpdate) SetInput(i UpdateRelaySiteInput) *RelaySiteUpdate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// SetInput applies the change-set in the UpdateRelaySiteInput on the RelaySiteUpdateOne builder.
+func (c *RelaySiteUpdateOne) SetInput(i UpdateRelaySiteInput) *RelaySiteUpdateOne {
 	i.Mutate(c.Mutation())
 	return c
 }

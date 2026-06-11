@@ -28,6 +28,13 @@ import (
 	"github.com/looplj/axonhub/internal/ent/prompt"
 	"github.com/looplj/axonhub/internal/ent/promptprotectionrule"
 	"github.com/looplj/axonhub/internal/ent/providerquotastatus"
+	"github.com/looplj/axonhub/internal/ent/relaysite"
+	"github.com/looplj/axonhub/internal/ent/relaysiteannouncement"
+	"github.com/looplj/axonhub/internal/ent/relaysiteapikey"
+	"github.com/looplj/axonhub/internal/ent/relaysitebalancesnapshot"
+	"github.com/looplj/axonhub/internal/ent/relaysitecheckinlog"
+	"github.com/looplj/axonhub/internal/ent/relaysitegroup"
+	"github.com/looplj/axonhub/internal/ent/relaysitemodelprice"
 	"github.com/looplj/axonhub/internal/ent/request"
 	"github.com/looplj/axonhub/internal/ent/requestexecution"
 	"github.com/looplj/axonhub/internal/ent/role"
@@ -116,6 +123,41 @@ var providerquotastatusImplementors = []string{"ProviderQuotaStatus", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
 func (*ProviderQuotaStatus) IsNode() {}
+
+var relaysiteImplementors = []string{"RelaySite", "Node"}
+
+// IsNode implements the Node interface check for GQLGen.
+func (*RelaySite) IsNode() {}
+
+var relaysiteapikeyImplementors = []string{"RelaySiteAPIKey", "Node"}
+
+// IsNode implements the Node interface check for GQLGen.
+func (*RelaySiteAPIKey) IsNode() {}
+
+var relaysiteannouncementImplementors = []string{"RelaySiteAnnouncement", "Node"}
+
+// IsNode implements the Node interface check for GQLGen.
+func (*RelaySiteAnnouncement) IsNode() {}
+
+var relaysitebalancesnapshotImplementors = []string{"RelaySiteBalanceSnapshot", "Node"}
+
+// IsNode implements the Node interface check for GQLGen.
+func (*RelaySiteBalanceSnapshot) IsNode() {}
+
+var relaysitecheckinlogImplementors = []string{"RelaySiteCheckinLog", "Node"}
+
+// IsNode implements the Node interface check for GQLGen.
+func (*RelaySiteCheckinLog) IsNode() {}
+
+var relaysitegroupImplementors = []string{"RelaySiteGroup", "Node"}
+
+// IsNode implements the Node interface check for GQLGen.
+func (*RelaySiteGroup) IsNode() {}
+
+var relaysitemodelpriceImplementors = []string{"RelaySiteModelPrice", "Node"}
+
+// IsNode implements the Node interface check for GQLGen.
+func (*RelaySiteModelPrice) IsNode() {}
 
 var requestImplementors = []string{"Request", "Node"}
 
@@ -347,6 +389,69 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 			Where(providerquotastatus.ID(id))
 		if fc := graphql.GetFieldContext(ctx); fc != nil {
 			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, providerquotastatusImplementors...); err != nil {
+				return nil, err
+			}
+		}
+		return query.Only(ctx)
+	case relaysite.Table:
+		query := c.RelaySite.Query().
+			Where(relaysite.ID(id))
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, relaysiteImplementors...); err != nil {
+				return nil, err
+			}
+		}
+		return query.Only(ctx)
+	case relaysiteapikey.Table:
+		query := c.RelaySiteAPIKey.Query().
+			Where(relaysiteapikey.ID(id))
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, relaysiteapikeyImplementors...); err != nil {
+				return nil, err
+			}
+		}
+		return query.Only(ctx)
+	case relaysiteannouncement.Table:
+		query := c.RelaySiteAnnouncement.Query().
+			Where(relaysiteannouncement.ID(id))
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, relaysiteannouncementImplementors...); err != nil {
+				return nil, err
+			}
+		}
+		return query.Only(ctx)
+	case relaysitebalancesnapshot.Table:
+		query := c.RelaySiteBalanceSnapshot.Query().
+			Where(relaysitebalancesnapshot.ID(id))
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, relaysitebalancesnapshotImplementors...); err != nil {
+				return nil, err
+			}
+		}
+		return query.Only(ctx)
+	case relaysitecheckinlog.Table:
+		query := c.RelaySiteCheckinLog.Query().
+			Where(relaysitecheckinlog.ID(id))
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, relaysitecheckinlogImplementors...); err != nil {
+				return nil, err
+			}
+		}
+		return query.Only(ctx)
+	case relaysitegroup.Table:
+		query := c.RelaySiteGroup.Query().
+			Where(relaysitegroup.ID(id))
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, relaysitegroupImplementors...); err != nil {
+				return nil, err
+			}
+		}
+		return query.Only(ctx)
+	case relaysitemodelprice.Table:
+		query := c.RelaySiteModelPrice.Query().
+			Where(relaysitemodelprice.ID(id))
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, relaysitemodelpriceImplementors...); err != nil {
 				return nil, err
 			}
 		}
@@ -726,6 +831,118 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 		query := c.ProviderQuotaStatus.Query().
 			Where(providerquotastatus.IDIn(ids...))
 		query, err := query.CollectFields(ctx, providerquotastatusImplementors...)
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case relaysite.Table:
+		query := c.RelaySite.Query().
+			Where(relaysite.IDIn(ids...))
+		query, err := query.CollectFields(ctx, relaysiteImplementors...)
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case relaysiteapikey.Table:
+		query := c.RelaySiteAPIKey.Query().
+			Where(relaysiteapikey.IDIn(ids...))
+		query, err := query.CollectFields(ctx, relaysiteapikeyImplementors...)
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case relaysiteannouncement.Table:
+		query := c.RelaySiteAnnouncement.Query().
+			Where(relaysiteannouncement.IDIn(ids...))
+		query, err := query.CollectFields(ctx, relaysiteannouncementImplementors...)
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case relaysitebalancesnapshot.Table:
+		query := c.RelaySiteBalanceSnapshot.Query().
+			Where(relaysitebalancesnapshot.IDIn(ids...))
+		query, err := query.CollectFields(ctx, relaysitebalancesnapshotImplementors...)
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case relaysitecheckinlog.Table:
+		query := c.RelaySiteCheckinLog.Query().
+			Where(relaysitecheckinlog.IDIn(ids...))
+		query, err := query.CollectFields(ctx, relaysitecheckinlogImplementors...)
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case relaysitegroup.Table:
+		query := c.RelaySiteGroup.Query().
+			Where(relaysitegroup.IDIn(ids...))
+		query, err := query.CollectFields(ctx, relaysitegroupImplementors...)
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case relaysitemodelprice.Table:
+		query := c.RelaySiteModelPrice.Query().
+			Where(relaysitemodelprice.IDIn(ids...))
+		query, err := query.CollectFields(ctx, relaysitemodelpriceImplementors...)
 		if err != nil {
 			return nil, err
 		}

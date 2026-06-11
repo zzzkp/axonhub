@@ -15,6 +15,7 @@ schema:
   - prompt.graphql
   - prompt_protection_rule.graphql
   - price.graphql
+  - relay_site.graphql
   - cost.graphql
 
 omit_gqlgen_version_in_file_notice: true

@@ -18,6 +18,14 @@ import (
 	"github.com/looplj/axonhub/internal/ent/prompt"
 	"github.com/looplj/axonhub/internal/ent/promptprotectionrule"
 	"github.com/looplj/axonhub/internal/ent/providerquotastatus"
+	"github.com/looplj/axonhub/internal/ent/relaysite"
+	"github.com/looplj/axonhub/internal/ent/relaysiteannouncement"
+	"github.com/looplj/axonhub/internal/ent/relaysiteapikey"
+	"github.com/looplj/axonhub/internal/ent/relaysitebalancesnapshot"
+	"github.com/looplj/axonhub/internal/ent/relaysitecheckinlog"
+	"github.com/looplj/axonhub/internal/ent/relaysitecredential"
+	"github.com/looplj/axonhub/internal/ent/relaysitegroup"
+	"github.com/looplj/axonhub/internal/ent/relaysitemodelprice"
 	"github.com/looplj/axonhub/internal/ent/request"
 	"github.com/looplj/axonhub/internal/ent/requestexecution"
 	"github.com/looplj/axonhub/internal/ent/role"
@@ -37,7 +45,7 @@ import (
 
 // schemaGraph holds a representation of ent/schema at runtime.
 var schemaGraph = func() *sqlgraph.Schema {
-	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 24)}
+	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 32)}
 	graph.Nodes[0] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   apikey.Table,
@@ -361,6 +369,181 @@ var schemaGraph = func() *sqlgraph.Schema {
 	}
 	graph.Nodes[14] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
+			Table:   relaysite.Table,
+			Columns: relaysite.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt,
+				Column: relaysite.FieldID,
+			},
+		},
+		Type: "RelaySite",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			relaysite.FieldCreatedAt:          {Type: field.TypeTime, Column: relaysite.FieldCreatedAt},
+			relaysite.FieldUpdatedAt:          {Type: field.TypeTime, Column: relaysite.FieldUpdatedAt},
+			relaysite.FieldDeletedAt:          {Type: field.TypeInt, Column: relaysite.FieldDeletedAt},
+			relaysite.FieldName:               {Type: field.TypeString, Column: relaysite.FieldName},
+			relaysite.FieldType:               {Type: field.TypeEnum, Column: relaysite.FieldType},
+			relaysite.FieldBaseURL:            {Type: field.TypeString, Column: relaysite.FieldBaseURL},
+			relaysite.FieldStatus:             {Type: field.TypeEnum, Column: relaysite.FieldStatus},
+			relaysite.FieldAutoCheckinEnabled: {Type: field.TypeBool, Column: relaysite.FieldAutoCheckinEnabled},
+			relaysite.FieldRemark:             {Type: field.TypeString, Column: relaysite.FieldRemark},
+			relaysite.FieldLastSyncedAt:       {Type: field.TypeTime, Column: relaysite.FieldLastSyncedAt},
+			relaysite.FieldLastSyncError:      {Type: field.TypeString, Column: relaysite.FieldLastSyncError},
+			relaysite.FieldLastCheckinAt:      {Type: field.TypeTime, Column: relaysite.FieldLastCheckinAt},
+			relaysite.FieldLastCheckinResult:  {Type: field.TypeString, Column: relaysite.FieldLastCheckinResult},
+		},
+	}
+	graph.Nodes[15] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
+			Table:   relaysiteapikey.Table,
+			Columns: relaysiteapikey.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt,
+				Column: relaysiteapikey.FieldID,
+			},
+		},
+		Type: "RelaySiteAPIKey",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			relaysiteapikey.FieldCreatedAt:   {Type: field.TypeTime, Column: relaysiteapikey.FieldCreatedAt},
+			relaysiteapikey.FieldUpdatedAt:   {Type: field.TypeTime, Column: relaysiteapikey.FieldUpdatedAt},
+			relaysiteapikey.FieldDeletedAt:   {Type: field.TypeInt, Column: relaysiteapikey.FieldDeletedAt},
+			relaysiteapikey.FieldRelaySiteID: {Type: field.TypeInt, Column: relaysiteapikey.FieldRelaySiteID},
+			relaysiteapikey.FieldRemoteID:    {Type: field.TypeString, Column: relaysiteapikey.FieldRemoteID},
+			relaysiteapikey.FieldName:        {Type: field.TypeString, Column: relaysiteapikey.FieldName},
+			relaysiteapikey.FieldStatus:      {Type: field.TypeEnum, Column: relaysiteapikey.FieldStatus},
+			relaysiteapikey.FieldGroupName:   {Type: field.TypeString, Column: relaysiteapikey.FieldGroupName},
+			relaysiteapikey.FieldQuota:       {Type: field.TypeFloat64, Column: relaysiteapikey.FieldQuota},
+			relaysiteapikey.FieldUsedQuota:   {Type: field.TypeFloat64, Column: relaysiteapikey.FieldUsedQuota},
+			relaysiteapikey.FieldExpiresAt:   {Type: field.TypeTime, Column: relaysiteapikey.FieldExpiresAt},
+			relaysiteapikey.FieldMetadata:    {Type: field.TypeJSON, Column: relaysiteapikey.FieldMetadata},
+			relaysiteapikey.FieldSyncedAt:    {Type: field.TypeTime, Column: relaysiteapikey.FieldSyncedAt},
+		},
+	}
+	graph.Nodes[16] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
+			Table:   relaysiteannouncement.Table,
+			Columns: relaysiteannouncement.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt,
+				Column: relaysiteannouncement.FieldID,
+			},
+		},
+		Type: "RelaySiteAnnouncement",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			relaysiteannouncement.FieldCreatedAt:   {Type: field.TypeTime, Column: relaysiteannouncement.FieldCreatedAt},
+			relaysiteannouncement.FieldUpdatedAt:   {Type: field.TypeTime, Column: relaysiteannouncement.FieldUpdatedAt},
+			relaysiteannouncement.FieldRelaySiteID: {Type: field.TypeInt, Column: relaysiteannouncement.FieldRelaySiteID},
+			relaysiteannouncement.FieldRemoteID:    {Type: field.TypeString, Column: relaysiteannouncement.FieldRemoteID},
+			relaysiteannouncement.FieldType:        {Type: field.TypeString, Column: relaysiteannouncement.FieldType},
+			relaysiteannouncement.FieldContent:     {Type: field.TypeString, Column: relaysiteannouncement.FieldContent},
+			relaysiteannouncement.FieldExtra:       {Type: field.TypeString, Column: relaysiteannouncement.FieldExtra},
+			relaysiteannouncement.FieldContentHash: {Type: field.TypeString, Column: relaysiteannouncement.FieldContentHash},
+			relaysiteannouncement.FieldPublishedAt: {Type: field.TypeTime, Column: relaysiteannouncement.FieldPublishedAt},
+			relaysiteannouncement.FieldFetchedAt:   {Type: field.TypeTime, Column: relaysiteannouncement.FieldFetchedAt},
+			relaysiteannouncement.FieldReadAt:      {Type: field.TypeTime, Column: relaysiteannouncement.FieldReadAt},
+			relaysiteannouncement.FieldMetadata:    {Type: field.TypeJSON, Column: relaysiteannouncement.FieldMetadata},
+		},
+	}
+	graph.Nodes[17] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
+			Table:   relaysitebalancesnapshot.Table,
+			Columns: relaysitebalancesnapshot.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt,
+				Column: relaysitebalancesnapshot.FieldID,
+			},
+		},
+		Type: "RelaySiteBalanceSnapshot",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			relaysitebalancesnapshot.FieldCreatedAt:   {Type: field.TypeTime, Column: relaysitebalancesnapshot.FieldCreatedAt},
+			relaysitebalancesnapshot.FieldUpdatedAt:   {Type: field.TypeTime, Column: relaysitebalancesnapshot.FieldUpdatedAt},
+			relaysitebalancesnapshot.FieldRelaySiteID: {Type: field.TypeInt, Column: relaysitebalancesnapshot.FieldRelaySiteID},
+			relaysitebalancesnapshot.FieldBalance:     {Type: field.TypeFloat64, Column: relaysitebalancesnapshot.FieldBalance},
+			relaysitebalancesnapshot.FieldUnit:        {Type: field.TypeString, Column: relaysitebalancesnapshot.FieldUnit},
+			relaysitebalancesnapshot.FieldPulledAt:    {Type: field.TypeTime, Column: relaysitebalancesnapshot.FieldPulledAt},
+		},
+	}
+	graph.Nodes[18] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
+			Table:   relaysitecheckinlog.Table,
+			Columns: relaysitecheckinlog.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt,
+				Column: relaysitecheckinlog.FieldID,
+			},
+		},
+		Type: "RelaySiteCheckinLog",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			relaysitecheckinlog.FieldCreatedAt:    {Type: field.TypeTime, Column: relaysitecheckinlog.FieldCreatedAt},
+			relaysitecheckinlog.FieldUpdatedAt:    {Type: field.TypeTime, Column: relaysitecheckinlog.FieldUpdatedAt},
+			relaysitecheckinlog.FieldRelaySiteID:  {Type: field.TypeInt, Column: relaysitecheckinlog.FieldRelaySiteID},
+			relaysitecheckinlog.FieldExecutedAt:   {Type: field.TypeTime, Column: relaysitecheckinlog.FieldExecutedAt},
+			relaysitecheckinlog.FieldStatus:       {Type: field.TypeEnum, Column: relaysitecheckinlog.FieldStatus},
+			relaysitecheckinlog.FieldMessage:      {Type: field.TypeString, Column: relaysitecheckinlog.FieldMessage},
+			relaysitecheckinlog.FieldErrorMessage: {Type: field.TypeString, Column: relaysitecheckinlog.FieldErrorMessage},
+		},
+	}
+	graph.Nodes[19] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
+			Table:   relaysitecredential.Table,
+			Columns: relaysitecredential.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt,
+				Column: relaysitecredential.FieldID,
+			},
+		},
+		Type: "RelaySiteCredential",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			relaysitecredential.FieldCreatedAt:   {Type: field.TypeTime, Column: relaysitecredential.FieldCreatedAt},
+			relaysitecredential.FieldUpdatedAt:   {Type: field.TypeTime, Column: relaysitecredential.FieldUpdatedAt},
+			relaysitecredential.FieldRelaySiteID: {Type: field.TypeInt, Column: relaysitecredential.FieldRelaySiteID},
+			relaysitecredential.FieldAuthType:    {Type: field.TypeEnum, Column: relaysitecredential.FieldAuthType},
+			relaysitecredential.FieldCredential:  {Type: field.TypeJSON, Column: relaysitecredential.FieldCredential},
+		},
+	}
+	graph.Nodes[20] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
+			Table:   relaysitegroup.Table,
+			Columns: relaysitegroup.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt,
+				Column: relaysitegroup.FieldID,
+			},
+		},
+		Type: "RelaySiteGroup",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			relaysitegroup.FieldCreatedAt:   {Type: field.TypeTime, Column: relaysitegroup.FieldCreatedAt},
+			relaysitegroup.FieldUpdatedAt:   {Type: field.TypeTime, Column: relaysitegroup.FieldUpdatedAt},
+			relaysitegroup.FieldDeletedAt:   {Type: field.TypeInt, Column: relaysitegroup.FieldDeletedAt},
+			relaysitegroup.FieldRelaySiteID: {Type: field.TypeInt, Column: relaysitegroup.FieldRelaySiteID},
+			relaysitegroup.FieldName:        {Type: field.TypeString, Column: relaysitegroup.FieldName},
+			relaysitegroup.FieldRatio:       {Type: field.TypeFloat64, Column: relaysitegroup.FieldRatio},
+			relaysitegroup.FieldSettings:    {Type: field.TypeJSON, Column: relaysitegroup.FieldSettings},
+			relaysitegroup.FieldSyncedAt:    {Type: field.TypeTime, Column: relaysitegroup.FieldSyncedAt},
+		},
+	}
+	graph.Nodes[21] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
+			Table:   relaysitemodelprice.Table,
+			Columns: relaysitemodelprice.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt,
+				Column: relaysitemodelprice.FieldID,
+			},
+		},
+		Type: "RelaySiteModelPrice",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			relaysitemodelprice.FieldCreatedAt:   {Type: field.TypeTime, Column: relaysitemodelprice.FieldCreatedAt},
+			relaysitemodelprice.FieldUpdatedAt:   {Type: field.TypeTime, Column: relaysitemodelprice.FieldUpdatedAt},
+			relaysitemodelprice.FieldDeletedAt:   {Type: field.TypeInt, Column: relaysitemodelprice.FieldDeletedAt},
+			relaysitemodelprice.FieldRelaySiteID: {Type: field.TypeInt, Column: relaysitemodelprice.FieldRelaySiteID},
+			relaysitemodelprice.FieldModelID:     {Type: field.TypeString, Column: relaysitemodelprice.FieldModelID},
+			relaysitemodelprice.FieldPrice:       {Type: field.TypeJSON, Column: relaysitemodelprice.FieldPrice},
+			relaysitemodelprice.FieldSyncedAt:    {Type: field.TypeTime, Column: relaysitemodelprice.FieldSyncedAt},
+		},
+	}
+	graph.Nodes[22] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
 			Table:   request.Table,
 			Columns: request.Columns,
 			ID: &sqlgraph.FieldSpec{
@@ -398,7 +581,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			request.FieldContentSavedAt:             {Type: field.TypeTime, Column: request.FieldContentSavedAt},
 		},
 	}
-	graph.Nodes[15] = &sqlgraph.Node{
+	graph.Nodes[23] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   requestexecution.Table,
 			Columns: requestexecution.Columns,
@@ -433,7 +616,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			requestexecution.FieldPassThroughApplied:         {Type: field.TypeBool, Column: requestexecution.FieldPassThroughApplied},
 		},
 	}
-	graph.Nodes[16] = &sqlgraph.Node{
+	graph.Nodes[24] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   role.Table,
 			Columns: role.Columns,
@@ -453,7 +636,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			role.FieldScopes:    {Type: field.TypeJSON, Column: role.FieldScopes},
 		},
 	}
-	graph.Nodes[17] = &sqlgraph.Node{
+	graph.Nodes[25] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   system.Table,
 			Columns: system.Columns,
@@ -471,7 +654,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			system.FieldValue:     {Type: field.TypeString, Column: system.FieldValue},
 		},
 	}
-	graph.Nodes[18] = &sqlgraph.Node{
+	graph.Nodes[26] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   thread.Table,
 			Columns: thread.Columns,
@@ -488,7 +671,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			thread.FieldThreadID:  {Type: field.TypeString, Column: thread.FieldThreadID},
 		},
 	}
-	graph.Nodes[19] = &sqlgraph.Node{
+	graph.Nodes[27] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   trace.Table,
 			Columns: trace.Columns,
@@ -506,7 +689,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			trace.FieldThreadID:  {Type: field.TypeInt, Column: trace.FieldThreadID},
 		},
 	}
-	graph.Nodes[20] = &sqlgraph.Node{
+	graph.Nodes[28] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   usagelog.Table,
 			Columns: usagelog.Columns,
@@ -543,7 +726,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			usagelog.FieldCostPriceReferenceID:               {Type: field.TypeString, Column: usagelog.FieldCostPriceReferenceID},
 		},
 	}
-	graph.Nodes[21] = &sqlgraph.Node{
+	graph.Nodes[29] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   user.Table,
 			Columns: user.Columns,
@@ -568,7 +751,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			user.FieldScopes:         {Type: field.TypeJSON, Column: user.FieldScopes},
 		},
 	}
-	graph.Nodes[22] = &sqlgraph.Node{
+	graph.Nodes[30] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   userproject.Table,
 			Columns: userproject.Columns,
@@ -587,7 +770,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			userproject.FieldScopes:    {Type: field.TypeJSON, Column: userproject.FieldScopes},
 		},
 	}
-	graph.Nodes[23] = &sqlgraph.Node{
+	graph.Nodes[31] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   userrole.Table,
 			Columns: userrole.Columns,
@@ -963,6 +1146,174 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		"ProviderQuotaStatus",
 		"Channel",
+	)
+	graph.MustAddE(
+		"credential",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   relaysite.CredentialTable,
+			Columns: []string{relaysite.CredentialColumn},
+			Bidi:    false,
+		},
+		"RelaySite",
+		"RelaySiteCredential",
+	)
+	graph.MustAddE(
+		"api_keys",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   relaysite.APIKeysTable,
+			Columns: []string{relaysite.APIKeysColumn},
+			Bidi:    false,
+		},
+		"RelaySite",
+		"RelaySiteAPIKey",
+	)
+	graph.MustAddE(
+		"groups",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   relaysite.GroupsTable,
+			Columns: []string{relaysite.GroupsColumn},
+			Bidi:    false,
+		},
+		"RelaySite",
+		"RelaySiteGroup",
+	)
+	graph.MustAddE(
+		"balance_snapshots",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   relaysite.BalanceSnapshotsTable,
+			Columns: []string{relaysite.BalanceSnapshotsColumn},
+			Bidi:    false,
+		},
+		"RelaySite",
+		"RelaySiteBalanceSnapshot",
+	)
+	graph.MustAddE(
+		"model_prices",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   relaysite.ModelPricesTable,
+			Columns: []string{relaysite.ModelPricesColumn},
+			Bidi:    false,
+		},
+		"RelaySite",
+		"RelaySiteModelPrice",
+	)
+	graph.MustAddE(
+		"checkin_logs",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   relaysite.CheckinLogsTable,
+			Columns: []string{relaysite.CheckinLogsColumn},
+			Bidi:    false,
+		},
+		"RelaySite",
+		"RelaySiteCheckinLog",
+	)
+	graph.MustAddE(
+		"announcements",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   relaysite.AnnouncementsTable,
+			Columns: []string{relaysite.AnnouncementsColumn},
+			Bidi:    false,
+		},
+		"RelaySite",
+		"RelaySiteAnnouncement",
+	)
+	graph.MustAddE(
+		"relay_site",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   relaysiteapikey.RelaySiteTable,
+			Columns: []string{relaysiteapikey.RelaySiteColumn},
+			Bidi:    false,
+		},
+		"RelaySiteAPIKey",
+		"RelaySite",
+	)
+	graph.MustAddE(
+		"relay_site",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   relaysiteannouncement.RelaySiteTable,
+			Columns: []string{relaysiteannouncement.RelaySiteColumn},
+			Bidi:    false,
+		},
+		"RelaySiteAnnouncement",
+		"RelaySite",
+	)
+	graph.MustAddE(
+		"relay_site",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   relaysitebalancesnapshot.RelaySiteTable,
+			Columns: []string{relaysitebalancesnapshot.RelaySiteColumn},
+			Bidi:    false,
+		},
+		"RelaySiteBalanceSnapshot",
+		"RelaySite",
+	)
+	graph.MustAddE(
+		"relay_site",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   relaysitecheckinlog.RelaySiteTable,
+			Columns: []string{relaysitecheckinlog.RelaySiteColumn},
+			Bidi:    false,
+		},
+		"RelaySiteCheckinLog",
+		"RelaySite",
+	)
+	graph.MustAddE(
+		"relay_site",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   relaysitecredential.RelaySiteTable,
+			Columns: []string{relaysitecredential.RelaySiteColumn},
+			Bidi:    false,
+		},
+		"RelaySiteCredential",
+		"RelaySite",
+	)
+	graph.MustAddE(
+		"relay_site",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   relaysitegroup.RelaySiteTable,
+			Columns: []string{relaysitegroup.RelaySiteColumn},
+			Bidi:    false,
+		},
+		"RelaySiteGroup",
+		"RelaySite",
+	)
+	graph.MustAddE(
+		"relay_site",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   relaysitemodelprice.RelaySiteTable,
+			Columns: []string{relaysitemodelprice.RelaySiteColumn},
+			Bidi:    false,
+		},
+		"RelaySiteModelPrice",
+		"RelaySite",
 	)
 	graph.MustAddE(
 		"api_key",
@@ -3033,6 +3384,877 @@ func (f *ProviderQuotaStatusFilter) WhereHasChannelWith(preds ...predicate.Chann
 }
 
 // addPredicate implements the predicateAdder interface.
+func (_q *RelaySiteQuery) addPredicate(pred func(s *sql.Selector)) {
+	_q.predicates = append(_q.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the RelaySiteQuery builder.
+func (_q *RelaySiteQuery) Filter() *RelaySiteFilter {
+	return &RelaySiteFilter{config: _q.config, predicateAdder: _q}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *RelaySiteMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the RelaySiteMutation builder.
+func (m *RelaySiteMutation) Filter() *RelaySiteFilter {
+	return &RelaySiteFilter{config: m.config, predicateAdder: m}
+}
+
+// RelaySiteFilter provides a generic filtering capability at runtime for RelaySiteQuery.
+type RelaySiteFilter struct {
+	predicateAdder
+	config
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *RelaySiteFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[14].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql int predicate on the id field.
+func (f *RelaySiteFilter) WhereID(p entql.IntP) {
+	f.Where(p.Field(relaysite.FieldID))
+}
+
+// WhereCreatedAt applies the entql time.Time predicate on the created_at field.
+func (f *RelaySiteFilter) WhereCreatedAt(p entql.TimeP) {
+	f.Where(p.Field(relaysite.FieldCreatedAt))
+}
+
+// WhereUpdatedAt applies the entql time.Time predicate on the updated_at field.
+func (f *RelaySiteFilter) WhereUpdatedAt(p entql.TimeP) {
+	f.Where(p.Field(relaysite.FieldUpdatedAt))
+}
+
+// WhereDeletedAt applies the entql int predicate on the deleted_at field.
+func (f *RelaySiteFilter) WhereDeletedAt(p entql.IntP) {
+	f.Where(p.Field(relaysite.FieldDeletedAt))
+}
+
+// WhereName applies the entql string predicate on the name field.
+func (f *RelaySiteFilter) WhereName(p entql.StringP) {
+	f.Where(p.Field(relaysite.FieldName))
+}
+
+// WhereType applies the entql string predicate on the type field.
+func (f *RelaySiteFilter) WhereType(p entql.StringP) {
+	f.Where(p.Field(relaysite.FieldType))
+}
+
+// WhereBaseURL applies the entql string predicate on the base_url field.
+func (f *RelaySiteFilter) WhereBaseURL(p entql.StringP) {
+	f.Where(p.Field(relaysite.FieldBaseURL))
+}
+
+// WhereStatus applies the entql string predicate on the status field.
+func (f *RelaySiteFilter) WhereStatus(p entql.StringP) {
+	f.Where(p.Field(relaysite.FieldStatus))
+}
+
+// WhereAutoCheckinEnabled applies the entql bool predicate on the auto_checkin_enabled field.
+func (f *RelaySiteFilter) WhereAutoCheckinEnabled(p entql.BoolP) {
+	f.Where(p.Field(relaysite.FieldAutoCheckinEnabled))
+}
+
+// WhereRemark applies the entql string predicate on the remark field.
+func (f *RelaySiteFilter) WhereRemark(p entql.StringP) {
+	f.Where(p.Field(relaysite.FieldRemark))
+}
+
+// WhereLastSyncedAt applies the entql time.Time predicate on the last_synced_at field.
+func (f *RelaySiteFilter) WhereLastSyncedAt(p entql.TimeP) {
+	f.Where(p.Field(relaysite.FieldLastSyncedAt))
+}
+
+// WhereLastSyncError applies the entql string predicate on the last_sync_error field.
+func (f *RelaySiteFilter) WhereLastSyncError(p entql.StringP) {
+	f.Where(p.Field(relaysite.FieldLastSyncError))
+}
+
+// WhereLastCheckinAt applies the entql time.Time predicate on the last_checkin_at field.
+func (f *RelaySiteFilter) WhereLastCheckinAt(p entql.TimeP) {
+	f.Where(p.Field(relaysite.FieldLastCheckinAt))
+}
+
+// WhereLastCheckinResult applies the entql string predicate on the last_checkin_result field.
+func (f *RelaySiteFilter) WhereLastCheckinResult(p entql.StringP) {
+	f.Where(p.Field(relaysite.FieldLastCheckinResult))
+}
+
+// WhereHasCredential applies a predicate to check if query has an edge credential.
+func (f *RelaySiteFilter) WhereHasCredential() {
+	f.Where(entql.HasEdge("credential"))
+}
+
+// WhereHasCredentialWith applies a predicate to check if query has an edge credential with a given conditions (other predicates).
+func (f *RelaySiteFilter) WhereHasCredentialWith(preds ...predicate.RelaySiteCredential) {
+	f.Where(entql.HasEdgeWith("credential", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasAPIKeys applies a predicate to check if query has an edge api_keys.
+func (f *RelaySiteFilter) WhereHasAPIKeys() {
+	f.Where(entql.HasEdge("api_keys"))
+}
+
+// WhereHasAPIKeysWith applies a predicate to check if query has an edge api_keys with a given conditions (other predicates).
+func (f *RelaySiteFilter) WhereHasAPIKeysWith(preds ...predicate.RelaySiteAPIKey) {
+	f.Where(entql.HasEdgeWith("api_keys", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasGroups applies a predicate to check if query has an edge groups.
+func (f *RelaySiteFilter) WhereHasGroups() {
+	f.Where(entql.HasEdge("groups"))
+}
+
+// WhereHasGroupsWith applies a predicate to check if query has an edge groups with a given conditions (other predicates).
+func (f *RelaySiteFilter) WhereHasGroupsWith(preds ...predicate.RelaySiteGroup) {
+	f.Where(entql.HasEdgeWith("groups", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasBalanceSnapshots applies a predicate to check if query has an edge balance_snapshots.
+func (f *RelaySiteFilter) WhereHasBalanceSnapshots() {
+	f.Where(entql.HasEdge("balance_snapshots"))
+}
+
+// WhereHasBalanceSnapshotsWith applies a predicate to check if query has an edge balance_snapshots with a given conditions (other predicates).
+func (f *RelaySiteFilter) WhereHasBalanceSnapshotsWith(preds ...predicate.RelaySiteBalanceSnapshot) {
+	f.Where(entql.HasEdgeWith("balance_snapshots", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasModelPrices applies a predicate to check if query has an edge model_prices.
+func (f *RelaySiteFilter) WhereHasModelPrices() {
+	f.Where(entql.HasEdge("model_prices"))
+}
+
+// WhereHasModelPricesWith applies a predicate to check if query has an edge model_prices with a given conditions (other predicates).
+func (f *RelaySiteFilter) WhereHasModelPricesWith(preds ...predicate.RelaySiteModelPrice) {
+	f.Where(entql.HasEdgeWith("model_prices", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasCheckinLogs applies a predicate to check if query has an edge checkin_logs.
+func (f *RelaySiteFilter) WhereHasCheckinLogs() {
+	f.Where(entql.HasEdge("checkin_logs"))
+}
+
+// WhereHasCheckinLogsWith applies a predicate to check if query has an edge checkin_logs with a given conditions (other predicates).
+func (f *RelaySiteFilter) WhereHasCheckinLogsWith(preds ...predicate.RelaySiteCheckinLog) {
+	f.Where(entql.HasEdgeWith("checkin_logs", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasAnnouncements applies a predicate to check if query has an edge announcements.
+func (f *RelaySiteFilter) WhereHasAnnouncements() {
+	f.Where(entql.HasEdge("announcements"))
+}
+
+// WhereHasAnnouncementsWith applies a predicate to check if query has an edge announcements with a given conditions (other predicates).
+func (f *RelaySiteFilter) WhereHasAnnouncementsWith(preds ...predicate.RelaySiteAnnouncement) {
+	f.Where(entql.HasEdgeWith("announcements", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// addPredicate implements the predicateAdder interface.
+func (_q *RelaySiteAPIKeyQuery) addPredicate(pred func(s *sql.Selector)) {
+	_q.predicates = append(_q.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the RelaySiteAPIKeyQuery builder.
+func (_q *RelaySiteAPIKeyQuery) Filter() *RelaySiteAPIKeyFilter {
+	return &RelaySiteAPIKeyFilter{config: _q.config, predicateAdder: _q}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *RelaySiteAPIKeyMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the RelaySiteAPIKeyMutation builder.
+func (m *RelaySiteAPIKeyMutation) Filter() *RelaySiteAPIKeyFilter {
+	return &RelaySiteAPIKeyFilter{config: m.config, predicateAdder: m}
+}
+
+// RelaySiteAPIKeyFilter provides a generic filtering capability at runtime for RelaySiteAPIKeyQuery.
+type RelaySiteAPIKeyFilter struct {
+	predicateAdder
+	config
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *RelaySiteAPIKeyFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[15].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql int predicate on the id field.
+func (f *RelaySiteAPIKeyFilter) WhereID(p entql.IntP) {
+	f.Where(p.Field(relaysiteapikey.FieldID))
+}
+
+// WhereCreatedAt applies the entql time.Time predicate on the created_at field.
+func (f *RelaySiteAPIKeyFilter) WhereCreatedAt(p entql.TimeP) {
+	f.Where(p.Field(relaysiteapikey.FieldCreatedAt))
+}
+
+// WhereUpdatedAt applies the entql time.Time predicate on the updated_at field.
+func (f *RelaySiteAPIKeyFilter) WhereUpdatedAt(p entql.TimeP) {
+	f.Where(p.Field(relaysiteapikey.FieldUpdatedAt))
+}
+
+// WhereDeletedAt applies the entql int predicate on the deleted_at field.
+func (f *RelaySiteAPIKeyFilter) WhereDeletedAt(p entql.IntP) {
+	f.Where(p.Field(relaysiteapikey.FieldDeletedAt))
+}
+
+// WhereRelaySiteID applies the entql int predicate on the relay_site_id field.
+func (f *RelaySiteAPIKeyFilter) WhereRelaySiteID(p entql.IntP) {
+	f.Where(p.Field(relaysiteapikey.FieldRelaySiteID))
+}
+
+// WhereRemoteID applies the entql string predicate on the remote_id field.
+func (f *RelaySiteAPIKeyFilter) WhereRemoteID(p entql.StringP) {
+	f.Where(p.Field(relaysiteapikey.FieldRemoteID))
+}
+
+// WhereName applies the entql string predicate on the name field.
+func (f *RelaySiteAPIKeyFilter) WhereName(p entql.StringP) {
+	f.Where(p.Field(relaysiteapikey.FieldName))
+}
+
+// WhereStatus applies the entql string predicate on the status field.
+func (f *RelaySiteAPIKeyFilter) WhereStatus(p entql.StringP) {
+	f.Where(p.Field(relaysiteapikey.FieldStatus))
+}
+
+// WhereGroupName applies the entql string predicate on the group_name field.
+func (f *RelaySiteAPIKeyFilter) WhereGroupName(p entql.StringP) {
+	f.Where(p.Field(relaysiteapikey.FieldGroupName))
+}
+
+// WhereQuota applies the entql float64 predicate on the quota field.
+func (f *RelaySiteAPIKeyFilter) WhereQuota(p entql.Float64P) {
+	f.Where(p.Field(relaysiteapikey.FieldQuota))
+}
+
+// WhereUsedQuota applies the entql float64 predicate on the used_quota field.
+func (f *RelaySiteAPIKeyFilter) WhereUsedQuota(p entql.Float64P) {
+	f.Where(p.Field(relaysiteapikey.FieldUsedQuota))
+}
+
+// WhereExpiresAt applies the entql time.Time predicate on the expires_at field.
+func (f *RelaySiteAPIKeyFilter) WhereExpiresAt(p entql.TimeP) {
+	f.Where(p.Field(relaysiteapikey.FieldExpiresAt))
+}
+
+// WhereMetadata applies the entql json.RawMessage predicate on the metadata field.
+func (f *RelaySiteAPIKeyFilter) WhereMetadata(p entql.BytesP) {
+	f.Where(p.Field(relaysiteapikey.FieldMetadata))
+}
+
+// WhereSyncedAt applies the entql time.Time predicate on the synced_at field.
+func (f *RelaySiteAPIKeyFilter) WhereSyncedAt(p entql.TimeP) {
+	f.Where(p.Field(relaysiteapikey.FieldSyncedAt))
+}
+
+// WhereHasRelaySite applies a predicate to check if query has an edge relay_site.
+func (f *RelaySiteAPIKeyFilter) WhereHasRelaySite() {
+	f.Where(entql.HasEdge("relay_site"))
+}
+
+// WhereHasRelaySiteWith applies a predicate to check if query has an edge relay_site with a given conditions (other predicates).
+func (f *RelaySiteAPIKeyFilter) WhereHasRelaySiteWith(preds ...predicate.RelaySite) {
+	f.Where(entql.HasEdgeWith("relay_site", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// addPredicate implements the predicateAdder interface.
+func (_q *RelaySiteAnnouncementQuery) addPredicate(pred func(s *sql.Selector)) {
+	_q.predicates = append(_q.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the RelaySiteAnnouncementQuery builder.
+func (_q *RelaySiteAnnouncementQuery) Filter() *RelaySiteAnnouncementFilter {
+	return &RelaySiteAnnouncementFilter{config: _q.config, predicateAdder: _q}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *RelaySiteAnnouncementMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the RelaySiteAnnouncementMutation builder.
+func (m *RelaySiteAnnouncementMutation) Filter() *RelaySiteAnnouncementFilter {
+	return &RelaySiteAnnouncementFilter{config: m.config, predicateAdder: m}
+}
+
+// RelaySiteAnnouncementFilter provides a generic filtering capability at runtime for RelaySiteAnnouncementQuery.
+type RelaySiteAnnouncementFilter struct {
+	predicateAdder
+	config
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *RelaySiteAnnouncementFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[16].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql int predicate on the id field.
+func (f *RelaySiteAnnouncementFilter) WhereID(p entql.IntP) {
+	f.Where(p.Field(relaysiteannouncement.FieldID))
+}
+
+// WhereCreatedAt applies the entql time.Time predicate on the created_at field.
+func (f *RelaySiteAnnouncementFilter) WhereCreatedAt(p entql.TimeP) {
+	f.Where(p.Field(relaysiteannouncement.FieldCreatedAt))
+}
+
+// WhereUpdatedAt applies the entql time.Time predicate on the updated_at field.
+func (f *RelaySiteAnnouncementFilter) WhereUpdatedAt(p entql.TimeP) {
+	f.Where(p.Field(relaysiteannouncement.FieldUpdatedAt))
+}
+
+// WhereRelaySiteID applies the entql int predicate on the relay_site_id field.
+func (f *RelaySiteAnnouncementFilter) WhereRelaySiteID(p entql.IntP) {
+	f.Where(p.Field(relaysiteannouncement.FieldRelaySiteID))
+}
+
+// WhereRemoteID applies the entql string predicate on the remote_id field.
+func (f *RelaySiteAnnouncementFilter) WhereRemoteID(p entql.StringP) {
+	f.Where(p.Field(relaysiteannouncement.FieldRemoteID))
+}
+
+// WhereType applies the entql string predicate on the type field.
+func (f *RelaySiteAnnouncementFilter) WhereType(p entql.StringP) {
+	f.Where(p.Field(relaysiteannouncement.FieldType))
+}
+
+// WhereContent applies the entql string predicate on the content field.
+func (f *RelaySiteAnnouncementFilter) WhereContent(p entql.StringP) {
+	f.Where(p.Field(relaysiteannouncement.FieldContent))
+}
+
+// WhereExtra applies the entql string predicate on the extra field.
+func (f *RelaySiteAnnouncementFilter) WhereExtra(p entql.StringP) {
+	f.Where(p.Field(relaysiteannouncement.FieldExtra))
+}
+
+// WhereContentHash applies the entql string predicate on the content_hash field.
+func (f *RelaySiteAnnouncementFilter) WhereContentHash(p entql.StringP) {
+	f.Where(p.Field(relaysiteannouncement.FieldContentHash))
+}
+
+// WherePublishedAt applies the entql time.Time predicate on the published_at field.
+func (f *RelaySiteAnnouncementFilter) WherePublishedAt(p entql.TimeP) {
+	f.Where(p.Field(relaysiteannouncement.FieldPublishedAt))
+}
+
+// WhereFetchedAt applies the entql time.Time predicate on the fetched_at field.
+func (f *RelaySiteAnnouncementFilter) WhereFetchedAt(p entql.TimeP) {
+	f.Where(p.Field(relaysiteannouncement.FieldFetchedAt))
+}
+
+// WhereReadAt applies the entql time.Time predicate on the read_at field.
+func (f *RelaySiteAnnouncementFilter) WhereReadAt(p entql.TimeP) {
+	f.Where(p.Field(relaysiteannouncement.FieldReadAt))
+}
+
+// WhereMetadata applies the entql json.RawMessage predicate on the metadata field.
+func (f *RelaySiteAnnouncementFilter) WhereMetadata(p entql.BytesP) {
+	f.Where(p.Field(relaysiteannouncement.FieldMetadata))
+}
+
+// WhereHasRelaySite applies a predicate to check if query has an edge relay_site.
+func (f *RelaySiteAnnouncementFilter) WhereHasRelaySite() {
+	f.Where(entql.HasEdge("relay_site"))
+}
+
+// WhereHasRelaySiteWith applies a predicate to check if query has an edge relay_site with a given conditions (other predicates).
+func (f *RelaySiteAnnouncementFilter) WhereHasRelaySiteWith(preds ...predicate.RelaySite) {
+	f.Where(entql.HasEdgeWith("relay_site", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// addPredicate implements the predicateAdder interface.
+func (_q *RelaySiteBalanceSnapshotQuery) addPredicate(pred func(s *sql.Selector)) {
+	_q.predicates = append(_q.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the RelaySiteBalanceSnapshotQuery builder.
+func (_q *RelaySiteBalanceSnapshotQuery) Filter() *RelaySiteBalanceSnapshotFilter {
+	return &RelaySiteBalanceSnapshotFilter{config: _q.config, predicateAdder: _q}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *RelaySiteBalanceSnapshotMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the RelaySiteBalanceSnapshotMutation builder.
+func (m *RelaySiteBalanceSnapshotMutation) Filter() *RelaySiteBalanceSnapshotFilter {
+	return &RelaySiteBalanceSnapshotFilter{config: m.config, predicateAdder: m}
+}
+
+// RelaySiteBalanceSnapshotFilter provides a generic filtering capability at runtime for RelaySiteBalanceSnapshotQuery.
+type RelaySiteBalanceSnapshotFilter struct {
+	predicateAdder
+	config
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *RelaySiteBalanceSnapshotFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[17].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql int predicate on the id field.
+func (f *RelaySiteBalanceSnapshotFilter) WhereID(p entql.IntP) {
+	f.Where(p.Field(relaysitebalancesnapshot.FieldID))
+}
+
+// WhereCreatedAt applies the entql time.Time predicate on the created_at field.
+func (f *RelaySiteBalanceSnapshotFilter) WhereCreatedAt(p entql.TimeP) {
+	f.Where(p.Field(relaysitebalancesnapshot.FieldCreatedAt))
+}
+
+// WhereUpdatedAt applies the entql time.Time predicate on the updated_at field.
+func (f *RelaySiteBalanceSnapshotFilter) WhereUpdatedAt(p entql.TimeP) {
+	f.Where(p.Field(relaysitebalancesnapshot.FieldUpdatedAt))
+}
+
+// WhereRelaySiteID applies the entql int predicate on the relay_site_id field.
+func (f *RelaySiteBalanceSnapshotFilter) WhereRelaySiteID(p entql.IntP) {
+	f.Where(p.Field(relaysitebalancesnapshot.FieldRelaySiteID))
+}
+
+// WhereBalance applies the entql float64 predicate on the balance field.
+func (f *RelaySiteBalanceSnapshotFilter) WhereBalance(p entql.Float64P) {
+	f.Where(p.Field(relaysitebalancesnapshot.FieldBalance))
+}
+
+// WhereUnit applies the entql string predicate on the unit field.
+func (f *RelaySiteBalanceSnapshotFilter) WhereUnit(p entql.StringP) {
+	f.Where(p.Field(relaysitebalancesnapshot.FieldUnit))
+}
+
+// WherePulledAt applies the entql time.Time predicate on the pulled_at field.
+func (f *RelaySiteBalanceSnapshotFilter) WherePulledAt(p entql.TimeP) {
+	f.Where(p.Field(relaysitebalancesnapshot.FieldPulledAt))
+}
+
+// WhereHasRelaySite applies a predicate to check if query has an edge relay_site.
+func (f *RelaySiteBalanceSnapshotFilter) WhereHasRelaySite() {
+	f.Where(entql.HasEdge("relay_site"))
+}
+
+// WhereHasRelaySiteWith applies a predicate to check if query has an edge relay_site with a given conditions (other predicates).
+func (f *RelaySiteBalanceSnapshotFilter) WhereHasRelaySiteWith(preds ...predicate.RelaySite) {
+	f.Where(entql.HasEdgeWith("relay_site", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// addPredicate implements the predicateAdder interface.
+func (_q *RelaySiteCheckinLogQuery) addPredicate(pred func(s *sql.Selector)) {
+	_q.predicates = append(_q.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the RelaySiteCheckinLogQuery builder.
+func (_q *RelaySiteCheckinLogQuery) Filter() *RelaySiteCheckinLogFilter {
+	return &RelaySiteCheckinLogFilter{config: _q.config, predicateAdder: _q}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *RelaySiteCheckinLogMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the RelaySiteCheckinLogMutation builder.
+func (m *RelaySiteCheckinLogMutation) Filter() *RelaySiteCheckinLogFilter {
+	return &RelaySiteCheckinLogFilter{config: m.config, predicateAdder: m}
+}
+
+// RelaySiteCheckinLogFilter provides a generic filtering capability at runtime for RelaySiteCheckinLogQuery.
+type RelaySiteCheckinLogFilter struct {
+	predicateAdder
+	config
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *RelaySiteCheckinLogFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[18].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql int predicate on the id field.
+func (f *RelaySiteCheckinLogFilter) WhereID(p entql.IntP) {
+	f.Where(p.Field(relaysitecheckinlog.FieldID))
+}
+
+// WhereCreatedAt applies the entql time.Time predicate on the created_at field.
+func (f *RelaySiteCheckinLogFilter) WhereCreatedAt(p entql.TimeP) {
+	f.Where(p.Field(relaysitecheckinlog.FieldCreatedAt))
+}
+
+// WhereUpdatedAt applies the entql time.Time predicate on the updated_at field.
+func (f *RelaySiteCheckinLogFilter) WhereUpdatedAt(p entql.TimeP) {
+	f.Where(p.Field(relaysitecheckinlog.FieldUpdatedAt))
+}
+
+// WhereRelaySiteID applies the entql int predicate on the relay_site_id field.
+func (f *RelaySiteCheckinLogFilter) WhereRelaySiteID(p entql.IntP) {
+	f.Where(p.Field(relaysitecheckinlog.FieldRelaySiteID))
+}
+
+// WhereExecutedAt applies the entql time.Time predicate on the executed_at field.
+func (f *RelaySiteCheckinLogFilter) WhereExecutedAt(p entql.TimeP) {
+	f.Where(p.Field(relaysitecheckinlog.FieldExecutedAt))
+}
+
+// WhereStatus applies the entql string predicate on the status field.
+func (f *RelaySiteCheckinLogFilter) WhereStatus(p entql.StringP) {
+	f.Where(p.Field(relaysitecheckinlog.FieldStatus))
+}
+
+// WhereMessage applies the entql string predicate on the message field.
+func (f *RelaySiteCheckinLogFilter) WhereMessage(p entql.StringP) {
+	f.Where(p.Field(relaysitecheckinlog.FieldMessage))
+}
+
+// WhereErrorMessage applies the entql string predicate on the error_message field.
+func (f *RelaySiteCheckinLogFilter) WhereErrorMessage(p entql.StringP) {
+	f.Where(p.Field(relaysitecheckinlog.FieldErrorMessage))
+}
+
+// WhereHasRelaySite applies a predicate to check if query has an edge relay_site.
+func (f *RelaySiteCheckinLogFilter) WhereHasRelaySite() {
+	f.Where(entql.HasEdge("relay_site"))
+}
+
+// WhereHasRelaySiteWith applies a predicate to check if query has an edge relay_site with a given conditions (other predicates).
+func (f *RelaySiteCheckinLogFilter) WhereHasRelaySiteWith(preds ...predicate.RelaySite) {
+	f.Where(entql.HasEdgeWith("relay_site", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// addPredicate implements the predicateAdder interface.
+func (_q *RelaySiteCredentialQuery) addPredicate(pred func(s *sql.Selector)) {
+	_q.predicates = append(_q.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the RelaySiteCredentialQuery builder.
+func (_q *RelaySiteCredentialQuery) Filter() *RelaySiteCredentialFilter {
+	return &RelaySiteCredentialFilter{config: _q.config, predicateAdder: _q}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *RelaySiteCredentialMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the RelaySiteCredentialMutation builder.
+func (m *RelaySiteCredentialMutation) Filter() *RelaySiteCredentialFilter {
+	return &RelaySiteCredentialFilter{config: m.config, predicateAdder: m}
+}
+
+// RelaySiteCredentialFilter provides a generic filtering capability at runtime for RelaySiteCredentialQuery.
+type RelaySiteCredentialFilter struct {
+	predicateAdder
+	config
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *RelaySiteCredentialFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[19].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql int predicate on the id field.
+func (f *RelaySiteCredentialFilter) WhereID(p entql.IntP) {
+	f.Where(p.Field(relaysitecredential.FieldID))
+}
+
+// WhereCreatedAt applies the entql time.Time predicate on the created_at field.
+func (f *RelaySiteCredentialFilter) WhereCreatedAt(p entql.TimeP) {
+	f.Where(p.Field(relaysitecredential.FieldCreatedAt))
+}
+
+// WhereUpdatedAt applies the entql time.Time predicate on the updated_at field.
+func (f *RelaySiteCredentialFilter) WhereUpdatedAt(p entql.TimeP) {
+	f.Where(p.Field(relaysitecredential.FieldUpdatedAt))
+}
+
+// WhereRelaySiteID applies the entql int predicate on the relay_site_id field.
+func (f *RelaySiteCredentialFilter) WhereRelaySiteID(p entql.IntP) {
+	f.Where(p.Field(relaysitecredential.FieldRelaySiteID))
+}
+
+// WhereAuthType applies the entql string predicate on the auth_type field.
+func (f *RelaySiteCredentialFilter) WhereAuthType(p entql.StringP) {
+	f.Where(p.Field(relaysitecredential.FieldAuthType))
+}
+
+// WhereCredential applies the entql json.RawMessage predicate on the credential field.
+func (f *RelaySiteCredentialFilter) WhereCredential(p entql.BytesP) {
+	f.Where(p.Field(relaysitecredential.FieldCredential))
+}
+
+// WhereHasRelaySite applies a predicate to check if query has an edge relay_site.
+func (f *RelaySiteCredentialFilter) WhereHasRelaySite() {
+	f.Where(entql.HasEdge("relay_site"))
+}
+
+// WhereHasRelaySiteWith applies a predicate to check if query has an edge relay_site with a given conditions (other predicates).
+func (f *RelaySiteCredentialFilter) WhereHasRelaySiteWith(preds ...predicate.RelaySite) {
+	f.Where(entql.HasEdgeWith("relay_site", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// addPredicate implements the predicateAdder interface.
+func (_q *RelaySiteGroupQuery) addPredicate(pred func(s *sql.Selector)) {
+	_q.predicates = append(_q.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the RelaySiteGroupQuery builder.
+func (_q *RelaySiteGroupQuery) Filter() *RelaySiteGroupFilter {
+	return &RelaySiteGroupFilter{config: _q.config, predicateAdder: _q}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *RelaySiteGroupMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the RelaySiteGroupMutation builder.
+func (m *RelaySiteGroupMutation) Filter() *RelaySiteGroupFilter {
+	return &RelaySiteGroupFilter{config: m.config, predicateAdder: m}
+}
+
+// RelaySiteGroupFilter provides a generic filtering capability at runtime for RelaySiteGroupQuery.
+type RelaySiteGroupFilter struct {
+	predicateAdder
+	config
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *RelaySiteGroupFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[20].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql int predicate on the id field.
+func (f *RelaySiteGroupFilter) WhereID(p entql.IntP) {
+	f.Where(p.Field(relaysitegroup.FieldID))
+}
+
+// WhereCreatedAt applies the entql time.Time predicate on the created_at field.
+func (f *RelaySiteGroupFilter) WhereCreatedAt(p entql.TimeP) {
+	f.Where(p.Field(relaysitegroup.FieldCreatedAt))
+}
+
+// WhereUpdatedAt applies the entql time.Time predicate on the updated_at field.
+func (f *RelaySiteGroupFilter) WhereUpdatedAt(p entql.TimeP) {
+	f.Where(p.Field(relaysitegroup.FieldUpdatedAt))
+}
+
+// WhereDeletedAt applies the entql int predicate on the deleted_at field.
+func (f *RelaySiteGroupFilter) WhereDeletedAt(p entql.IntP) {
+	f.Where(p.Field(relaysitegroup.FieldDeletedAt))
+}
+
+// WhereRelaySiteID applies the entql int predicate on the relay_site_id field.
+func (f *RelaySiteGroupFilter) WhereRelaySiteID(p entql.IntP) {
+	f.Where(p.Field(relaysitegroup.FieldRelaySiteID))
+}
+
+// WhereName applies the entql string predicate on the name field.
+func (f *RelaySiteGroupFilter) WhereName(p entql.StringP) {
+	f.Where(p.Field(relaysitegroup.FieldName))
+}
+
+// WhereRatio applies the entql float64 predicate on the ratio field.
+func (f *RelaySiteGroupFilter) WhereRatio(p entql.Float64P) {
+	f.Where(p.Field(relaysitegroup.FieldRatio))
+}
+
+// WhereSettings applies the entql json.RawMessage predicate on the settings field.
+func (f *RelaySiteGroupFilter) WhereSettings(p entql.BytesP) {
+	f.Where(p.Field(relaysitegroup.FieldSettings))
+}
+
+// WhereSyncedAt applies the entql time.Time predicate on the synced_at field.
+func (f *RelaySiteGroupFilter) WhereSyncedAt(p entql.TimeP) {
+	f.Where(p.Field(relaysitegroup.FieldSyncedAt))
+}
+
+// WhereHasRelaySite applies a predicate to check if query has an edge relay_site.
+func (f *RelaySiteGroupFilter) WhereHasRelaySite() {
+	f.Where(entql.HasEdge("relay_site"))
+}
+
+// WhereHasRelaySiteWith applies a predicate to check if query has an edge relay_site with a given conditions (other predicates).
+func (f *RelaySiteGroupFilter) WhereHasRelaySiteWith(preds ...predicate.RelaySite) {
+	f.Where(entql.HasEdgeWith("relay_site", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// addPredicate implements the predicateAdder interface.
+func (_q *RelaySiteModelPriceQuery) addPredicate(pred func(s *sql.Selector)) {
+	_q.predicates = append(_q.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the RelaySiteModelPriceQuery builder.
+func (_q *RelaySiteModelPriceQuery) Filter() *RelaySiteModelPriceFilter {
+	return &RelaySiteModelPriceFilter{config: _q.config, predicateAdder: _q}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *RelaySiteModelPriceMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the RelaySiteModelPriceMutation builder.
+func (m *RelaySiteModelPriceMutation) Filter() *RelaySiteModelPriceFilter {
+	return &RelaySiteModelPriceFilter{config: m.config, predicateAdder: m}
+}
+
+// RelaySiteModelPriceFilter provides a generic filtering capability at runtime for RelaySiteModelPriceQuery.
+type RelaySiteModelPriceFilter struct {
+	predicateAdder
+	config
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *RelaySiteModelPriceFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[21].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql int predicate on the id field.
+func (f *RelaySiteModelPriceFilter) WhereID(p entql.IntP) {
+	f.Where(p.Field(relaysitemodelprice.FieldID))
+}
+
+// WhereCreatedAt applies the entql time.Time predicate on the created_at field.
+func (f *RelaySiteModelPriceFilter) WhereCreatedAt(p entql.TimeP) {
+	f.Where(p.Field(relaysitemodelprice.FieldCreatedAt))
+}
+
+// WhereUpdatedAt applies the entql time.Time predicate on the updated_at field.
+func (f *RelaySiteModelPriceFilter) WhereUpdatedAt(p entql.TimeP) {
+	f.Where(p.Field(relaysitemodelprice.FieldUpdatedAt))
+}
+
+// WhereDeletedAt applies the entql int predicate on the deleted_at field.
+func (f *RelaySiteModelPriceFilter) WhereDeletedAt(p entql.IntP) {
+	f.Where(p.Field(relaysitemodelprice.FieldDeletedAt))
+}
+
+// WhereRelaySiteID applies the entql int predicate on the relay_site_id field.
+func (f *RelaySiteModelPriceFilter) WhereRelaySiteID(p entql.IntP) {
+	f.Where(p.Field(relaysitemodelprice.FieldRelaySiteID))
+}
+
+// WhereModelID applies the entql string predicate on the model_id field.
+func (f *RelaySiteModelPriceFilter) WhereModelID(p entql.StringP) {
+	f.Where(p.Field(relaysitemodelprice.FieldModelID))
+}
+
+// WherePrice applies the entql json.RawMessage predicate on the price field.
+func (f *RelaySiteModelPriceFilter) WherePrice(p entql.BytesP) {
+	f.Where(p.Field(relaysitemodelprice.FieldPrice))
+}
+
+// WhereSyncedAt applies the entql time.Time predicate on the synced_at field.
+func (f *RelaySiteModelPriceFilter) WhereSyncedAt(p entql.TimeP) {
+	f.Where(p.Field(relaysitemodelprice.FieldSyncedAt))
+}
+
+// WhereHasRelaySite applies a predicate to check if query has an edge relay_site.
+func (f *RelaySiteModelPriceFilter) WhereHasRelaySite() {
+	f.Where(entql.HasEdge("relay_site"))
+}
+
+// WhereHasRelaySiteWith applies a predicate to check if query has an edge relay_site with a given conditions (other predicates).
+func (f *RelaySiteModelPriceFilter) WhereHasRelaySiteWith(preds ...predicate.RelaySite) {
+	f.Where(entql.HasEdgeWith("relay_site", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// addPredicate implements the predicateAdder interface.
 func (_q *RequestQuery) addPredicate(pred func(s *sql.Selector)) {
 	_q.predicates = append(_q.predicates, pred)
 }
@@ -3061,7 +4283,7 @@ type RequestFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *RequestFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[14].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[22].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -3329,7 +4551,7 @@ type RequestExecutionFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *RequestExecutionFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[15].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[23].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -3521,7 +4743,7 @@ type RoleFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *RoleFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[16].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[24].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -3638,7 +4860,7 @@ type SystemFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *SystemFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[17].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[25].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -3703,7 +4925,7 @@ type ThreadFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *ThreadFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[18].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[26].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -3791,7 +5013,7 @@ type TraceFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *TraceFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[19].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[27].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -3898,7 +5120,7 @@ type UsageLogFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *UsageLogFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[20].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[28].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -4100,7 +5322,7 @@ type UserFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *UserFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[21].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[29].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -4298,7 +5520,7 @@ type UserProjectFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *UserProjectFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[22].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[30].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -4396,7 +5618,7 @@ type UserRoleFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *UserRoleFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[23].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[31].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})

@@ -40,6 +40,22 @@ type Tx struct {
 	PromptProtectionRule *PromptProtectionRuleClient
 	// ProviderQuotaStatus is the client for interacting with the ProviderQuotaStatus builders.
 	ProviderQuotaStatus *ProviderQuotaStatusClient
+	// RelaySite is the client for interacting with the RelaySite builders.
+	RelaySite *RelaySiteClient
+	// RelaySiteAPIKey is the client for interacting with the RelaySiteAPIKey builders.
+	RelaySiteAPIKey *RelaySiteAPIKeyClient
+	// RelaySiteAnnouncement is the client for interacting with the RelaySiteAnnouncement builders.
+	RelaySiteAnnouncement *RelaySiteAnnouncementClient
+	// RelaySiteBalanceSnapshot is the client for interacting with the RelaySiteBalanceSnapshot builders.
+	RelaySiteBalanceSnapshot *RelaySiteBalanceSnapshotClient
+	// RelaySiteCheckinLog is the client for interacting with the RelaySiteCheckinLog builders.
+	RelaySiteCheckinLog *RelaySiteCheckinLogClient
+	// RelaySiteCredential is the client for interacting with the RelaySiteCredential builders.
+	RelaySiteCredential *RelaySiteCredentialClient
+	// RelaySiteGroup is the client for interacting with the RelaySiteGroup builders.
+	RelaySiteGroup *RelaySiteGroupClient
+	// RelaySiteModelPrice is the client for interacting with the RelaySiteModelPrice builders.
+	RelaySiteModelPrice *RelaySiteModelPriceClient
 	// Request is the client for interacting with the Request builders.
 	Request *RequestClient
 	// RequestExecution is the client for interacting with the RequestExecution builders.
@@ -205,6 +221,14 @@ func (tx *Tx) init() {
 	tx.Prompt = NewPromptClient(tx.config)
 	tx.PromptProtectionRule = NewPromptProtectionRuleClient(tx.config)
 	tx.ProviderQuotaStatus = NewProviderQuotaStatusClient(tx.config)
+	tx.RelaySite = NewRelaySiteClient(tx.config)
+	tx.RelaySiteAPIKey = NewRelaySiteAPIKeyClient(tx.config)
+	tx.RelaySiteAnnouncement = NewRelaySiteAnnouncementClient(tx.config)
+	tx.RelaySiteBalanceSnapshot = NewRelaySiteBalanceSnapshotClient(tx.config)
+	tx.RelaySiteCheckinLog = NewRelaySiteCheckinLogClient(tx.config)
+	tx.RelaySiteCredential = NewRelaySiteCredentialClient(tx.config)
+	tx.RelaySiteGroup = NewRelaySiteGroupClient(tx.config)
+	tx.RelaySiteModelPrice = NewRelaySiteModelPriceClient(tx.config)
 	tx.Request = NewRequestClient(tx.config)
 	tx.RequestExecution = NewRequestExecutionClient(tx.config)
 	tx.Role = NewRoleClient(tx.config)

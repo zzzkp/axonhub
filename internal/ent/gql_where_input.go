@@ -22,6 +22,13 @@ import (
 	"github.com/looplj/axonhub/internal/ent/prompt"
 	"github.com/looplj/axonhub/internal/ent/promptprotectionrule"
 	"github.com/looplj/axonhub/internal/ent/providerquotastatus"
+	"github.com/looplj/axonhub/internal/ent/relaysite"
+	"github.com/looplj/axonhub/internal/ent/relaysiteannouncement"
+	"github.com/looplj/axonhub/internal/ent/relaysiteapikey"
+	"github.com/looplj/axonhub/internal/ent/relaysitebalancesnapshot"
+	"github.com/looplj/axonhub/internal/ent/relaysitecheckinlog"
+	"github.com/looplj/axonhub/internal/ent/relaysitegroup"
+	"github.com/looplj/axonhub/internal/ent/relaysitemodelprice"
 	"github.com/looplj/axonhub/internal/ent/request"
 	"github.com/looplj/axonhub/internal/ent/requestexecution"
 	"github.com/looplj/axonhub/internal/ent/role"
@@ -6403,6 +6410,3422 @@ func (i *ProviderQuotaStatusWhereInput) P() (predicate.ProviderQuotaStatus, erro
 		return predicates[0], nil
 	default:
 		return providerquotastatus.And(predicates...), nil
+	}
+}
+
+// RelaySiteWhereInput represents a where input for filtering RelaySite queries.
+type RelaySiteWhereInput struct {
+	Predicates []predicate.RelaySite  `json:"-"`
+	Not        *RelaySiteWhereInput   `json:"not,omitempty"`
+	Or         []*RelaySiteWhereInput `json:"or,omitempty"`
+	And        []*RelaySiteWhereInput `json:"and,omitempty"`
+
+	// "id" field predicates.
+	ID      *int  `json:"id,omitempty"`
+	IDNEQ   *int  `json:"idNEQ,omitempty"`
+	IDIn    []int `json:"idIn,omitempty"`
+	IDNotIn []int `json:"idNotIn,omitempty"`
+	IDGT    *int  `json:"idGT,omitempty"`
+	IDGTE   *int  `json:"idGTE,omitempty"`
+	IDLT    *int  `json:"idLT,omitempty"`
+	IDLTE   *int  `json:"idLTE,omitempty"`
+
+	// "created_at" field predicates.
+	CreatedAt      *time.Time  `json:"createdAt,omitempty"`
+	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ,omitempty"`
+	CreatedAtIn    []time.Time `json:"createdAtIn,omitempty"`
+	CreatedAtNotIn []time.Time `json:"createdAtNotIn,omitempty"`
+	CreatedAtGT    *time.Time  `json:"createdAtGT,omitempty"`
+	CreatedAtGTE   *time.Time  `json:"createdAtGTE,omitempty"`
+	CreatedAtLT    *time.Time  `json:"createdAtLT,omitempty"`
+	CreatedAtLTE   *time.Time  `json:"createdAtLTE,omitempty"`
+
+	// "updated_at" field predicates.
+	UpdatedAt      *time.Time  `json:"updatedAt,omitempty"`
+	UpdatedAtNEQ   *time.Time  `json:"updatedAtNEQ,omitempty"`
+	UpdatedAtIn    []time.Time `json:"updatedAtIn,omitempty"`
+	UpdatedAtNotIn []time.Time `json:"updatedAtNotIn,omitempty"`
+	UpdatedAtGT    *time.Time  `json:"updatedAtGT,omitempty"`
+	UpdatedAtGTE   *time.Time  `json:"updatedAtGTE,omitempty"`
+	UpdatedAtLT    *time.Time  `json:"updatedAtLT,omitempty"`
+	UpdatedAtLTE   *time.Time  `json:"updatedAtLTE,omitempty"`
+
+	// "name" field predicates.
+	Name             *string  `json:"name,omitempty"`
+	NameNEQ          *string  `json:"nameNEQ,omitempty"`
+	NameIn           []string `json:"nameIn,omitempty"`
+	NameNotIn        []string `json:"nameNotIn,omitempty"`
+	NameGT           *string  `json:"nameGT,omitempty"`
+	NameGTE          *string  `json:"nameGTE,omitempty"`
+	NameLT           *string  `json:"nameLT,omitempty"`
+	NameLTE          *string  `json:"nameLTE,omitempty"`
+	NameContains     *string  `json:"nameContains,omitempty"`
+	NameHasPrefix    *string  `json:"nameHasPrefix,omitempty"`
+	NameHasSuffix    *string  `json:"nameHasSuffix,omitempty"`
+	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
+	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
+
+	// "type" field predicates.
+	Type      *relaysite.Type  `json:"type,omitempty"`
+	TypeNEQ   *relaysite.Type  `json:"typeNEQ,omitempty"`
+	TypeIn    []relaysite.Type `json:"typeIn,omitempty"`
+	TypeNotIn []relaysite.Type `json:"typeNotIn,omitempty"`
+
+	// "base_url" field predicates.
+	BaseURL             *string  `json:"baseURL,omitempty"`
+	BaseURLNEQ          *string  `json:"baseURLNEQ,omitempty"`
+	BaseURLIn           []string `json:"baseURLIn,omitempty"`
+	BaseURLNotIn        []string `json:"baseURLNotIn,omitempty"`
+	BaseURLGT           *string  `json:"baseURLGT,omitempty"`
+	BaseURLGTE          *string  `json:"baseURLGTE,omitempty"`
+	BaseURLLT           *string  `json:"baseURLLT,omitempty"`
+	BaseURLLTE          *string  `json:"baseURLLTE,omitempty"`
+	BaseURLContains     *string  `json:"baseURLContains,omitempty"`
+	BaseURLHasPrefix    *string  `json:"baseURLHasPrefix,omitempty"`
+	BaseURLHasSuffix    *string  `json:"baseURLHasSuffix,omitempty"`
+	BaseURLEqualFold    *string  `json:"baseURLEqualFold,omitempty"`
+	BaseURLContainsFold *string  `json:"baseURLContainsFold,omitempty"`
+
+	// "status" field predicates.
+	Status      *relaysite.Status  `json:"status,omitempty"`
+	StatusNEQ   *relaysite.Status  `json:"statusNEQ,omitempty"`
+	StatusIn    []relaysite.Status `json:"statusIn,omitempty"`
+	StatusNotIn []relaysite.Status `json:"statusNotIn,omitempty"`
+
+	// "auto_checkin_enabled" field predicates.
+	AutoCheckinEnabled    *bool `json:"autoCheckinEnabled,omitempty"`
+	AutoCheckinEnabledNEQ *bool `json:"autoCheckinEnabledNEQ,omitempty"`
+
+	// "remark" field predicates.
+	Remark             *string  `json:"remark,omitempty"`
+	RemarkNEQ          *string  `json:"remarkNEQ,omitempty"`
+	RemarkIn           []string `json:"remarkIn,omitempty"`
+	RemarkNotIn        []string `json:"remarkNotIn,omitempty"`
+	RemarkGT           *string  `json:"remarkGT,omitempty"`
+	RemarkGTE          *string  `json:"remarkGTE,omitempty"`
+	RemarkLT           *string  `json:"remarkLT,omitempty"`
+	RemarkLTE          *string  `json:"remarkLTE,omitempty"`
+	RemarkContains     *string  `json:"remarkContains,omitempty"`
+	RemarkHasPrefix    *string  `json:"remarkHasPrefix,omitempty"`
+	RemarkHasSuffix    *string  `json:"remarkHasSuffix,omitempty"`
+	RemarkIsNil        bool     `json:"remarkIsNil,omitempty"`
+	RemarkNotNil       bool     `json:"remarkNotNil,omitempty"`
+	RemarkEqualFold    *string  `json:"remarkEqualFold,omitempty"`
+	RemarkContainsFold *string  `json:"remarkContainsFold,omitempty"`
+
+	// "last_synced_at" field predicates.
+	LastSyncedAt       *time.Time  `json:"lastSyncedAt,omitempty"`
+	LastSyncedAtNEQ    *time.Time  `json:"lastSyncedAtNEQ,omitempty"`
+	LastSyncedAtIn     []time.Time `json:"lastSyncedAtIn,omitempty"`
+	LastSyncedAtNotIn  []time.Time `json:"lastSyncedAtNotIn,omitempty"`
+	LastSyncedAtGT     *time.Time  `json:"lastSyncedAtGT,omitempty"`
+	LastSyncedAtGTE    *time.Time  `json:"lastSyncedAtGTE,omitempty"`
+	LastSyncedAtLT     *time.Time  `json:"lastSyncedAtLT,omitempty"`
+	LastSyncedAtLTE    *time.Time  `json:"lastSyncedAtLTE,omitempty"`
+	LastSyncedAtIsNil  bool        `json:"lastSyncedAtIsNil,omitempty"`
+	LastSyncedAtNotNil bool        `json:"lastSyncedAtNotNil,omitempty"`
+
+	// "last_sync_error" field predicates.
+	LastSyncError             *string  `json:"lastSyncError,omitempty"`
+	LastSyncErrorNEQ          *string  `json:"lastSyncErrorNEQ,omitempty"`
+	LastSyncErrorIn           []string `json:"lastSyncErrorIn,omitempty"`
+	LastSyncErrorNotIn        []string `json:"lastSyncErrorNotIn,omitempty"`
+	LastSyncErrorGT           *string  `json:"lastSyncErrorGT,omitempty"`
+	LastSyncErrorGTE          *string  `json:"lastSyncErrorGTE,omitempty"`
+	LastSyncErrorLT           *string  `json:"lastSyncErrorLT,omitempty"`
+	LastSyncErrorLTE          *string  `json:"lastSyncErrorLTE,omitempty"`
+	LastSyncErrorContains     *string  `json:"lastSyncErrorContains,omitempty"`
+	LastSyncErrorHasPrefix    *string  `json:"lastSyncErrorHasPrefix,omitempty"`
+	LastSyncErrorHasSuffix    *string  `json:"lastSyncErrorHasSuffix,omitempty"`
+	LastSyncErrorIsNil        bool     `json:"lastSyncErrorIsNil,omitempty"`
+	LastSyncErrorNotNil       bool     `json:"lastSyncErrorNotNil,omitempty"`
+	LastSyncErrorEqualFold    *string  `json:"lastSyncErrorEqualFold,omitempty"`
+	LastSyncErrorContainsFold *string  `json:"lastSyncErrorContainsFold,omitempty"`
+
+	// "last_checkin_at" field predicates.
+	LastCheckinAt       *time.Time  `json:"lastCheckinAt,omitempty"`
+	LastCheckinAtNEQ    *time.Time  `json:"lastCheckinAtNEQ,omitempty"`
+	LastCheckinAtIn     []time.Time `json:"lastCheckinAtIn,omitempty"`
+	LastCheckinAtNotIn  []time.Time `json:"lastCheckinAtNotIn,omitempty"`
+	LastCheckinAtGT     *time.Time  `json:"lastCheckinAtGT,omitempty"`
+	LastCheckinAtGTE    *time.Time  `json:"lastCheckinAtGTE,omitempty"`
+	LastCheckinAtLT     *time.Time  `json:"lastCheckinAtLT,omitempty"`
+	LastCheckinAtLTE    *time.Time  `json:"lastCheckinAtLTE,omitempty"`
+	LastCheckinAtIsNil  bool        `json:"lastCheckinAtIsNil,omitempty"`
+	LastCheckinAtNotNil bool        `json:"lastCheckinAtNotNil,omitempty"`
+
+	// "last_checkin_result" field predicates.
+	LastCheckinResult             *string  `json:"lastCheckinResult,omitempty"`
+	LastCheckinResultNEQ          *string  `json:"lastCheckinResultNEQ,omitempty"`
+	LastCheckinResultIn           []string `json:"lastCheckinResultIn,omitempty"`
+	LastCheckinResultNotIn        []string `json:"lastCheckinResultNotIn,omitempty"`
+	LastCheckinResultGT           *string  `json:"lastCheckinResultGT,omitempty"`
+	LastCheckinResultGTE          *string  `json:"lastCheckinResultGTE,omitempty"`
+	LastCheckinResultLT           *string  `json:"lastCheckinResultLT,omitempty"`
+	LastCheckinResultLTE          *string  `json:"lastCheckinResultLTE,omitempty"`
+	LastCheckinResultContains     *string  `json:"lastCheckinResultContains,omitempty"`
+	LastCheckinResultHasPrefix    *string  `json:"lastCheckinResultHasPrefix,omitempty"`
+	LastCheckinResultHasSuffix    *string  `json:"lastCheckinResultHasSuffix,omitempty"`
+	LastCheckinResultIsNil        bool     `json:"lastCheckinResultIsNil,omitempty"`
+	LastCheckinResultNotNil       bool     `json:"lastCheckinResultNotNil,omitempty"`
+	LastCheckinResultEqualFold    *string  `json:"lastCheckinResultEqualFold,omitempty"`
+	LastCheckinResultContainsFold *string  `json:"lastCheckinResultContainsFold,omitempty"`
+
+	// "api_keys" edge predicates.
+	HasAPIKeys     *bool                        `json:"hasAPIKeys,omitempty"`
+	HasAPIKeysWith []*RelaySiteAPIKeyWhereInput `json:"hasAPIKeysWith,omitempty"`
+
+	// "groups" edge predicates.
+	HasGroups     *bool                       `json:"hasGroups,omitempty"`
+	HasGroupsWith []*RelaySiteGroupWhereInput `json:"hasGroupsWith,omitempty"`
+
+	// "balance_snapshots" edge predicates.
+	HasBalanceSnapshots     *bool                                 `json:"hasBalanceSnapshots,omitempty"`
+	HasBalanceSnapshotsWith []*RelaySiteBalanceSnapshotWhereInput `json:"hasBalanceSnapshotsWith,omitempty"`
+
+	// "model_prices" edge predicates.
+	HasModelPrices     *bool                            `json:"hasModelPrices,omitempty"`
+	HasModelPricesWith []*RelaySiteModelPriceWhereInput `json:"hasModelPricesWith,omitempty"`
+
+	// "checkin_logs" edge predicates.
+	HasCheckinLogs     *bool                            `json:"hasCheckinLogs,omitempty"`
+	HasCheckinLogsWith []*RelaySiteCheckinLogWhereInput `json:"hasCheckinLogsWith,omitempty"`
+
+	// "announcements" edge predicates.
+	HasAnnouncements     *bool                              `json:"hasAnnouncements,omitempty"`
+	HasAnnouncementsWith []*RelaySiteAnnouncementWhereInput `json:"hasAnnouncementsWith,omitempty"`
+}
+
+// AddPredicates adds custom predicates to the where input to be used during the filtering phase.
+func (i *RelaySiteWhereInput) AddPredicates(predicates ...predicate.RelaySite) {
+	i.Predicates = append(i.Predicates, predicates...)
+}
+
+// Filter applies the RelaySiteWhereInput filter on the RelaySiteQuery builder.
+func (i *RelaySiteWhereInput) Filter(q *RelaySiteQuery) (*RelaySiteQuery, error) {
+	if i == nil {
+		return q, nil
+	}
+	p, err := i.P()
+	if err != nil {
+		if err == ErrEmptyRelaySiteWhereInput {
+			return q, nil
+		}
+		return nil, err
+	}
+	return q.Where(p), nil
+}
+
+// ErrEmptyRelaySiteWhereInput is returned in case the RelaySiteWhereInput is empty.
+var ErrEmptyRelaySiteWhereInput = errors.New("ent: empty predicate RelaySiteWhereInput")
+
+// P returns a predicate for filtering relaysites.
+// An error is returned if the input is empty or invalid.
+func (i *RelaySiteWhereInput) P() (predicate.RelaySite, error) {
+	var predicates []predicate.RelaySite
+	if i.Not != nil {
+		p, err := i.Not.P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'not'", err)
+		}
+		predicates = append(predicates, relaysite.Not(p))
+	}
+	switch n := len(i.Or); {
+	case n == 1:
+		p, err := i.Or[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'or'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		or := make([]predicate.RelaySite, 0, n)
+		for _, w := range i.Or {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'or'", err)
+			}
+			or = append(or, p)
+		}
+		predicates = append(predicates, relaysite.Or(or...))
+	}
+	switch n := len(i.And); {
+	case n == 1:
+		p, err := i.And[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'and'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		and := make([]predicate.RelaySite, 0, n)
+		for _, w := range i.And {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'and'", err)
+			}
+			and = append(and, p)
+		}
+		predicates = append(predicates, relaysite.And(and...))
+	}
+	predicates = append(predicates, i.Predicates...)
+	if i.ID != nil {
+		predicates = append(predicates, relaysite.IDEQ(*i.ID))
+	}
+	if i.IDNEQ != nil {
+		predicates = append(predicates, relaysite.IDNEQ(*i.IDNEQ))
+	}
+	if len(i.IDIn) > 0 {
+		predicates = append(predicates, relaysite.IDIn(i.IDIn...))
+	}
+	if len(i.IDNotIn) > 0 {
+		predicates = append(predicates, relaysite.IDNotIn(i.IDNotIn...))
+	}
+	if i.IDGT != nil {
+		predicates = append(predicates, relaysite.IDGT(*i.IDGT))
+	}
+	if i.IDGTE != nil {
+		predicates = append(predicates, relaysite.IDGTE(*i.IDGTE))
+	}
+	if i.IDLT != nil {
+		predicates = append(predicates, relaysite.IDLT(*i.IDLT))
+	}
+	if i.IDLTE != nil {
+		predicates = append(predicates, relaysite.IDLTE(*i.IDLTE))
+	}
+	if i.CreatedAt != nil {
+		predicates = append(predicates, relaysite.CreatedAtEQ(*i.CreatedAt))
+	}
+	if i.CreatedAtNEQ != nil {
+		predicates = append(predicates, relaysite.CreatedAtNEQ(*i.CreatedAtNEQ))
+	}
+	if len(i.CreatedAtIn) > 0 {
+		predicates = append(predicates, relaysite.CreatedAtIn(i.CreatedAtIn...))
+	}
+	if len(i.CreatedAtNotIn) > 0 {
+		predicates = append(predicates, relaysite.CreatedAtNotIn(i.CreatedAtNotIn...))
+	}
+	if i.CreatedAtGT != nil {
+		predicates = append(predicates, relaysite.CreatedAtGT(*i.CreatedAtGT))
+	}
+	if i.CreatedAtGTE != nil {
+		predicates = append(predicates, relaysite.CreatedAtGTE(*i.CreatedAtGTE))
+	}
+	if i.CreatedAtLT != nil {
+		predicates = append(predicates, relaysite.CreatedAtLT(*i.CreatedAtLT))
+	}
+	if i.CreatedAtLTE != nil {
+		predicates = append(predicates, relaysite.CreatedAtLTE(*i.CreatedAtLTE))
+	}
+	if i.UpdatedAt != nil {
+		predicates = append(predicates, relaysite.UpdatedAtEQ(*i.UpdatedAt))
+	}
+	if i.UpdatedAtNEQ != nil {
+		predicates = append(predicates, relaysite.UpdatedAtNEQ(*i.UpdatedAtNEQ))
+	}
+	if len(i.UpdatedAtIn) > 0 {
+		predicates = append(predicates, relaysite.UpdatedAtIn(i.UpdatedAtIn...))
+	}
+	if len(i.UpdatedAtNotIn) > 0 {
+		predicates = append(predicates, relaysite.UpdatedAtNotIn(i.UpdatedAtNotIn...))
+	}
+	if i.UpdatedAtGT != nil {
+		predicates = append(predicates, relaysite.UpdatedAtGT(*i.UpdatedAtGT))
+	}
+	if i.UpdatedAtGTE != nil {
+		predicates = append(predicates, relaysite.UpdatedAtGTE(*i.UpdatedAtGTE))
+	}
+	if i.UpdatedAtLT != nil {
+		predicates = append(predicates, relaysite.UpdatedAtLT(*i.UpdatedAtLT))
+	}
+	if i.UpdatedAtLTE != nil {
+		predicates = append(predicates, relaysite.UpdatedAtLTE(*i.UpdatedAtLTE))
+	}
+	if i.Name != nil {
+		predicates = append(predicates, relaysite.NameEQ(*i.Name))
+	}
+	if i.NameNEQ != nil {
+		predicates = append(predicates, relaysite.NameNEQ(*i.NameNEQ))
+	}
+	if len(i.NameIn) > 0 {
+		predicates = append(predicates, relaysite.NameIn(i.NameIn...))
+	}
+	if len(i.NameNotIn) > 0 {
+		predicates = append(predicates, relaysite.NameNotIn(i.NameNotIn...))
+	}
+	if i.NameGT != nil {
+		predicates = append(predicates, relaysite.NameGT(*i.NameGT))
+	}
+	if i.NameGTE != nil {
+		predicates = append(predicates, relaysite.NameGTE(*i.NameGTE))
+	}
+	if i.NameLT != nil {
+		predicates = append(predicates, relaysite.NameLT(*i.NameLT))
+	}
+	if i.NameLTE != nil {
+		predicates = append(predicates, relaysite.NameLTE(*i.NameLTE))
+	}
+	if i.NameContains != nil {
+		predicates = append(predicates, relaysite.NameContains(*i.NameContains))
+	}
+	if i.NameHasPrefix != nil {
+		predicates = append(predicates, relaysite.NameHasPrefix(*i.NameHasPrefix))
+	}
+	if i.NameHasSuffix != nil {
+		predicates = append(predicates, relaysite.NameHasSuffix(*i.NameHasSuffix))
+	}
+	if i.NameEqualFold != nil {
+		predicates = append(predicates, relaysite.NameEqualFold(*i.NameEqualFold))
+	}
+	if i.NameContainsFold != nil {
+		predicates = append(predicates, relaysite.NameContainsFold(*i.NameContainsFold))
+	}
+	if i.Type != nil {
+		predicates = append(predicates, relaysite.TypeEQ(*i.Type))
+	}
+	if i.TypeNEQ != nil {
+		predicates = append(predicates, relaysite.TypeNEQ(*i.TypeNEQ))
+	}
+	if len(i.TypeIn) > 0 {
+		predicates = append(predicates, relaysite.TypeIn(i.TypeIn...))
+	}
+	if len(i.TypeNotIn) > 0 {
+		predicates = append(predicates, relaysite.TypeNotIn(i.TypeNotIn...))
+	}
+	if i.BaseURL != nil {
+		predicates = append(predicates, relaysite.BaseURLEQ(*i.BaseURL))
+	}
+	if i.BaseURLNEQ != nil {
+		predicates = append(predicates, relaysite.BaseURLNEQ(*i.BaseURLNEQ))
+	}
+	if len(i.BaseURLIn) > 0 {
+		predicates = append(predicates, relaysite.BaseURLIn(i.BaseURLIn...))
+	}
+	if len(i.BaseURLNotIn) > 0 {
+		predicates = append(predicates, relaysite.BaseURLNotIn(i.BaseURLNotIn...))
+	}
+	if i.BaseURLGT != nil {
+		predicates = append(predicates, relaysite.BaseURLGT(*i.BaseURLGT))
+	}
+	if i.BaseURLGTE != nil {
+		predicates = append(predicates, relaysite.BaseURLGTE(*i.BaseURLGTE))
+	}
+	if i.BaseURLLT != nil {
+		predicates = append(predicates, relaysite.BaseURLLT(*i.BaseURLLT))
+	}
+	if i.BaseURLLTE != nil {
+		predicates = append(predicates, relaysite.BaseURLLTE(*i.BaseURLLTE))
+	}
+	if i.BaseURLContains != nil {
+		predicates = append(predicates, relaysite.BaseURLContains(*i.BaseURLContains))
+	}
+	if i.BaseURLHasPrefix != nil {
+		predicates = append(predicates, relaysite.BaseURLHasPrefix(*i.BaseURLHasPrefix))
+	}
+	if i.BaseURLHasSuffix != nil {
+		predicates = append(predicates, relaysite.BaseURLHasSuffix(*i.BaseURLHasSuffix))
+	}
+	if i.BaseURLEqualFold != nil {
+		predicates = append(predicates, relaysite.BaseURLEqualFold(*i.BaseURLEqualFold))
+	}
+	if i.BaseURLContainsFold != nil {
+		predicates = append(predicates, relaysite.BaseURLContainsFold(*i.BaseURLContainsFold))
+	}
+	if i.Status != nil {
+		predicates = append(predicates, relaysite.StatusEQ(*i.Status))
+	}
+	if i.StatusNEQ != nil {
+		predicates = append(predicates, relaysite.StatusNEQ(*i.StatusNEQ))
+	}
+	if len(i.StatusIn) > 0 {
+		predicates = append(predicates, relaysite.StatusIn(i.StatusIn...))
+	}
+	if len(i.StatusNotIn) > 0 {
+		predicates = append(predicates, relaysite.StatusNotIn(i.StatusNotIn...))
+	}
+	if i.AutoCheckinEnabled != nil {
+		predicates = append(predicates, relaysite.AutoCheckinEnabledEQ(*i.AutoCheckinEnabled))
+	}
+	if i.AutoCheckinEnabledNEQ != nil {
+		predicates = append(predicates, relaysite.AutoCheckinEnabledNEQ(*i.AutoCheckinEnabledNEQ))
+	}
+	if i.Remark != nil {
+		predicates = append(predicates, relaysite.RemarkEQ(*i.Remark))
+	}
+	if i.RemarkNEQ != nil {
+		predicates = append(predicates, relaysite.RemarkNEQ(*i.RemarkNEQ))
+	}
+	if len(i.RemarkIn) > 0 {
+		predicates = append(predicates, relaysite.RemarkIn(i.RemarkIn...))
+	}
+	if len(i.RemarkNotIn) > 0 {
+		predicates = append(predicates, relaysite.RemarkNotIn(i.RemarkNotIn...))
+	}
+	if i.RemarkGT != nil {
+		predicates = append(predicates, relaysite.RemarkGT(*i.RemarkGT))
+	}
+	if i.RemarkGTE != nil {
+		predicates = append(predicates, relaysite.RemarkGTE(*i.RemarkGTE))
+	}
+	if i.RemarkLT != nil {
+		predicates = append(predicates, relaysite.RemarkLT(*i.RemarkLT))
+	}
+	if i.RemarkLTE != nil {
+		predicates = append(predicates, relaysite.RemarkLTE(*i.RemarkLTE))
+	}
+	if i.RemarkContains != nil {
+		predicates = append(predicates, relaysite.RemarkContains(*i.RemarkContains))
+	}
+	if i.RemarkHasPrefix != nil {
+		predicates = append(predicates, relaysite.RemarkHasPrefix(*i.RemarkHasPrefix))
+	}
+	if i.RemarkHasSuffix != nil {
+		predicates = append(predicates, relaysite.RemarkHasSuffix(*i.RemarkHasSuffix))
+	}
+	if i.RemarkIsNil {
+		predicates = append(predicates, relaysite.RemarkIsNil())
+	}
+	if i.RemarkNotNil {
+		predicates = append(predicates, relaysite.RemarkNotNil())
+	}
+	if i.RemarkEqualFold != nil {
+		predicates = append(predicates, relaysite.RemarkEqualFold(*i.RemarkEqualFold))
+	}
+	if i.RemarkContainsFold != nil {
+		predicates = append(predicates, relaysite.RemarkContainsFold(*i.RemarkContainsFold))
+	}
+	if i.LastSyncedAt != nil {
+		predicates = append(predicates, relaysite.LastSyncedAtEQ(*i.LastSyncedAt))
+	}
+	if i.LastSyncedAtNEQ != nil {
+		predicates = append(predicates, relaysite.LastSyncedAtNEQ(*i.LastSyncedAtNEQ))
+	}
+	if len(i.LastSyncedAtIn) > 0 {
+		predicates = append(predicates, relaysite.LastSyncedAtIn(i.LastSyncedAtIn...))
+	}
+	if len(i.LastSyncedAtNotIn) > 0 {
+		predicates = append(predicates, relaysite.LastSyncedAtNotIn(i.LastSyncedAtNotIn...))
+	}
+	if i.LastSyncedAtGT != nil {
+		predicates = append(predicates, relaysite.LastSyncedAtGT(*i.LastSyncedAtGT))
+	}
+	if i.LastSyncedAtGTE != nil {
+		predicates = append(predicates, relaysite.LastSyncedAtGTE(*i.LastSyncedAtGTE))
+	}
+	if i.LastSyncedAtLT != nil {
+		predicates = append(predicates, relaysite.LastSyncedAtLT(*i.LastSyncedAtLT))
+	}
+	if i.LastSyncedAtLTE != nil {
+		predicates = append(predicates, relaysite.LastSyncedAtLTE(*i.LastSyncedAtLTE))
+	}
+	if i.LastSyncedAtIsNil {
+		predicates = append(predicates, relaysite.LastSyncedAtIsNil())
+	}
+	if i.LastSyncedAtNotNil {
+		predicates = append(predicates, relaysite.LastSyncedAtNotNil())
+	}
+	if i.LastSyncError != nil {
+		predicates = append(predicates, relaysite.LastSyncErrorEQ(*i.LastSyncError))
+	}
+	if i.LastSyncErrorNEQ != nil {
+		predicates = append(predicates, relaysite.LastSyncErrorNEQ(*i.LastSyncErrorNEQ))
+	}
+	if len(i.LastSyncErrorIn) > 0 {
+		predicates = append(predicates, relaysite.LastSyncErrorIn(i.LastSyncErrorIn...))
+	}
+	if len(i.LastSyncErrorNotIn) > 0 {
+		predicates = append(predicates, relaysite.LastSyncErrorNotIn(i.LastSyncErrorNotIn...))
+	}
+	if i.LastSyncErrorGT != nil {
+		predicates = append(predicates, relaysite.LastSyncErrorGT(*i.LastSyncErrorGT))
+	}
+	if i.LastSyncErrorGTE != nil {
+		predicates = append(predicates, relaysite.LastSyncErrorGTE(*i.LastSyncErrorGTE))
+	}
+	if i.LastSyncErrorLT != nil {
+		predicates = append(predicates, relaysite.LastSyncErrorLT(*i.LastSyncErrorLT))
+	}
+	if i.LastSyncErrorLTE != nil {
+		predicates = append(predicates, relaysite.LastSyncErrorLTE(*i.LastSyncErrorLTE))
+	}
+	if i.LastSyncErrorContains != nil {
+		predicates = append(predicates, relaysite.LastSyncErrorContains(*i.LastSyncErrorContains))
+	}
+	if i.LastSyncErrorHasPrefix != nil {
+		predicates = append(predicates, relaysite.LastSyncErrorHasPrefix(*i.LastSyncErrorHasPrefix))
+	}
+	if i.LastSyncErrorHasSuffix != nil {
+		predicates = append(predicates, relaysite.LastSyncErrorHasSuffix(*i.LastSyncErrorHasSuffix))
+	}
+	if i.LastSyncErrorIsNil {
+		predicates = append(predicates, relaysite.LastSyncErrorIsNil())
+	}
+	if i.LastSyncErrorNotNil {
+		predicates = append(predicates, relaysite.LastSyncErrorNotNil())
+	}
+	if i.LastSyncErrorEqualFold != nil {
+		predicates = append(predicates, relaysite.LastSyncErrorEqualFold(*i.LastSyncErrorEqualFold))
+	}
+	if i.LastSyncErrorContainsFold != nil {
+		predicates = append(predicates, relaysite.LastSyncErrorContainsFold(*i.LastSyncErrorContainsFold))
+	}
+	if i.LastCheckinAt != nil {
+		predicates = append(predicates, relaysite.LastCheckinAtEQ(*i.LastCheckinAt))
+	}
+	if i.LastCheckinAtNEQ != nil {
+		predicates = append(predicates, relaysite.LastCheckinAtNEQ(*i.LastCheckinAtNEQ))
+	}
+	if len(i.LastCheckinAtIn) > 0 {
+		predicates = append(predicates, relaysite.LastCheckinAtIn(i.LastCheckinAtIn...))
+	}
+	if len(i.LastCheckinAtNotIn) > 0 {
+		predicates = append(predicates, relaysite.LastCheckinAtNotIn(i.LastCheckinAtNotIn...))
+	}
+	if i.LastCheckinAtGT != nil {
+		predicates = append(predicates, relaysite.LastCheckinAtGT(*i.LastCheckinAtGT))
+	}
+	if i.LastCheckinAtGTE != nil {
+		predicates = append(predicates, relaysite.LastCheckinAtGTE(*i.LastCheckinAtGTE))
+	}
+	if i.LastCheckinAtLT != nil {
+		predicates = append(predicates, relaysite.LastCheckinAtLT(*i.LastCheckinAtLT))
+	}
+	if i.LastCheckinAtLTE != nil {
+		predicates = append(predicates, relaysite.LastCheckinAtLTE(*i.LastCheckinAtLTE))
+	}
+	if i.LastCheckinAtIsNil {
+		predicates = append(predicates, relaysite.LastCheckinAtIsNil())
+	}
+	if i.LastCheckinAtNotNil {
+		predicates = append(predicates, relaysite.LastCheckinAtNotNil())
+	}
+	if i.LastCheckinResult != nil {
+		predicates = append(predicates, relaysite.LastCheckinResultEQ(*i.LastCheckinResult))
+	}
+	if i.LastCheckinResultNEQ != nil {
+		predicates = append(predicates, relaysite.LastCheckinResultNEQ(*i.LastCheckinResultNEQ))
+	}
+	if len(i.LastCheckinResultIn) > 0 {
+		predicates = append(predicates, relaysite.LastCheckinResultIn(i.LastCheckinResultIn...))
+	}
+	if len(i.LastCheckinResultNotIn) > 0 {
+		predicates = append(predicates, relaysite.LastCheckinResultNotIn(i.LastCheckinResultNotIn...))
+	}
+	if i.LastCheckinResultGT != nil {
+		predicates = append(predicates, relaysite.LastCheckinResultGT(*i.LastCheckinResultGT))
+	}
+	if i.LastCheckinResultGTE != nil {
+		predicates = append(predicates, relaysite.LastCheckinResultGTE(*i.LastCheckinResultGTE))
+	}
+	if i.LastCheckinResultLT != nil {
+		predicates = append(predicates, relaysite.LastCheckinResultLT(*i.LastCheckinResultLT))
+	}
+	if i.LastCheckinResultLTE != nil {
+		predicates = append(predicates, relaysite.LastCheckinResultLTE(*i.LastCheckinResultLTE))
+	}
+	if i.LastCheckinResultContains != nil {
+		predicates = append(predicates, relaysite.LastCheckinResultContains(*i.LastCheckinResultContains))
+	}
+	if i.LastCheckinResultHasPrefix != nil {
+		predicates = append(predicates, relaysite.LastCheckinResultHasPrefix(*i.LastCheckinResultHasPrefix))
+	}
+	if i.LastCheckinResultHasSuffix != nil {
+		predicates = append(predicates, relaysite.LastCheckinResultHasSuffix(*i.LastCheckinResultHasSuffix))
+	}
+	if i.LastCheckinResultIsNil {
+		predicates = append(predicates, relaysite.LastCheckinResultIsNil())
+	}
+	if i.LastCheckinResultNotNil {
+		predicates = append(predicates, relaysite.LastCheckinResultNotNil())
+	}
+	if i.LastCheckinResultEqualFold != nil {
+		predicates = append(predicates, relaysite.LastCheckinResultEqualFold(*i.LastCheckinResultEqualFold))
+	}
+	if i.LastCheckinResultContainsFold != nil {
+		predicates = append(predicates, relaysite.LastCheckinResultContainsFold(*i.LastCheckinResultContainsFold))
+	}
+
+	if i.HasAPIKeys != nil {
+		p := relaysite.HasAPIKeys()
+		if !*i.HasAPIKeys {
+			p = relaysite.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasAPIKeysWith) > 0 {
+		with := make([]predicate.RelaySiteAPIKey, 0, len(i.HasAPIKeysWith))
+		for _, w := range i.HasAPIKeysWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasAPIKeysWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, relaysite.HasAPIKeysWith(with...))
+	}
+	if i.HasGroups != nil {
+		p := relaysite.HasGroups()
+		if !*i.HasGroups {
+			p = relaysite.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasGroupsWith) > 0 {
+		with := make([]predicate.RelaySiteGroup, 0, len(i.HasGroupsWith))
+		for _, w := range i.HasGroupsWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasGroupsWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, relaysite.HasGroupsWith(with...))
+	}
+	if i.HasBalanceSnapshots != nil {
+		p := relaysite.HasBalanceSnapshots()
+		if !*i.HasBalanceSnapshots {
+			p = relaysite.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasBalanceSnapshotsWith) > 0 {
+		with := make([]predicate.RelaySiteBalanceSnapshot, 0, len(i.HasBalanceSnapshotsWith))
+		for _, w := range i.HasBalanceSnapshotsWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasBalanceSnapshotsWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, relaysite.HasBalanceSnapshotsWith(with...))
+	}
+	if i.HasModelPrices != nil {
+		p := relaysite.HasModelPrices()
+		if !*i.HasModelPrices {
+			p = relaysite.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasModelPricesWith) > 0 {
+		with := make([]predicate.RelaySiteModelPrice, 0, len(i.HasModelPricesWith))
+		for _, w := range i.HasModelPricesWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasModelPricesWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, relaysite.HasModelPricesWith(with...))
+	}
+	if i.HasCheckinLogs != nil {
+		p := relaysite.HasCheckinLogs()
+		if !*i.HasCheckinLogs {
+			p = relaysite.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasCheckinLogsWith) > 0 {
+		with := make([]predicate.RelaySiteCheckinLog, 0, len(i.HasCheckinLogsWith))
+		for _, w := range i.HasCheckinLogsWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasCheckinLogsWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, relaysite.HasCheckinLogsWith(with...))
+	}
+	if i.HasAnnouncements != nil {
+		p := relaysite.HasAnnouncements()
+		if !*i.HasAnnouncements {
+			p = relaysite.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasAnnouncementsWith) > 0 {
+		with := make([]predicate.RelaySiteAnnouncement, 0, len(i.HasAnnouncementsWith))
+		for _, w := range i.HasAnnouncementsWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasAnnouncementsWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, relaysite.HasAnnouncementsWith(with...))
+	}
+	switch len(predicates) {
+	case 0:
+		return nil, ErrEmptyRelaySiteWhereInput
+	case 1:
+		return predicates[0], nil
+	default:
+		return relaysite.And(predicates...), nil
+	}
+}
+
+// RelaySiteAPIKeyWhereInput represents a where input for filtering RelaySiteAPIKey queries.
+type RelaySiteAPIKeyWhereInput struct {
+	Predicates []predicate.RelaySiteAPIKey  `json:"-"`
+	Not        *RelaySiteAPIKeyWhereInput   `json:"not,omitempty"`
+	Or         []*RelaySiteAPIKeyWhereInput `json:"or,omitempty"`
+	And        []*RelaySiteAPIKeyWhereInput `json:"and,omitempty"`
+
+	// "id" field predicates.
+	ID      *int  `json:"id,omitempty"`
+	IDNEQ   *int  `json:"idNEQ,omitempty"`
+	IDIn    []int `json:"idIn,omitempty"`
+	IDNotIn []int `json:"idNotIn,omitempty"`
+	IDGT    *int  `json:"idGT,omitempty"`
+	IDGTE   *int  `json:"idGTE,omitempty"`
+	IDLT    *int  `json:"idLT,omitempty"`
+	IDLTE   *int  `json:"idLTE,omitempty"`
+
+	// "created_at" field predicates.
+	CreatedAt      *time.Time  `json:"createdAt,omitempty"`
+	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ,omitempty"`
+	CreatedAtIn    []time.Time `json:"createdAtIn,omitempty"`
+	CreatedAtNotIn []time.Time `json:"createdAtNotIn,omitempty"`
+	CreatedAtGT    *time.Time  `json:"createdAtGT,omitempty"`
+	CreatedAtGTE   *time.Time  `json:"createdAtGTE,omitempty"`
+	CreatedAtLT    *time.Time  `json:"createdAtLT,omitempty"`
+	CreatedAtLTE   *time.Time  `json:"createdAtLTE,omitempty"`
+
+	// "updated_at" field predicates.
+	UpdatedAt      *time.Time  `json:"updatedAt,omitempty"`
+	UpdatedAtNEQ   *time.Time  `json:"updatedAtNEQ,omitempty"`
+	UpdatedAtIn    []time.Time `json:"updatedAtIn,omitempty"`
+	UpdatedAtNotIn []time.Time `json:"updatedAtNotIn,omitempty"`
+	UpdatedAtGT    *time.Time  `json:"updatedAtGT,omitempty"`
+	UpdatedAtGTE   *time.Time  `json:"updatedAtGTE,omitempty"`
+	UpdatedAtLT    *time.Time  `json:"updatedAtLT,omitempty"`
+	UpdatedAtLTE   *time.Time  `json:"updatedAtLTE,omitempty"`
+
+	// "relay_site_id" field predicates.
+	RelaySiteID      *int  `json:"relaySiteID,omitempty"`
+	RelaySiteIDNEQ   *int  `json:"relaySiteIDNEQ,omitempty"`
+	RelaySiteIDIn    []int `json:"relaySiteIDIn,omitempty"`
+	RelaySiteIDNotIn []int `json:"relaySiteIDNotIn,omitempty"`
+
+	// "remote_id" field predicates.
+	RemoteID             *string  `json:"remoteID,omitempty"`
+	RemoteIDNEQ          *string  `json:"remoteIDNEQ,omitempty"`
+	RemoteIDIn           []string `json:"remoteIDIn,omitempty"`
+	RemoteIDNotIn        []string `json:"remoteIDNotIn,omitempty"`
+	RemoteIDGT           *string  `json:"remoteIDGT,omitempty"`
+	RemoteIDGTE          *string  `json:"remoteIDGTE,omitempty"`
+	RemoteIDLT           *string  `json:"remoteIDLT,omitempty"`
+	RemoteIDLTE          *string  `json:"remoteIDLTE,omitempty"`
+	RemoteIDContains     *string  `json:"remoteIDContains,omitempty"`
+	RemoteIDHasPrefix    *string  `json:"remoteIDHasPrefix,omitempty"`
+	RemoteIDHasSuffix    *string  `json:"remoteIDHasSuffix,omitempty"`
+	RemoteIDEqualFold    *string  `json:"remoteIDEqualFold,omitempty"`
+	RemoteIDContainsFold *string  `json:"remoteIDContainsFold,omitempty"`
+
+	// "name" field predicates.
+	Name             *string  `json:"name,omitempty"`
+	NameNEQ          *string  `json:"nameNEQ,omitempty"`
+	NameIn           []string `json:"nameIn,omitempty"`
+	NameNotIn        []string `json:"nameNotIn,omitempty"`
+	NameGT           *string  `json:"nameGT,omitempty"`
+	NameGTE          *string  `json:"nameGTE,omitempty"`
+	NameLT           *string  `json:"nameLT,omitempty"`
+	NameLTE          *string  `json:"nameLTE,omitempty"`
+	NameContains     *string  `json:"nameContains,omitempty"`
+	NameHasPrefix    *string  `json:"nameHasPrefix,omitempty"`
+	NameHasSuffix    *string  `json:"nameHasSuffix,omitempty"`
+	NameIsNil        bool     `json:"nameIsNil,omitempty"`
+	NameNotNil       bool     `json:"nameNotNil,omitempty"`
+	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
+	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
+
+	// "status" field predicates.
+	Status      *relaysiteapikey.Status  `json:"status,omitempty"`
+	StatusNEQ   *relaysiteapikey.Status  `json:"statusNEQ,omitempty"`
+	StatusIn    []relaysiteapikey.Status `json:"statusIn,omitempty"`
+	StatusNotIn []relaysiteapikey.Status `json:"statusNotIn,omitempty"`
+
+	// "group_name" field predicates.
+	GroupName             *string  `json:"groupName,omitempty"`
+	GroupNameNEQ          *string  `json:"groupNameNEQ,omitempty"`
+	GroupNameIn           []string `json:"groupNameIn,omitempty"`
+	GroupNameNotIn        []string `json:"groupNameNotIn,omitempty"`
+	GroupNameGT           *string  `json:"groupNameGT,omitempty"`
+	GroupNameGTE          *string  `json:"groupNameGTE,omitempty"`
+	GroupNameLT           *string  `json:"groupNameLT,omitempty"`
+	GroupNameLTE          *string  `json:"groupNameLTE,omitempty"`
+	GroupNameContains     *string  `json:"groupNameContains,omitempty"`
+	GroupNameHasPrefix    *string  `json:"groupNameHasPrefix,omitempty"`
+	GroupNameHasSuffix    *string  `json:"groupNameHasSuffix,omitempty"`
+	GroupNameIsNil        bool     `json:"groupNameIsNil,omitempty"`
+	GroupNameNotNil       bool     `json:"groupNameNotNil,omitempty"`
+	GroupNameEqualFold    *string  `json:"groupNameEqualFold,omitempty"`
+	GroupNameContainsFold *string  `json:"groupNameContainsFold,omitempty"`
+
+	// "quota" field predicates.
+	Quota       *float64  `json:"quota,omitempty"`
+	QuotaNEQ    *float64  `json:"quotaNEQ,omitempty"`
+	QuotaIn     []float64 `json:"quotaIn,omitempty"`
+	QuotaNotIn  []float64 `json:"quotaNotIn,omitempty"`
+	QuotaGT     *float64  `json:"quotaGT,omitempty"`
+	QuotaGTE    *float64  `json:"quotaGTE,omitempty"`
+	QuotaLT     *float64  `json:"quotaLT,omitempty"`
+	QuotaLTE    *float64  `json:"quotaLTE,omitempty"`
+	QuotaIsNil  bool      `json:"quotaIsNil,omitempty"`
+	QuotaNotNil bool      `json:"quotaNotNil,omitempty"`
+
+	// "used_quota" field predicates.
+	UsedQuota       *float64  `json:"usedQuota,omitempty"`
+	UsedQuotaNEQ    *float64  `json:"usedQuotaNEQ,omitempty"`
+	UsedQuotaIn     []float64 `json:"usedQuotaIn,omitempty"`
+	UsedQuotaNotIn  []float64 `json:"usedQuotaNotIn,omitempty"`
+	UsedQuotaGT     *float64  `json:"usedQuotaGT,omitempty"`
+	UsedQuotaGTE    *float64  `json:"usedQuotaGTE,omitempty"`
+	UsedQuotaLT     *float64  `json:"usedQuotaLT,omitempty"`
+	UsedQuotaLTE    *float64  `json:"usedQuotaLTE,omitempty"`
+	UsedQuotaIsNil  bool      `json:"usedQuotaIsNil,omitempty"`
+	UsedQuotaNotNil bool      `json:"usedQuotaNotNil,omitempty"`
+
+	// "expires_at" field predicates.
+	ExpiresAt       *time.Time  `json:"expiresAt,omitempty"`
+	ExpiresAtNEQ    *time.Time  `json:"expiresAtNEQ,omitempty"`
+	ExpiresAtIn     []time.Time `json:"expiresAtIn,omitempty"`
+	ExpiresAtNotIn  []time.Time `json:"expiresAtNotIn,omitempty"`
+	ExpiresAtGT     *time.Time  `json:"expiresAtGT,omitempty"`
+	ExpiresAtGTE    *time.Time  `json:"expiresAtGTE,omitempty"`
+	ExpiresAtLT     *time.Time  `json:"expiresAtLT,omitempty"`
+	ExpiresAtLTE    *time.Time  `json:"expiresAtLTE,omitempty"`
+	ExpiresAtIsNil  bool        `json:"expiresAtIsNil,omitempty"`
+	ExpiresAtNotNil bool        `json:"expiresAtNotNil,omitempty"`
+
+	// "synced_at" field predicates.
+	SyncedAt      *time.Time  `json:"syncedAt,omitempty"`
+	SyncedAtNEQ   *time.Time  `json:"syncedAtNEQ,omitempty"`
+	SyncedAtIn    []time.Time `json:"syncedAtIn,omitempty"`
+	SyncedAtNotIn []time.Time `json:"syncedAtNotIn,omitempty"`
+	SyncedAtGT    *time.Time  `json:"syncedAtGT,omitempty"`
+	SyncedAtGTE   *time.Time  `json:"syncedAtGTE,omitempty"`
+	SyncedAtLT    *time.Time  `json:"syncedAtLT,omitempty"`
+	SyncedAtLTE   *time.Time  `json:"syncedAtLTE,omitempty"`
+
+	// "relay_site" edge predicates.
+	HasRelaySite     *bool                  `json:"hasRelaySite,omitempty"`
+	HasRelaySiteWith []*RelaySiteWhereInput `json:"hasRelaySiteWith,omitempty"`
+}
+
+// AddPredicates adds custom predicates to the where input to be used during the filtering phase.
+func (i *RelaySiteAPIKeyWhereInput) AddPredicates(predicates ...predicate.RelaySiteAPIKey) {
+	i.Predicates = append(i.Predicates, predicates...)
+}
+
+// Filter applies the RelaySiteAPIKeyWhereInput filter on the RelaySiteAPIKeyQuery builder.
+func (i *RelaySiteAPIKeyWhereInput) Filter(q *RelaySiteAPIKeyQuery) (*RelaySiteAPIKeyQuery, error) {
+	if i == nil {
+		return q, nil
+	}
+	p, err := i.P()
+	if err != nil {
+		if err == ErrEmptyRelaySiteAPIKeyWhereInput {
+			return q, nil
+		}
+		return nil, err
+	}
+	return q.Where(p), nil
+}
+
+// ErrEmptyRelaySiteAPIKeyWhereInput is returned in case the RelaySiteAPIKeyWhereInput is empty.
+var ErrEmptyRelaySiteAPIKeyWhereInput = errors.New("ent: empty predicate RelaySiteAPIKeyWhereInput")
+
+// P returns a predicate for filtering relaysiteapikeys.
+// An error is returned if the input is empty or invalid.
+func (i *RelaySiteAPIKeyWhereInput) P() (predicate.RelaySiteAPIKey, error) {
+	var predicates []predicate.RelaySiteAPIKey
+	if i.Not != nil {
+		p, err := i.Not.P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'not'", err)
+		}
+		predicates = append(predicates, relaysiteapikey.Not(p))
+	}
+	switch n := len(i.Or); {
+	case n == 1:
+		p, err := i.Or[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'or'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		or := make([]predicate.RelaySiteAPIKey, 0, n)
+		for _, w := range i.Or {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'or'", err)
+			}
+			or = append(or, p)
+		}
+		predicates = append(predicates, relaysiteapikey.Or(or...))
+	}
+	switch n := len(i.And); {
+	case n == 1:
+		p, err := i.And[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'and'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		and := make([]predicate.RelaySiteAPIKey, 0, n)
+		for _, w := range i.And {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'and'", err)
+			}
+			and = append(and, p)
+		}
+		predicates = append(predicates, relaysiteapikey.And(and...))
+	}
+	predicates = append(predicates, i.Predicates...)
+	if i.ID != nil {
+		predicates = append(predicates, relaysiteapikey.IDEQ(*i.ID))
+	}
+	if i.IDNEQ != nil {
+		predicates = append(predicates, relaysiteapikey.IDNEQ(*i.IDNEQ))
+	}
+	if len(i.IDIn) > 0 {
+		predicates = append(predicates, relaysiteapikey.IDIn(i.IDIn...))
+	}
+	if len(i.IDNotIn) > 0 {
+		predicates = append(predicates, relaysiteapikey.IDNotIn(i.IDNotIn...))
+	}
+	if i.IDGT != nil {
+		predicates = append(predicates, relaysiteapikey.IDGT(*i.IDGT))
+	}
+	if i.IDGTE != nil {
+		predicates = append(predicates, relaysiteapikey.IDGTE(*i.IDGTE))
+	}
+	if i.IDLT != nil {
+		predicates = append(predicates, relaysiteapikey.IDLT(*i.IDLT))
+	}
+	if i.IDLTE != nil {
+		predicates = append(predicates, relaysiteapikey.IDLTE(*i.IDLTE))
+	}
+	if i.CreatedAt != nil {
+		predicates = append(predicates, relaysiteapikey.CreatedAtEQ(*i.CreatedAt))
+	}
+	if i.CreatedAtNEQ != nil {
+		predicates = append(predicates, relaysiteapikey.CreatedAtNEQ(*i.CreatedAtNEQ))
+	}
+	if len(i.CreatedAtIn) > 0 {
+		predicates = append(predicates, relaysiteapikey.CreatedAtIn(i.CreatedAtIn...))
+	}
+	if len(i.CreatedAtNotIn) > 0 {
+		predicates = append(predicates, relaysiteapikey.CreatedAtNotIn(i.CreatedAtNotIn...))
+	}
+	if i.CreatedAtGT != nil {
+		predicates = append(predicates, relaysiteapikey.CreatedAtGT(*i.CreatedAtGT))
+	}
+	if i.CreatedAtGTE != nil {
+		predicates = append(predicates, relaysiteapikey.CreatedAtGTE(*i.CreatedAtGTE))
+	}
+	if i.CreatedAtLT != nil {
+		predicates = append(predicates, relaysiteapikey.CreatedAtLT(*i.CreatedAtLT))
+	}
+	if i.CreatedAtLTE != nil {
+		predicates = append(predicates, relaysiteapikey.CreatedAtLTE(*i.CreatedAtLTE))
+	}
+	if i.UpdatedAt != nil {
+		predicates = append(predicates, relaysiteapikey.UpdatedAtEQ(*i.UpdatedAt))
+	}
+	if i.UpdatedAtNEQ != nil {
+		predicates = append(predicates, relaysiteapikey.UpdatedAtNEQ(*i.UpdatedAtNEQ))
+	}
+	if len(i.UpdatedAtIn) > 0 {
+		predicates = append(predicates, relaysiteapikey.UpdatedAtIn(i.UpdatedAtIn...))
+	}
+	if len(i.UpdatedAtNotIn) > 0 {
+		predicates = append(predicates, relaysiteapikey.UpdatedAtNotIn(i.UpdatedAtNotIn...))
+	}
+	if i.UpdatedAtGT != nil {
+		predicates = append(predicates, relaysiteapikey.UpdatedAtGT(*i.UpdatedAtGT))
+	}
+	if i.UpdatedAtGTE != nil {
+		predicates = append(predicates, relaysiteapikey.UpdatedAtGTE(*i.UpdatedAtGTE))
+	}
+	if i.UpdatedAtLT != nil {
+		predicates = append(predicates, relaysiteapikey.UpdatedAtLT(*i.UpdatedAtLT))
+	}
+	if i.UpdatedAtLTE != nil {
+		predicates = append(predicates, relaysiteapikey.UpdatedAtLTE(*i.UpdatedAtLTE))
+	}
+	if i.RelaySiteID != nil {
+		predicates = append(predicates, relaysiteapikey.RelaySiteIDEQ(*i.RelaySiteID))
+	}
+	if i.RelaySiteIDNEQ != nil {
+		predicates = append(predicates, relaysiteapikey.RelaySiteIDNEQ(*i.RelaySiteIDNEQ))
+	}
+	if len(i.RelaySiteIDIn) > 0 {
+		predicates = append(predicates, relaysiteapikey.RelaySiteIDIn(i.RelaySiteIDIn...))
+	}
+	if len(i.RelaySiteIDNotIn) > 0 {
+		predicates = append(predicates, relaysiteapikey.RelaySiteIDNotIn(i.RelaySiteIDNotIn...))
+	}
+	if i.RemoteID != nil {
+		predicates = append(predicates, relaysiteapikey.RemoteIDEQ(*i.RemoteID))
+	}
+	if i.RemoteIDNEQ != nil {
+		predicates = append(predicates, relaysiteapikey.RemoteIDNEQ(*i.RemoteIDNEQ))
+	}
+	if len(i.RemoteIDIn) > 0 {
+		predicates = append(predicates, relaysiteapikey.RemoteIDIn(i.RemoteIDIn...))
+	}
+	if len(i.RemoteIDNotIn) > 0 {
+		predicates = append(predicates, relaysiteapikey.RemoteIDNotIn(i.RemoteIDNotIn...))
+	}
+	if i.RemoteIDGT != nil {
+		predicates = append(predicates, relaysiteapikey.RemoteIDGT(*i.RemoteIDGT))
+	}
+	if i.RemoteIDGTE != nil {
+		predicates = append(predicates, relaysiteapikey.RemoteIDGTE(*i.RemoteIDGTE))
+	}
+	if i.RemoteIDLT != nil {
+		predicates = append(predicates, relaysiteapikey.RemoteIDLT(*i.RemoteIDLT))
+	}
+	if i.RemoteIDLTE != nil {
+		predicates = append(predicates, relaysiteapikey.RemoteIDLTE(*i.RemoteIDLTE))
+	}
+	if i.RemoteIDContains != nil {
+		predicates = append(predicates, relaysiteapikey.RemoteIDContains(*i.RemoteIDContains))
+	}
+	if i.RemoteIDHasPrefix != nil {
+		predicates = append(predicates, relaysiteapikey.RemoteIDHasPrefix(*i.RemoteIDHasPrefix))
+	}
+	if i.RemoteIDHasSuffix != nil {
+		predicates = append(predicates, relaysiteapikey.RemoteIDHasSuffix(*i.RemoteIDHasSuffix))
+	}
+	if i.RemoteIDEqualFold != nil {
+		predicates = append(predicates, relaysiteapikey.RemoteIDEqualFold(*i.RemoteIDEqualFold))
+	}
+	if i.RemoteIDContainsFold != nil {
+		predicates = append(predicates, relaysiteapikey.RemoteIDContainsFold(*i.RemoteIDContainsFold))
+	}
+	if i.Name != nil {
+		predicates = append(predicates, relaysiteapikey.NameEQ(*i.Name))
+	}
+	if i.NameNEQ != nil {
+		predicates = append(predicates, relaysiteapikey.NameNEQ(*i.NameNEQ))
+	}
+	if len(i.NameIn) > 0 {
+		predicates = append(predicates, relaysiteapikey.NameIn(i.NameIn...))
+	}
+	if len(i.NameNotIn) > 0 {
+		predicates = append(predicates, relaysiteapikey.NameNotIn(i.NameNotIn...))
+	}
+	if i.NameGT != nil {
+		predicates = append(predicates, relaysiteapikey.NameGT(*i.NameGT))
+	}
+	if i.NameGTE != nil {
+		predicates = append(predicates, relaysiteapikey.NameGTE(*i.NameGTE))
+	}
+	if i.NameLT != nil {
+		predicates = append(predicates, relaysiteapikey.NameLT(*i.NameLT))
+	}
+	if i.NameLTE != nil {
+		predicates = append(predicates, relaysiteapikey.NameLTE(*i.NameLTE))
+	}
+	if i.NameContains != nil {
+		predicates = append(predicates, relaysiteapikey.NameContains(*i.NameContains))
+	}
+	if i.NameHasPrefix != nil {
+		predicates = append(predicates, relaysiteapikey.NameHasPrefix(*i.NameHasPrefix))
+	}
+	if i.NameHasSuffix != nil {
+		predicates = append(predicates, relaysiteapikey.NameHasSuffix(*i.NameHasSuffix))
+	}
+	if i.NameIsNil {
+		predicates = append(predicates, relaysiteapikey.NameIsNil())
+	}
+	if i.NameNotNil {
+		predicates = append(predicates, relaysiteapikey.NameNotNil())
+	}
+	if i.NameEqualFold != nil {
+		predicates = append(predicates, relaysiteapikey.NameEqualFold(*i.NameEqualFold))
+	}
+	if i.NameContainsFold != nil {
+		predicates = append(predicates, relaysiteapikey.NameContainsFold(*i.NameContainsFold))
+	}
+	if i.Status != nil {
+		predicates = append(predicates, relaysiteapikey.StatusEQ(*i.Status))
+	}
+	if i.StatusNEQ != nil {
+		predicates = append(predicates, relaysiteapikey.StatusNEQ(*i.StatusNEQ))
+	}
+	if len(i.StatusIn) > 0 {
+		predicates = append(predicates, relaysiteapikey.StatusIn(i.StatusIn...))
+	}
+	if len(i.StatusNotIn) > 0 {
+		predicates = append(predicates, relaysiteapikey.StatusNotIn(i.StatusNotIn...))
+	}
+	if i.GroupName != nil {
+		predicates = append(predicates, relaysiteapikey.GroupNameEQ(*i.GroupName))
+	}
+	if i.GroupNameNEQ != nil {
+		predicates = append(predicates, relaysiteapikey.GroupNameNEQ(*i.GroupNameNEQ))
+	}
+	if len(i.GroupNameIn) > 0 {
+		predicates = append(predicates, relaysiteapikey.GroupNameIn(i.GroupNameIn...))
+	}
+	if len(i.GroupNameNotIn) > 0 {
+		predicates = append(predicates, relaysiteapikey.GroupNameNotIn(i.GroupNameNotIn...))
+	}
+	if i.GroupNameGT != nil {
+		predicates = append(predicates, relaysiteapikey.GroupNameGT(*i.GroupNameGT))
+	}
+	if i.GroupNameGTE != nil {
+		predicates = append(predicates, relaysiteapikey.GroupNameGTE(*i.GroupNameGTE))
+	}
+	if i.GroupNameLT != nil {
+		predicates = append(predicates, relaysiteapikey.GroupNameLT(*i.GroupNameLT))
+	}
+	if i.GroupNameLTE != nil {
+		predicates = append(predicates, relaysiteapikey.GroupNameLTE(*i.GroupNameLTE))
+	}
+	if i.GroupNameContains != nil {
+		predicates = append(predicates, relaysiteapikey.GroupNameContains(*i.GroupNameContains))
+	}
+	if i.GroupNameHasPrefix != nil {
+		predicates = append(predicates, relaysiteapikey.GroupNameHasPrefix(*i.GroupNameHasPrefix))
+	}
+	if i.GroupNameHasSuffix != nil {
+		predicates = append(predicates, relaysiteapikey.GroupNameHasSuffix(*i.GroupNameHasSuffix))
+	}
+	if i.GroupNameIsNil {
+		predicates = append(predicates, relaysiteapikey.GroupNameIsNil())
+	}
+	if i.GroupNameNotNil {
+		predicates = append(predicates, relaysiteapikey.GroupNameNotNil())
+	}
+	if i.GroupNameEqualFold != nil {
+		predicates = append(predicates, relaysiteapikey.GroupNameEqualFold(*i.GroupNameEqualFold))
+	}
+	if i.GroupNameContainsFold != nil {
+		predicates = append(predicates, relaysiteapikey.GroupNameContainsFold(*i.GroupNameContainsFold))
+	}
+	if i.Quota != nil {
+		predicates = append(predicates, relaysiteapikey.QuotaEQ(*i.Quota))
+	}
+	if i.QuotaNEQ != nil {
+		predicates = append(predicates, relaysiteapikey.QuotaNEQ(*i.QuotaNEQ))
+	}
+	if len(i.QuotaIn) > 0 {
+		predicates = append(predicates, relaysiteapikey.QuotaIn(i.QuotaIn...))
+	}
+	if len(i.QuotaNotIn) > 0 {
+		predicates = append(predicates, relaysiteapikey.QuotaNotIn(i.QuotaNotIn...))
+	}
+	if i.QuotaGT != nil {
+		predicates = append(predicates, relaysiteapikey.QuotaGT(*i.QuotaGT))
+	}
+	if i.QuotaGTE != nil {
+		predicates = append(predicates, relaysiteapikey.QuotaGTE(*i.QuotaGTE))
+	}
+	if i.QuotaLT != nil {
+		predicates = append(predicates, relaysiteapikey.QuotaLT(*i.QuotaLT))
+	}
+	if i.QuotaLTE != nil {
+		predicates = append(predicates, relaysiteapikey.QuotaLTE(*i.QuotaLTE))
+	}
+	if i.QuotaIsNil {
+		predicates = append(predicates, relaysiteapikey.QuotaIsNil())
+	}
+	if i.QuotaNotNil {
+		predicates = append(predicates, relaysiteapikey.QuotaNotNil())
+	}
+	if i.UsedQuota != nil {
+		predicates = append(predicates, relaysiteapikey.UsedQuotaEQ(*i.UsedQuota))
+	}
+	if i.UsedQuotaNEQ != nil {
+		predicates = append(predicates, relaysiteapikey.UsedQuotaNEQ(*i.UsedQuotaNEQ))
+	}
+	if len(i.UsedQuotaIn) > 0 {
+		predicates = append(predicates, relaysiteapikey.UsedQuotaIn(i.UsedQuotaIn...))
+	}
+	if len(i.UsedQuotaNotIn) > 0 {
+		predicates = append(predicates, relaysiteapikey.UsedQuotaNotIn(i.UsedQuotaNotIn...))
+	}
+	if i.UsedQuotaGT != nil {
+		predicates = append(predicates, relaysiteapikey.UsedQuotaGT(*i.UsedQuotaGT))
+	}
+	if i.UsedQuotaGTE != nil {
+		predicates = append(predicates, relaysiteapikey.UsedQuotaGTE(*i.UsedQuotaGTE))
+	}
+	if i.UsedQuotaLT != nil {
+		predicates = append(predicates, relaysiteapikey.UsedQuotaLT(*i.UsedQuotaLT))
+	}
+	if i.UsedQuotaLTE != nil {
+		predicates = append(predicates, relaysiteapikey.UsedQuotaLTE(*i.UsedQuotaLTE))
+	}
+	if i.UsedQuotaIsNil {
+		predicates = append(predicates, relaysiteapikey.UsedQuotaIsNil())
+	}
+	if i.UsedQuotaNotNil {
+		predicates = append(predicates, relaysiteapikey.UsedQuotaNotNil())
+	}
+	if i.ExpiresAt != nil {
+		predicates = append(predicates, relaysiteapikey.ExpiresAtEQ(*i.ExpiresAt))
+	}
+	if i.ExpiresAtNEQ != nil {
+		predicates = append(predicates, relaysiteapikey.ExpiresAtNEQ(*i.ExpiresAtNEQ))
+	}
+	if len(i.ExpiresAtIn) > 0 {
+		predicates = append(predicates, relaysiteapikey.ExpiresAtIn(i.ExpiresAtIn...))
+	}
+	if len(i.ExpiresAtNotIn) > 0 {
+		predicates = append(predicates, relaysiteapikey.ExpiresAtNotIn(i.ExpiresAtNotIn...))
+	}
+	if i.ExpiresAtGT != nil {
+		predicates = append(predicates, relaysiteapikey.ExpiresAtGT(*i.ExpiresAtGT))
+	}
+	if i.ExpiresAtGTE != nil {
+		predicates = append(predicates, relaysiteapikey.ExpiresAtGTE(*i.ExpiresAtGTE))
+	}
+	if i.ExpiresAtLT != nil {
+		predicates = append(predicates, relaysiteapikey.ExpiresAtLT(*i.ExpiresAtLT))
+	}
+	if i.ExpiresAtLTE != nil {
+		predicates = append(predicates, relaysiteapikey.ExpiresAtLTE(*i.ExpiresAtLTE))
+	}
+	if i.ExpiresAtIsNil {
+		predicates = append(predicates, relaysiteapikey.ExpiresAtIsNil())
+	}
+	if i.ExpiresAtNotNil {
+		predicates = append(predicates, relaysiteapikey.ExpiresAtNotNil())
+	}
+	if i.SyncedAt != nil {
+		predicates = append(predicates, relaysiteapikey.SyncedAtEQ(*i.SyncedAt))
+	}
+	if i.SyncedAtNEQ != nil {
+		predicates = append(predicates, relaysiteapikey.SyncedAtNEQ(*i.SyncedAtNEQ))
+	}
+	if len(i.SyncedAtIn) > 0 {
+		predicates = append(predicates, relaysiteapikey.SyncedAtIn(i.SyncedAtIn...))
+	}
+	if len(i.SyncedAtNotIn) > 0 {
+		predicates = append(predicates, relaysiteapikey.SyncedAtNotIn(i.SyncedAtNotIn...))
+	}
+	if i.SyncedAtGT != nil {
+		predicates = append(predicates, relaysiteapikey.SyncedAtGT(*i.SyncedAtGT))
+	}
+	if i.SyncedAtGTE != nil {
+		predicates = append(predicates, relaysiteapikey.SyncedAtGTE(*i.SyncedAtGTE))
+	}
+	if i.SyncedAtLT != nil {
+		predicates = append(predicates, relaysiteapikey.SyncedAtLT(*i.SyncedAtLT))
+	}
+	if i.SyncedAtLTE != nil {
+		predicates = append(predicates, relaysiteapikey.SyncedAtLTE(*i.SyncedAtLTE))
+	}
+
+	if i.HasRelaySite != nil {
+		p := relaysiteapikey.HasRelaySite()
+		if !*i.HasRelaySite {
+			p = relaysiteapikey.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasRelaySiteWith) > 0 {
+		with := make([]predicate.RelaySite, 0, len(i.HasRelaySiteWith))
+		for _, w := range i.HasRelaySiteWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasRelaySiteWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, relaysiteapikey.HasRelaySiteWith(with...))
+	}
+	switch len(predicates) {
+	case 0:
+		return nil, ErrEmptyRelaySiteAPIKeyWhereInput
+	case 1:
+		return predicates[0], nil
+	default:
+		return relaysiteapikey.And(predicates...), nil
+	}
+}
+
+// RelaySiteAnnouncementWhereInput represents a where input for filtering RelaySiteAnnouncement queries.
+type RelaySiteAnnouncementWhereInput struct {
+	Predicates []predicate.RelaySiteAnnouncement  `json:"-"`
+	Not        *RelaySiteAnnouncementWhereInput   `json:"not,omitempty"`
+	Or         []*RelaySiteAnnouncementWhereInput `json:"or,omitempty"`
+	And        []*RelaySiteAnnouncementWhereInput `json:"and,omitempty"`
+
+	// "id" field predicates.
+	ID      *int  `json:"id,omitempty"`
+	IDNEQ   *int  `json:"idNEQ,omitempty"`
+	IDIn    []int `json:"idIn,omitempty"`
+	IDNotIn []int `json:"idNotIn,omitempty"`
+	IDGT    *int  `json:"idGT,omitempty"`
+	IDGTE   *int  `json:"idGTE,omitempty"`
+	IDLT    *int  `json:"idLT,omitempty"`
+	IDLTE   *int  `json:"idLTE,omitempty"`
+
+	// "created_at" field predicates.
+	CreatedAt      *time.Time  `json:"createdAt,omitempty"`
+	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ,omitempty"`
+	CreatedAtIn    []time.Time `json:"createdAtIn,omitempty"`
+	CreatedAtNotIn []time.Time `json:"createdAtNotIn,omitempty"`
+	CreatedAtGT    *time.Time  `json:"createdAtGT,omitempty"`
+	CreatedAtGTE   *time.Time  `json:"createdAtGTE,omitempty"`
+	CreatedAtLT    *time.Time  `json:"createdAtLT,omitempty"`
+	CreatedAtLTE   *time.Time  `json:"createdAtLTE,omitempty"`
+
+	// "updated_at" field predicates.
+	UpdatedAt      *time.Time  `json:"updatedAt,omitempty"`
+	UpdatedAtNEQ   *time.Time  `json:"updatedAtNEQ,omitempty"`
+	UpdatedAtIn    []time.Time `json:"updatedAtIn,omitempty"`
+	UpdatedAtNotIn []time.Time `json:"updatedAtNotIn,omitempty"`
+	UpdatedAtGT    *time.Time  `json:"updatedAtGT,omitempty"`
+	UpdatedAtGTE   *time.Time  `json:"updatedAtGTE,omitempty"`
+	UpdatedAtLT    *time.Time  `json:"updatedAtLT,omitempty"`
+	UpdatedAtLTE   *time.Time  `json:"updatedAtLTE,omitempty"`
+
+	// "relay_site_id" field predicates.
+	RelaySiteID      *int  `json:"relaySiteID,omitempty"`
+	RelaySiteIDNEQ   *int  `json:"relaySiteIDNEQ,omitempty"`
+	RelaySiteIDIn    []int `json:"relaySiteIDIn,omitempty"`
+	RelaySiteIDNotIn []int `json:"relaySiteIDNotIn,omitempty"`
+
+	// "remote_id" field predicates.
+	RemoteID             *string  `json:"remoteID,omitempty"`
+	RemoteIDNEQ          *string  `json:"remoteIDNEQ,omitempty"`
+	RemoteIDIn           []string `json:"remoteIDIn,omitempty"`
+	RemoteIDNotIn        []string `json:"remoteIDNotIn,omitempty"`
+	RemoteIDGT           *string  `json:"remoteIDGT,omitempty"`
+	RemoteIDGTE          *string  `json:"remoteIDGTE,omitempty"`
+	RemoteIDLT           *string  `json:"remoteIDLT,omitempty"`
+	RemoteIDLTE          *string  `json:"remoteIDLTE,omitempty"`
+	RemoteIDContains     *string  `json:"remoteIDContains,omitempty"`
+	RemoteIDHasPrefix    *string  `json:"remoteIDHasPrefix,omitempty"`
+	RemoteIDHasSuffix    *string  `json:"remoteIDHasSuffix,omitempty"`
+	RemoteIDEqualFold    *string  `json:"remoteIDEqualFold,omitempty"`
+	RemoteIDContainsFold *string  `json:"remoteIDContainsFold,omitempty"`
+
+	// "type" field predicates.
+	Type             *string  `json:"type,omitempty"`
+	TypeNEQ          *string  `json:"typeNEQ,omitempty"`
+	TypeIn           []string `json:"typeIn,omitempty"`
+	TypeNotIn        []string `json:"typeNotIn,omitempty"`
+	TypeGT           *string  `json:"typeGT,omitempty"`
+	TypeGTE          *string  `json:"typeGTE,omitempty"`
+	TypeLT           *string  `json:"typeLT,omitempty"`
+	TypeLTE          *string  `json:"typeLTE,omitempty"`
+	TypeContains     *string  `json:"typeContains,omitempty"`
+	TypeHasPrefix    *string  `json:"typeHasPrefix,omitempty"`
+	TypeHasSuffix    *string  `json:"typeHasSuffix,omitempty"`
+	TypeIsNil        bool     `json:"typeIsNil,omitempty"`
+	TypeNotNil       bool     `json:"typeNotNil,omitempty"`
+	TypeEqualFold    *string  `json:"typeEqualFold,omitempty"`
+	TypeContainsFold *string  `json:"typeContainsFold,omitempty"`
+
+	// "content" field predicates.
+	Content             *string  `json:"content,omitempty"`
+	ContentNEQ          *string  `json:"contentNEQ,omitempty"`
+	ContentIn           []string `json:"contentIn,omitempty"`
+	ContentNotIn        []string `json:"contentNotIn,omitempty"`
+	ContentGT           *string  `json:"contentGT,omitempty"`
+	ContentGTE          *string  `json:"contentGTE,omitempty"`
+	ContentLT           *string  `json:"contentLT,omitempty"`
+	ContentLTE          *string  `json:"contentLTE,omitempty"`
+	ContentContains     *string  `json:"contentContains,omitempty"`
+	ContentHasPrefix    *string  `json:"contentHasPrefix,omitempty"`
+	ContentHasSuffix    *string  `json:"contentHasSuffix,omitempty"`
+	ContentEqualFold    *string  `json:"contentEqualFold,omitempty"`
+	ContentContainsFold *string  `json:"contentContainsFold,omitempty"`
+
+	// "extra" field predicates.
+	Extra             *string  `json:"extra,omitempty"`
+	ExtraNEQ          *string  `json:"extraNEQ,omitempty"`
+	ExtraIn           []string `json:"extraIn,omitempty"`
+	ExtraNotIn        []string `json:"extraNotIn,omitempty"`
+	ExtraGT           *string  `json:"extraGT,omitempty"`
+	ExtraGTE          *string  `json:"extraGTE,omitempty"`
+	ExtraLT           *string  `json:"extraLT,omitempty"`
+	ExtraLTE          *string  `json:"extraLTE,omitempty"`
+	ExtraContains     *string  `json:"extraContains,omitempty"`
+	ExtraHasPrefix    *string  `json:"extraHasPrefix,omitempty"`
+	ExtraHasSuffix    *string  `json:"extraHasSuffix,omitempty"`
+	ExtraIsNil        bool     `json:"extraIsNil,omitempty"`
+	ExtraNotNil       bool     `json:"extraNotNil,omitempty"`
+	ExtraEqualFold    *string  `json:"extraEqualFold,omitempty"`
+	ExtraContainsFold *string  `json:"extraContainsFold,omitempty"`
+
+	// "content_hash" field predicates.
+	ContentHash             *string  `json:"contentHash,omitempty"`
+	ContentHashNEQ          *string  `json:"contentHashNEQ,omitempty"`
+	ContentHashIn           []string `json:"contentHashIn,omitempty"`
+	ContentHashNotIn        []string `json:"contentHashNotIn,omitempty"`
+	ContentHashGT           *string  `json:"contentHashGT,omitempty"`
+	ContentHashGTE          *string  `json:"contentHashGTE,omitempty"`
+	ContentHashLT           *string  `json:"contentHashLT,omitempty"`
+	ContentHashLTE          *string  `json:"contentHashLTE,omitempty"`
+	ContentHashContains     *string  `json:"contentHashContains,omitempty"`
+	ContentHashHasPrefix    *string  `json:"contentHashHasPrefix,omitempty"`
+	ContentHashHasSuffix    *string  `json:"contentHashHasSuffix,omitempty"`
+	ContentHashEqualFold    *string  `json:"contentHashEqualFold,omitempty"`
+	ContentHashContainsFold *string  `json:"contentHashContainsFold,omitempty"`
+
+	// "published_at" field predicates.
+	PublishedAt       *time.Time  `json:"publishedAt,omitempty"`
+	PublishedAtNEQ    *time.Time  `json:"publishedAtNEQ,omitempty"`
+	PublishedAtIn     []time.Time `json:"publishedAtIn,omitempty"`
+	PublishedAtNotIn  []time.Time `json:"publishedAtNotIn,omitempty"`
+	PublishedAtGT     *time.Time  `json:"publishedAtGT,omitempty"`
+	PublishedAtGTE    *time.Time  `json:"publishedAtGTE,omitempty"`
+	PublishedAtLT     *time.Time  `json:"publishedAtLT,omitempty"`
+	PublishedAtLTE    *time.Time  `json:"publishedAtLTE,omitempty"`
+	PublishedAtIsNil  bool        `json:"publishedAtIsNil,omitempty"`
+	PublishedAtNotNil bool        `json:"publishedAtNotNil,omitempty"`
+
+	// "fetched_at" field predicates.
+	FetchedAt      *time.Time  `json:"fetchedAt,omitempty"`
+	FetchedAtNEQ   *time.Time  `json:"fetchedAtNEQ,omitempty"`
+	FetchedAtIn    []time.Time `json:"fetchedAtIn,omitempty"`
+	FetchedAtNotIn []time.Time `json:"fetchedAtNotIn,omitempty"`
+	FetchedAtGT    *time.Time  `json:"fetchedAtGT,omitempty"`
+	FetchedAtGTE   *time.Time  `json:"fetchedAtGTE,omitempty"`
+	FetchedAtLT    *time.Time  `json:"fetchedAtLT,omitempty"`
+	FetchedAtLTE   *time.Time  `json:"fetchedAtLTE,omitempty"`
+
+	// "read_at" field predicates.
+	ReadAt       *time.Time  `json:"readAt,omitempty"`
+	ReadAtNEQ    *time.Time  `json:"readAtNEQ,omitempty"`
+	ReadAtIn     []time.Time `json:"readAtIn,omitempty"`
+	ReadAtNotIn  []time.Time `json:"readAtNotIn,omitempty"`
+	ReadAtGT     *time.Time  `json:"readAtGT,omitempty"`
+	ReadAtGTE    *time.Time  `json:"readAtGTE,omitempty"`
+	ReadAtLT     *time.Time  `json:"readAtLT,omitempty"`
+	ReadAtLTE    *time.Time  `json:"readAtLTE,omitempty"`
+	ReadAtIsNil  bool        `json:"readAtIsNil,omitempty"`
+	ReadAtNotNil bool        `json:"readAtNotNil,omitempty"`
+
+	// "relay_site" edge predicates.
+	HasRelaySite     *bool                  `json:"hasRelaySite,omitempty"`
+	HasRelaySiteWith []*RelaySiteWhereInput `json:"hasRelaySiteWith,omitempty"`
+}
+
+// AddPredicates adds custom predicates to the where input to be used during the filtering phase.
+func (i *RelaySiteAnnouncementWhereInput) AddPredicates(predicates ...predicate.RelaySiteAnnouncement) {
+	i.Predicates = append(i.Predicates, predicates...)
+}
+
+// Filter applies the RelaySiteAnnouncementWhereInput filter on the RelaySiteAnnouncementQuery builder.
+func (i *RelaySiteAnnouncementWhereInput) Filter(q *RelaySiteAnnouncementQuery) (*RelaySiteAnnouncementQuery, error) {
+	if i == nil {
+		return q, nil
+	}
+	p, err := i.P()
+	if err != nil {
+		if err == ErrEmptyRelaySiteAnnouncementWhereInput {
+			return q, nil
+		}
+		return nil, err
+	}
+	return q.Where(p), nil
+}
+
+// ErrEmptyRelaySiteAnnouncementWhereInput is returned in case the RelaySiteAnnouncementWhereInput is empty.
+var ErrEmptyRelaySiteAnnouncementWhereInput = errors.New("ent: empty predicate RelaySiteAnnouncementWhereInput")
+
+// P returns a predicate for filtering relaysiteannouncements.
+// An error is returned if the input is empty or invalid.
+func (i *RelaySiteAnnouncementWhereInput) P() (predicate.RelaySiteAnnouncement, error) {
+	var predicates []predicate.RelaySiteAnnouncement
+	if i.Not != nil {
+		p, err := i.Not.P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'not'", err)
+		}
+		predicates = append(predicates, relaysiteannouncement.Not(p))
+	}
+	switch n := len(i.Or); {
+	case n == 1:
+		p, err := i.Or[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'or'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		or := make([]predicate.RelaySiteAnnouncement, 0, n)
+		for _, w := range i.Or {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'or'", err)
+			}
+			or = append(or, p)
+		}
+		predicates = append(predicates, relaysiteannouncement.Or(or...))
+	}
+	switch n := len(i.And); {
+	case n == 1:
+		p, err := i.And[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'and'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		and := make([]predicate.RelaySiteAnnouncement, 0, n)
+		for _, w := range i.And {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'and'", err)
+			}
+			and = append(and, p)
+		}
+		predicates = append(predicates, relaysiteannouncement.And(and...))
+	}
+	predicates = append(predicates, i.Predicates...)
+	if i.ID != nil {
+		predicates = append(predicates, relaysiteannouncement.IDEQ(*i.ID))
+	}
+	if i.IDNEQ != nil {
+		predicates = append(predicates, relaysiteannouncement.IDNEQ(*i.IDNEQ))
+	}
+	if len(i.IDIn) > 0 {
+		predicates = append(predicates, relaysiteannouncement.IDIn(i.IDIn...))
+	}
+	if len(i.IDNotIn) > 0 {
+		predicates = append(predicates, relaysiteannouncement.IDNotIn(i.IDNotIn...))
+	}
+	if i.IDGT != nil {
+		predicates = append(predicates, relaysiteannouncement.IDGT(*i.IDGT))
+	}
+	if i.IDGTE != nil {
+		predicates = append(predicates, relaysiteannouncement.IDGTE(*i.IDGTE))
+	}
+	if i.IDLT != nil {
+		predicates = append(predicates, relaysiteannouncement.IDLT(*i.IDLT))
+	}
+	if i.IDLTE != nil {
+		predicates = append(predicates, relaysiteannouncement.IDLTE(*i.IDLTE))
+	}
+	if i.CreatedAt != nil {
+		predicates = append(predicates, relaysiteannouncement.CreatedAtEQ(*i.CreatedAt))
+	}
+	if i.CreatedAtNEQ != nil {
+		predicates = append(predicates, relaysiteannouncement.CreatedAtNEQ(*i.CreatedAtNEQ))
+	}
+	if len(i.CreatedAtIn) > 0 {
+		predicates = append(predicates, relaysiteannouncement.CreatedAtIn(i.CreatedAtIn...))
+	}
+	if len(i.CreatedAtNotIn) > 0 {
+		predicates = append(predicates, relaysiteannouncement.CreatedAtNotIn(i.CreatedAtNotIn...))
+	}
+	if i.CreatedAtGT != nil {
+		predicates = append(predicates, relaysiteannouncement.CreatedAtGT(*i.CreatedAtGT))
+	}
+	if i.CreatedAtGTE != nil {
+		predicates = append(predicates, relaysiteannouncement.CreatedAtGTE(*i.CreatedAtGTE))
+	}
+	if i.CreatedAtLT != nil {
+		predicates = append(predicates, relaysiteannouncement.CreatedAtLT(*i.CreatedAtLT))
+	}
+	if i.CreatedAtLTE != nil {
+		predicates = append(predicates, relaysiteannouncement.CreatedAtLTE(*i.CreatedAtLTE))
+	}
+	if i.UpdatedAt != nil {
+		predicates = append(predicates, relaysiteannouncement.UpdatedAtEQ(*i.UpdatedAt))
+	}
+	if i.UpdatedAtNEQ != nil {
+		predicates = append(predicates, relaysiteannouncement.UpdatedAtNEQ(*i.UpdatedAtNEQ))
+	}
+	if len(i.UpdatedAtIn) > 0 {
+		predicates = append(predicates, relaysiteannouncement.UpdatedAtIn(i.UpdatedAtIn...))
+	}
+	if len(i.UpdatedAtNotIn) > 0 {
+		predicates = append(predicates, relaysiteannouncement.UpdatedAtNotIn(i.UpdatedAtNotIn...))
+	}
+	if i.UpdatedAtGT != nil {
+		predicates = append(predicates, relaysiteannouncement.UpdatedAtGT(*i.UpdatedAtGT))
+	}
+	if i.UpdatedAtGTE != nil {
+		predicates = append(predicates, relaysiteannouncement.UpdatedAtGTE(*i.UpdatedAtGTE))
+	}
+	if i.UpdatedAtLT != nil {
+		predicates = append(predicates, relaysiteannouncement.UpdatedAtLT(*i.UpdatedAtLT))
+	}
+	if i.UpdatedAtLTE != nil {
+		predicates = append(predicates, relaysiteannouncement.UpdatedAtLTE(*i.UpdatedAtLTE))
+	}
+	if i.RelaySiteID != nil {
+		predicates = append(predicates, relaysiteannouncement.RelaySiteIDEQ(*i.RelaySiteID))
+	}
+	if i.RelaySiteIDNEQ != nil {
+		predicates = append(predicates, relaysiteannouncement.RelaySiteIDNEQ(*i.RelaySiteIDNEQ))
+	}
+	if len(i.RelaySiteIDIn) > 0 {
+		predicates = append(predicates, relaysiteannouncement.RelaySiteIDIn(i.RelaySiteIDIn...))
+	}
+	if len(i.RelaySiteIDNotIn) > 0 {
+		predicates = append(predicates, relaysiteannouncement.RelaySiteIDNotIn(i.RelaySiteIDNotIn...))
+	}
+	if i.RemoteID != nil {
+		predicates = append(predicates, relaysiteannouncement.RemoteIDEQ(*i.RemoteID))
+	}
+	if i.RemoteIDNEQ != nil {
+		predicates = append(predicates, relaysiteannouncement.RemoteIDNEQ(*i.RemoteIDNEQ))
+	}
+	if len(i.RemoteIDIn) > 0 {
+		predicates = append(predicates, relaysiteannouncement.RemoteIDIn(i.RemoteIDIn...))
+	}
+	if len(i.RemoteIDNotIn) > 0 {
+		predicates = append(predicates, relaysiteannouncement.RemoteIDNotIn(i.RemoteIDNotIn...))
+	}
+	if i.RemoteIDGT != nil {
+		predicates = append(predicates, relaysiteannouncement.RemoteIDGT(*i.RemoteIDGT))
+	}
+	if i.RemoteIDGTE != nil {
+		predicates = append(predicates, relaysiteannouncement.RemoteIDGTE(*i.RemoteIDGTE))
+	}
+	if i.RemoteIDLT != nil {
+		predicates = append(predicates, relaysiteannouncement.RemoteIDLT(*i.RemoteIDLT))
+	}
+	if i.RemoteIDLTE != nil {
+		predicates = append(predicates, relaysiteannouncement.RemoteIDLTE(*i.RemoteIDLTE))
+	}
+	if i.RemoteIDContains != nil {
+		predicates = append(predicates, relaysiteannouncement.RemoteIDContains(*i.RemoteIDContains))
+	}
+	if i.RemoteIDHasPrefix != nil {
+		predicates = append(predicates, relaysiteannouncement.RemoteIDHasPrefix(*i.RemoteIDHasPrefix))
+	}
+	if i.RemoteIDHasSuffix != nil {
+		predicates = append(predicates, relaysiteannouncement.RemoteIDHasSuffix(*i.RemoteIDHasSuffix))
+	}
+	if i.RemoteIDEqualFold != nil {
+		predicates = append(predicates, relaysiteannouncement.RemoteIDEqualFold(*i.RemoteIDEqualFold))
+	}
+	if i.RemoteIDContainsFold != nil {
+		predicates = append(predicates, relaysiteannouncement.RemoteIDContainsFold(*i.RemoteIDContainsFold))
+	}
+	if i.Type != nil {
+		predicates = append(predicates, relaysiteannouncement.TypeEQ(*i.Type))
+	}
+	if i.TypeNEQ != nil {
+		predicates = append(predicates, relaysiteannouncement.TypeNEQ(*i.TypeNEQ))
+	}
+	if len(i.TypeIn) > 0 {
+		predicates = append(predicates, relaysiteannouncement.TypeIn(i.TypeIn...))
+	}
+	if len(i.TypeNotIn) > 0 {
+		predicates = append(predicates, relaysiteannouncement.TypeNotIn(i.TypeNotIn...))
+	}
+	if i.TypeGT != nil {
+		predicates = append(predicates, relaysiteannouncement.TypeGT(*i.TypeGT))
+	}
+	if i.TypeGTE != nil {
+		predicates = append(predicates, relaysiteannouncement.TypeGTE(*i.TypeGTE))
+	}
+	if i.TypeLT != nil {
+		predicates = append(predicates, relaysiteannouncement.TypeLT(*i.TypeLT))
+	}
+	if i.TypeLTE != nil {
+		predicates = append(predicates, relaysiteannouncement.TypeLTE(*i.TypeLTE))
+	}
+	if i.TypeContains != nil {
+		predicates = append(predicates, relaysiteannouncement.TypeContains(*i.TypeContains))
+	}
+	if i.TypeHasPrefix != nil {
+		predicates = append(predicates, relaysiteannouncement.TypeHasPrefix(*i.TypeHasPrefix))
+	}
+	if i.TypeHasSuffix != nil {
+		predicates = append(predicates, relaysiteannouncement.TypeHasSuffix(*i.TypeHasSuffix))
+	}
+	if i.TypeIsNil {
+		predicates = append(predicates, relaysiteannouncement.TypeIsNil())
+	}
+	if i.TypeNotNil {
+		predicates = append(predicates, relaysiteannouncement.TypeNotNil())
+	}
+	if i.TypeEqualFold != nil {
+		predicates = append(predicates, relaysiteannouncement.TypeEqualFold(*i.TypeEqualFold))
+	}
+	if i.TypeContainsFold != nil {
+		predicates = append(predicates, relaysiteannouncement.TypeContainsFold(*i.TypeContainsFold))
+	}
+	if i.Content != nil {
+		predicates = append(predicates, relaysiteannouncement.ContentEQ(*i.Content))
+	}
+	if i.ContentNEQ != nil {
+		predicates = append(predicates, relaysiteannouncement.ContentNEQ(*i.ContentNEQ))
+	}
+	if len(i.ContentIn) > 0 {
+		predicates = append(predicates, relaysiteannouncement.ContentIn(i.ContentIn...))
+	}
+	if len(i.ContentNotIn) > 0 {
+		predicates = append(predicates, relaysiteannouncement.ContentNotIn(i.ContentNotIn...))
+	}
+	if i.ContentGT != nil {
+		predicates = append(predicates, relaysiteannouncement.ContentGT(*i.ContentGT))
+	}
+	if i.ContentGTE != nil {
+		predicates = append(predicates, relaysiteannouncement.ContentGTE(*i.ContentGTE))
+	}
+	if i.ContentLT != nil {
+		predicates = append(predicates, relaysiteannouncement.ContentLT(*i.ContentLT))
+	}
+	if i.ContentLTE != nil {
+		predicates = append(predicates, relaysiteannouncement.ContentLTE(*i.ContentLTE))
+	}
+	if i.ContentContains != nil {
+		predicates = append(predicates, relaysiteannouncement.ContentContains(*i.ContentContains))
+	}
+	if i.ContentHasPrefix != nil {
+		predicates = append(predicates, relaysiteannouncement.ContentHasPrefix(*i.ContentHasPrefix))
+	}
+	if i.ContentHasSuffix != nil {
+		predicates = append(predicates, relaysiteannouncement.ContentHasSuffix(*i.ContentHasSuffix))
+	}
+	if i.ContentEqualFold != nil {
+		predicates = append(predicates, relaysiteannouncement.ContentEqualFold(*i.ContentEqualFold))
+	}
+	if i.ContentContainsFold != nil {
+		predicates = append(predicates, relaysiteannouncement.ContentContainsFold(*i.ContentContainsFold))
+	}
+	if i.Extra != nil {
+		predicates = append(predicates, relaysiteannouncement.ExtraEQ(*i.Extra))
+	}
+	if i.ExtraNEQ != nil {
+		predicates = append(predicates, relaysiteannouncement.ExtraNEQ(*i.ExtraNEQ))
+	}
+	if len(i.ExtraIn) > 0 {
+		predicates = append(predicates, relaysiteannouncement.ExtraIn(i.ExtraIn...))
+	}
+	if len(i.ExtraNotIn) > 0 {
+		predicates = append(predicates, relaysiteannouncement.ExtraNotIn(i.ExtraNotIn...))
+	}
+	if i.ExtraGT != nil {
+		predicates = append(predicates, relaysiteannouncement.ExtraGT(*i.ExtraGT))
+	}
+	if i.ExtraGTE != nil {
+		predicates = append(predicates, relaysiteannouncement.ExtraGTE(*i.ExtraGTE))
+	}
+	if i.ExtraLT != nil {
+		predicates = append(predicates, relaysiteannouncement.ExtraLT(*i.ExtraLT))
+	}
+	if i.ExtraLTE != nil {
+		predicates = append(predicates, relaysiteannouncement.ExtraLTE(*i.ExtraLTE))
+	}
+	if i.ExtraContains != nil {
+		predicates = append(predicates, relaysiteannouncement.ExtraContains(*i.ExtraContains))
+	}
+	if i.ExtraHasPrefix != nil {
+		predicates = append(predicates, relaysiteannouncement.ExtraHasPrefix(*i.ExtraHasPrefix))
+	}
+	if i.ExtraHasSuffix != nil {
+		predicates = append(predicates, relaysiteannouncement.ExtraHasSuffix(*i.ExtraHasSuffix))
+	}
+	if i.ExtraIsNil {
+		predicates = append(predicates, relaysiteannouncement.ExtraIsNil())
+	}
+	if i.ExtraNotNil {
+		predicates = append(predicates, relaysiteannouncement.ExtraNotNil())
+	}
+	if i.ExtraEqualFold != nil {
+		predicates = append(predicates, relaysiteannouncement.ExtraEqualFold(*i.ExtraEqualFold))
+	}
+	if i.ExtraContainsFold != nil {
+		predicates = append(predicates, relaysiteannouncement.ExtraContainsFold(*i.ExtraContainsFold))
+	}
+	if i.ContentHash != nil {
+		predicates = append(predicates, relaysiteannouncement.ContentHashEQ(*i.ContentHash))
+	}
+	if i.ContentHashNEQ != nil {
+		predicates = append(predicates, relaysiteannouncement.ContentHashNEQ(*i.ContentHashNEQ))
+	}
+	if len(i.ContentHashIn) > 0 {
+		predicates = append(predicates, relaysiteannouncement.ContentHashIn(i.ContentHashIn...))
+	}
+	if len(i.ContentHashNotIn) > 0 {
+		predicates = append(predicates, relaysiteannouncement.ContentHashNotIn(i.ContentHashNotIn...))
+	}
+	if i.ContentHashGT != nil {
+		predicates = append(predicates, relaysiteannouncement.ContentHashGT(*i.ContentHashGT))
+	}
+	if i.ContentHashGTE != nil {
+		predicates = append(predicates, relaysiteannouncement.ContentHashGTE(*i.ContentHashGTE))
+	}
+	if i.ContentHashLT != nil {
+		predicates = append(predicates, relaysiteannouncement.ContentHashLT(*i.ContentHashLT))
+	}
+	if i.ContentHashLTE != nil {
+		predicates = append(predicates, relaysiteannouncement.ContentHashLTE(*i.ContentHashLTE))
+	}
+	if i.ContentHashContains != nil {
+		predicates = append(predicates, relaysiteannouncement.ContentHashContains(*i.ContentHashContains))
+	}
+	if i.ContentHashHasPrefix != nil {
+		predicates = append(predicates, relaysiteannouncement.ContentHashHasPrefix(*i.ContentHashHasPrefix))
+	}
+	if i.ContentHashHasSuffix != nil {
+		predicates = append(predicates, relaysiteannouncement.ContentHashHasSuffix(*i.ContentHashHasSuffix))
+	}
+	if i.ContentHashEqualFold != nil {
+		predicates = append(predicates, relaysiteannouncement.ContentHashEqualFold(*i.ContentHashEqualFold))
+	}
+	if i.ContentHashContainsFold != nil {
+		predicates = append(predicates, relaysiteannouncement.ContentHashContainsFold(*i.ContentHashContainsFold))
+	}
+	if i.PublishedAt != nil {
+		predicates = append(predicates, relaysiteannouncement.PublishedAtEQ(*i.PublishedAt))
+	}
+	if i.PublishedAtNEQ != nil {
+		predicates = append(predicates, relaysiteannouncement.PublishedAtNEQ(*i.PublishedAtNEQ))
+	}
+	if len(i.PublishedAtIn) > 0 {
+		predicates = append(predicates, relaysiteannouncement.PublishedAtIn(i.PublishedAtIn...))
+	}
+	if len(i.PublishedAtNotIn) > 0 {
+		predicates = append(predicates, relaysiteannouncement.PublishedAtNotIn(i.PublishedAtNotIn...))
+	}
+	if i.PublishedAtGT != nil {
+		predicates = append(predicates, relaysiteannouncement.PublishedAtGT(*i.PublishedAtGT))
+	}
+	if i.PublishedAtGTE != nil {
+		predicates = append(predicates, relaysiteannouncement.PublishedAtGTE(*i.PublishedAtGTE))
+	}
+	if i.PublishedAtLT != nil {
+		predicates = append(predicates, relaysiteannouncement.PublishedAtLT(*i.PublishedAtLT))
+	}
+	if i.PublishedAtLTE != nil {
+		predicates = append(predicates, relaysiteannouncement.PublishedAtLTE(*i.PublishedAtLTE))
+	}
+	if i.PublishedAtIsNil {
+		predicates = append(predicates, relaysiteannouncement.PublishedAtIsNil())
+	}
+	if i.PublishedAtNotNil {
+		predicates = append(predicates, relaysiteannouncement.PublishedAtNotNil())
+	}
+	if i.FetchedAt != nil {
+		predicates = append(predicates, relaysiteannouncement.FetchedAtEQ(*i.FetchedAt))
+	}
+	if i.FetchedAtNEQ != nil {
+		predicates = append(predicates, relaysiteannouncement.FetchedAtNEQ(*i.FetchedAtNEQ))
+	}
+	if len(i.FetchedAtIn) > 0 {
+		predicates = append(predicates, relaysiteannouncement.FetchedAtIn(i.FetchedAtIn...))
+	}
+	if len(i.FetchedAtNotIn) > 0 {
+		predicates = append(predicates, relaysiteannouncement.FetchedAtNotIn(i.FetchedAtNotIn...))
+	}
+	if i.FetchedAtGT != nil {
+		predicates = append(predicates, relaysiteannouncement.FetchedAtGT(*i.FetchedAtGT))
+	}
+	if i.FetchedAtGTE != nil {
+		predicates = append(predicates, relaysiteannouncement.FetchedAtGTE(*i.FetchedAtGTE))
+	}
+	if i.FetchedAtLT != nil {
+		predicates = append(predicates, relaysiteannouncement.FetchedAtLT(*i.FetchedAtLT))
+	}
+	if i.FetchedAtLTE != nil {
+		predicates = append(predicates, relaysiteannouncement.FetchedAtLTE(*i.FetchedAtLTE))
+	}
+	if i.ReadAt != nil {
+		predicates = append(predicates, relaysiteannouncement.ReadAtEQ(*i.ReadAt))
+	}
+	if i.ReadAtNEQ != nil {
+		predicates = append(predicates, relaysiteannouncement.ReadAtNEQ(*i.ReadAtNEQ))
+	}
+	if len(i.ReadAtIn) > 0 {
+		predicates = append(predicates, relaysiteannouncement.ReadAtIn(i.ReadAtIn...))
+	}
+	if len(i.ReadAtNotIn) > 0 {
+		predicates = append(predicates, relaysiteannouncement.ReadAtNotIn(i.ReadAtNotIn...))
+	}
+	if i.ReadAtGT != nil {
+		predicates = append(predicates, relaysiteannouncement.ReadAtGT(*i.ReadAtGT))
+	}
+	if i.ReadAtGTE != nil {
+		predicates = append(predicates, relaysiteannouncement.ReadAtGTE(*i.ReadAtGTE))
+	}
+	if i.ReadAtLT != nil {
+		predicates = append(predicates, relaysiteannouncement.ReadAtLT(*i.ReadAtLT))
+	}
+	if i.ReadAtLTE != nil {
+		predicates = append(predicates, relaysiteannouncement.ReadAtLTE(*i.ReadAtLTE))
+	}
+	if i.ReadAtIsNil {
+		predicates = append(predicates, relaysiteannouncement.ReadAtIsNil())
+	}
+	if i.ReadAtNotNil {
+		predicates = append(predicates, relaysiteannouncement.ReadAtNotNil())
+	}
+
+	if i.HasRelaySite != nil {
+		p := relaysiteannouncement.HasRelaySite()
+		if !*i.HasRelaySite {
+			p = relaysiteannouncement.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasRelaySiteWith) > 0 {
+		with := make([]predicate.RelaySite, 0, len(i.HasRelaySiteWith))
+		for _, w := range i.HasRelaySiteWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasRelaySiteWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, relaysiteannouncement.HasRelaySiteWith(with...))
+	}
+	switch len(predicates) {
+	case 0:
+		return nil, ErrEmptyRelaySiteAnnouncementWhereInput
+	case 1:
+		return predicates[0], nil
+	default:
+		return relaysiteannouncement.And(predicates...), nil
+	}
+}
+
+// RelaySiteBalanceSnapshotWhereInput represents a where input for filtering RelaySiteBalanceSnapshot queries.
+type RelaySiteBalanceSnapshotWhereInput struct {
+	Predicates []predicate.RelaySiteBalanceSnapshot  `json:"-"`
+	Not        *RelaySiteBalanceSnapshotWhereInput   `json:"not,omitempty"`
+	Or         []*RelaySiteBalanceSnapshotWhereInput `json:"or,omitempty"`
+	And        []*RelaySiteBalanceSnapshotWhereInput `json:"and,omitempty"`
+
+	// "id" field predicates.
+	ID      *int  `json:"id,omitempty"`
+	IDNEQ   *int  `json:"idNEQ,omitempty"`
+	IDIn    []int `json:"idIn,omitempty"`
+	IDNotIn []int `json:"idNotIn,omitempty"`
+	IDGT    *int  `json:"idGT,omitempty"`
+	IDGTE   *int  `json:"idGTE,omitempty"`
+	IDLT    *int  `json:"idLT,omitempty"`
+	IDLTE   *int  `json:"idLTE,omitempty"`
+
+	// "created_at" field predicates.
+	CreatedAt      *time.Time  `json:"createdAt,omitempty"`
+	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ,omitempty"`
+	CreatedAtIn    []time.Time `json:"createdAtIn,omitempty"`
+	CreatedAtNotIn []time.Time `json:"createdAtNotIn,omitempty"`
+	CreatedAtGT    *time.Time  `json:"createdAtGT,omitempty"`
+	CreatedAtGTE   *time.Time  `json:"createdAtGTE,omitempty"`
+	CreatedAtLT    *time.Time  `json:"createdAtLT,omitempty"`
+	CreatedAtLTE   *time.Time  `json:"createdAtLTE,omitempty"`
+
+	// "updated_at" field predicates.
+	UpdatedAt      *time.Time  `json:"updatedAt,omitempty"`
+	UpdatedAtNEQ   *time.Time  `json:"updatedAtNEQ,omitempty"`
+	UpdatedAtIn    []time.Time `json:"updatedAtIn,omitempty"`
+	UpdatedAtNotIn []time.Time `json:"updatedAtNotIn,omitempty"`
+	UpdatedAtGT    *time.Time  `json:"updatedAtGT,omitempty"`
+	UpdatedAtGTE   *time.Time  `json:"updatedAtGTE,omitempty"`
+	UpdatedAtLT    *time.Time  `json:"updatedAtLT,omitempty"`
+	UpdatedAtLTE   *time.Time  `json:"updatedAtLTE,omitempty"`
+
+	// "relay_site_id" field predicates.
+	RelaySiteID      *int  `json:"relaySiteID,omitempty"`
+	RelaySiteIDNEQ   *int  `json:"relaySiteIDNEQ,omitempty"`
+	RelaySiteIDIn    []int `json:"relaySiteIDIn,omitempty"`
+	RelaySiteIDNotIn []int `json:"relaySiteIDNotIn,omitempty"`
+
+	// "balance" field predicates.
+	Balance      *float64  `json:"balance,omitempty"`
+	BalanceNEQ   *float64  `json:"balanceNEQ,omitempty"`
+	BalanceIn    []float64 `json:"balanceIn,omitempty"`
+	BalanceNotIn []float64 `json:"balanceNotIn,omitempty"`
+	BalanceGT    *float64  `json:"balanceGT,omitempty"`
+	BalanceGTE   *float64  `json:"balanceGTE,omitempty"`
+	BalanceLT    *float64  `json:"balanceLT,omitempty"`
+	BalanceLTE   *float64  `json:"balanceLTE,omitempty"`
+
+	// "unit" field predicates.
+	Unit             *string  `json:"unit,omitempty"`
+	UnitNEQ          *string  `json:"unitNEQ,omitempty"`
+	UnitIn           []string `json:"unitIn,omitempty"`
+	UnitNotIn        []string `json:"unitNotIn,omitempty"`
+	UnitGT           *string  `json:"unitGT,omitempty"`
+	UnitGTE          *string  `json:"unitGTE,omitempty"`
+	UnitLT           *string  `json:"unitLT,omitempty"`
+	UnitLTE          *string  `json:"unitLTE,omitempty"`
+	UnitContains     *string  `json:"unitContains,omitempty"`
+	UnitHasPrefix    *string  `json:"unitHasPrefix,omitempty"`
+	UnitHasSuffix    *string  `json:"unitHasSuffix,omitempty"`
+	UnitEqualFold    *string  `json:"unitEqualFold,omitempty"`
+	UnitContainsFold *string  `json:"unitContainsFold,omitempty"`
+
+	// "pulled_at" field predicates.
+	PulledAt      *time.Time  `json:"pulledAt,omitempty"`
+	PulledAtNEQ   *time.Time  `json:"pulledAtNEQ,omitempty"`
+	PulledAtIn    []time.Time `json:"pulledAtIn,omitempty"`
+	PulledAtNotIn []time.Time `json:"pulledAtNotIn,omitempty"`
+	PulledAtGT    *time.Time  `json:"pulledAtGT,omitempty"`
+	PulledAtGTE   *time.Time  `json:"pulledAtGTE,omitempty"`
+	PulledAtLT    *time.Time  `json:"pulledAtLT,omitempty"`
+	PulledAtLTE   *time.Time  `json:"pulledAtLTE,omitempty"`
+
+	// "relay_site" edge predicates.
+	HasRelaySite     *bool                  `json:"hasRelaySite,omitempty"`
+	HasRelaySiteWith []*RelaySiteWhereInput `json:"hasRelaySiteWith,omitempty"`
+}
+
+// AddPredicates adds custom predicates to the where input to be used during the filtering phase.
+func (i *RelaySiteBalanceSnapshotWhereInput) AddPredicates(predicates ...predicate.RelaySiteBalanceSnapshot) {
+	i.Predicates = append(i.Predicates, predicates...)
+}
+
+// Filter applies the RelaySiteBalanceSnapshotWhereInput filter on the RelaySiteBalanceSnapshotQuery builder.
+func (i *RelaySiteBalanceSnapshotWhereInput) Filter(q *RelaySiteBalanceSnapshotQuery) (*RelaySiteBalanceSnapshotQuery, error) {
+	if i == nil {
+		return q, nil
+	}
+	p, err := i.P()
+	if err != nil {
+		if err == ErrEmptyRelaySiteBalanceSnapshotWhereInput {
+			return q, nil
+		}
+		return nil, err
+	}
+	return q.Where(p), nil
+}
+
+// ErrEmptyRelaySiteBalanceSnapshotWhereInput is returned in case the RelaySiteBalanceSnapshotWhereInput is empty.
+var ErrEmptyRelaySiteBalanceSnapshotWhereInput = errors.New("ent: empty predicate RelaySiteBalanceSnapshotWhereInput")
+
+// P returns a predicate for filtering relaysitebalancesnapshots.
+// An error is returned if the input is empty or invalid.
+func (i *RelaySiteBalanceSnapshotWhereInput) P() (predicate.RelaySiteBalanceSnapshot, error) {
+	var predicates []predicate.RelaySiteBalanceSnapshot
+	if i.Not != nil {
+		p, err := i.Not.P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'not'", err)
+		}
+		predicates = append(predicates, relaysitebalancesnapshot.Not(p))
+	}
+	switch n := len(i.Or); {
+	case n == 1:
+		p, err := i.Or[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'or'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		or := make([]predicate.RelaySiteBalanceSnapshot, 0, n)
+		for _, w := range i.Or {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'or'", err)
+			}
+			or = append(or, p)
+		}
+		predicates = append(predicates, relaysitebalancesnapshot.Or(or...))
+	}
+	switch n := len(i.And); {
+	case n == 1:
+		p, err := i.And[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'and'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		and := make([]predicate.RelaySiteBalanceSnapshot, 0, n)
+		for _, w := range i.And {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'and'", err)
+			}
+			and = append(and, p)
+		}
+		predicates = append(predicates, relaysitebalancesnapshot.And(and...))
+	}
+	predicates = append(predicates, i.Predicates...)
+	if i.ID != nil {
+		predicates = append(predicates, relaysitebalancesnapshot.IDEQ(*i.ID))
+	}
+	if i.IDNEQ != nil {
+		predicates = append(predicates, relaysitebalancesnapshot.IDNEQ(*i.IDNEQ))
+	}
+	if len(i.IDIn) > 0 {
+		predicates = append(predicates, relaysitebalancesnapshot.IDIn(i.IDIn...))
+	}
+	if len(i.IDNotIn) > 0 {
+		predicates = append(predicates, relaysitebalancesnapshot.IDNotIn(i.IDNotIn...))
+	}
+	if i.IDGT != nil {
+		predicates = append(predicates, relaysitebalancesnapshot.IDGT(*i.IDGT))
+	}
+	if i.IDGTE != nil {
+		predicates = append(predicates, relaysitebalancesnapshot.IDGTE(*i.IDGTE))
+	}
+	if i.IDLT != nil {
+		predicates = append(predicates, relaysitebalancesnapshot.IDLT(*i.IDLT))
+	}
+	if i.IDLTE != nil {
+		predicates = append(predicates, relaysitebalancesnapshot.IDLTE(*i.IDLTE))
+	}
+	if i.CreatedAt != nil {
+		predicates = append(predicates, relaysitebalancesnapshot.CreatedAtEQ(*i.CreatedAt))
+	}
+	if i.CreatedAtNEQ != nil {
+		predicates = append(predicates, relaysitebalancesnapshot.CreatedAtNEQ(*i.CreatedAtNEQ))
+	}
+	if len(i.CreatedAtIn) > 0 {
+		predicates = append(predicates, relaysitebalancesnapshot.CreatedAtIn(i.CreatedAtIn...))
+	}
+	if len(i.CreatedAtNotIn) > 0 {
+		predicates = append(predicates, relaysitebalancesnapshot.CreatedAtNotIn(i.CreatedAtNotIn...))
+	}
+	if i.CreatedAtGT != nil {
+		predicates = append(predicates, relaysitebalancesnapshot.CreatedAtGT(*i.CreatedAtGT))
+	}
+	if i.CreatedAtGTE != nil {
+		predicates = append(predicates, relaysitebalancesnapshot.CreatedAtGTE(*i.CreatedAtGTE))
+	}
+	if i.CreatedAtLT != nil {
+		predicates = append(predicates, relaysitebalancesnapshot.CreatedAtLT(*i.CreatedAtLT))
+	}
+	if i.CreatedAtLTE != nil {
+		predicates = append(predicates, relaysitebalancesnapshot.CreatedAtLTE(*i.CreatedAtLTE))
+	}
+	if i.UpdatedAt != nil {
+		predicates = append(predicates, relaysitebalancesnapshot.UpdatedAtEQ(*i.UpdatedAt))
+	}
+	if i.UpdatedAtNEQ != nil {
+		predicates = append(predicates, relaysitebalancesnapshot.UpdatedAtNEQ(*i.UpdatedAtNEQ))
+	}
+	if len(i.UpdatedAtIn) > 0 {
+		predicates = append(predicates, relaysitebalancesnapshot.UpdatedAtIn(i.UpdatedAtIn...))
+	}
+	if len(i.UpdatedAtNotIn) > 0 {
+		predicates = append(predicates, relaysitebalancesnapshot.UpdatedAtNotIn(i.UpdatedAtNotIn...))
+	}
+	if i.UpdatedAtGT != nil {
+		predicates = append(predicates, relaysitebalancesnapshot.UpdatedAtGT(*i.UpdatedAtGT))
+	}
+	if i.UpdatedAtGTE != nil {
+		predicates = append(predicates, relaysitebalancesnapshot.UpdatedAtGTE(*i.UpdatedAtGTE))
+	}
+	if i.UpdatedAtLT != nil {
+		predicates = append(predicates, relaysitebalancesnapshot.UpdatedAtLT(*i.UpdatedAtLT))
+	}
+	if i.UpdatedAtLTE != nil {
+		predicates = append(predicates, relaysitebalancesnapshot.UpdatedAtLTE(*i.UpdatedAtLTE))
+	}
+	if i.RelaySiteID != nil {
+		predicates = append(predicates, relaysitebalancesnapshot.RelaySiteIDEQ(*i.RelaySiteID))
+	}
+	if i.RelaySiteIDNEQ != nil {
+		predicates = append(predicates, relaysitebalancesnapshot.RelaySiteIDNEQ(*i.RelaySiteIDNEQ))
+	}
+	if len(i.RelaySiteIDIn) > 0 {
+		predicates = append(predicates, relaysitebalancesnapshot.RelaySiteIDIn(i.RelaySiteIDIn...))
+	}
+	if len(i.RelaySiteIDNotIn) > 0 {
+		predicates = append(predicates, relaysitebalancesnapshot.RelaySiteIDNotIn(i.RelaySiteIDNotIn...))
+	}
+	if i.Balance != nil {
+		predicates = append(predicates, relaysitebalancesnapshot.BalanceEQ(*i.Balance))
+	}
+	if i.BalanceNEQ != nil {
+		predicates = append(predicates, relaysitebalancesnapshot.BalanceNEQ(*i.BalanceNEQ))
+	}
+	if len(i.BalanceIn) > 0 {
+		predicates = append(predicates, relaysitebalancesnapshot.BalanceIn(i.BalanceIn...))
+	}
+	if len(i.BalanceNotIn) > 0 {
+		predicates = append(predicates, relaysitebalancesnapshot.BalanceNotIn(i.BalanceNotIn...))
+	}
+	if i.BalanceGT != nil {
+		predicates = append(predicates, relaysitebalancesnapshot.BalanceGT(*i.BalanceGT))
+	}
+	if i.BalanceGTE != nil {
+		predicates = append(predicates, relaysitebalancesnapshot.BalanceGTE(*i.BalanceGTE))
+	}
+	if i.BalanceLT != nil {
+		predicates = append(predicates, relaysitebalancesnapshot.BalanceLT(*i.BalanceLT))
+	}
+	if i.BalanceLTE != nil {
+		predicates = append(predicates, relaysitebalancesnapshot.BalanceLTE(*i.BalanceLTE))
+	}
+	if i.Unit != nil {
+		predicates = append(predicates, relaysitebalancesnapshot.UnitEQ(*i.Unit))
+	}
+	if i.UnitNEQ != nil {
+		predicates = append(predicates, relaysitebalancesnapshot.UnitNEQ(*i.UnitNEQ))
+	}
+	if len(i.UnitIn) > 0 {
+		predicates = append(predicates, relaysitebalancesnapshot.UnitIn(i.UnitIn...))
+	}
+	if len(i.UnitNotIn) > 0 {
+		predicates = append(predicates, relaysitebalancesnapshot.UnitNotIn(i.UnitNotIn...))
+	}
+	if i.UnitGT != nil {
+		predicates = append(predicates, relaysitebalancesnapshot.UnitGT(*i.UnitGT))
+	}
+	if i.UnitGTE != nil {
+		predicates = append(predicates, relaysitebalancesnapshot.UnitGTE(*i.UnitGTE))
+	}
+	if i.UnitLT != nil {
+		predicates = append(predicates, relaysitebalancesnapshot.UnitLT(*i.UnitLT))
+	}
+	if i.UnitLTE != nil {
+		predicates = append(predicates, relaysitebalancesnapshot.UnitLTE(*i.UnitLTE))
+	}
+	if i.UnitContains != nil {
+		predicates = append(predicates, relaysitebalancesnapshot.UnitContains(*i.UnitContains))
+	}
+	if i.UnitHasPrefix != nil {
+		predicates = append(predicates, relaysitebalancesnapshot.UnitHasPrefix(*i.UnitHasPrefix))
+	}
+	if i.UnitHasSuffix != nil {
+		predicates = append(predicates, relaysitebalancesnapshot.UnitHasSuffix(*i.UnitHasSuffix))
+	}
+	if i.UnitEqualFold != nil {
+		predicates = append(predicates, relaysitebalancesnapshot.UnitEqualFold(*i.UnitEqualFold))
+	}
+	if i.UnitContainsFold != nil {
+		predicates = append(predicates, relaysitebalancesnapshot.UnitContainsFold(*i.UnitContainsFold))
+	}
+	if i.PulledAt != nil {
+		predicates = append(predicates, relaysitebalancesnapshot.PulledAtEQ(*i.PulledAt))
+	}
+	if i.PulledAtNEQ != nil {
+		predicates = append(predicates, relaysitebalancesnapshot.PulledAtNEQ(*i.PulledAtNEQ))
+	}
+	if len(i.PulledAtIn) > 0 {
+		predicates = append(predicates, relaysitebalancesnapshot.PulledAtIn(i.PulledAtIn...))
+	}
+	if len(i.PulledAtNotIn) > 0 {
+		predicates = append(predicates, relaysitebalancesnapshot.PulledAtNotIn(i.PulledAtNotIn...))
+	}
+	if i.PulledAtGT != nil {
+		predicates = append(predicates, relaysitebalancesnapshot.PulledAtGT(*i.PulledAtGT))
+	}
+	if i.PulledAtGTE != nil {
+		predicates = append(predicates, relaysitebalancesnapshot.PulledAtGTE(*i.PulledAtGTE))
+	}
+	if i.PulledAtLT != nil {
+		predicates = append(predicates, relaysitebalancesnapshot.PulledAtLT(*i.PulledAtLT))
+	}
+	if i.PulledAtLTE != nil {
+		predicates = append(predicates, relaysitebalancesnapshot.PulledAtLTE(*i.PulledAtLTE))
+	}
+
+	if i.HasRelaySite != nil {
+		p := relaysitebalancesnapshot.HasRelaySite()
+		if !*i.HasRelaySite {
+			p = relaysitebalancesnapshot.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasRelaySiteWith) > 0 {
+		with := make([]predicate.RelaySite, 0, len(i.HasRelaySiteWith))
+		for _, w := range i.HasRelaySiteWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasRelaySiteWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, relaysitebalancesnapshot.HasRelaySiteWith(with...))
+	}
+	switch len(predicates) {
+	case 0:
+		return nil, ErrEmptyRelaySiteBalanceSnapshotWhereInput
+	case 1:
+		return predicates[0], nil
+	default:
+		return relaysitebalancesnapshot.And(predicates...), nil
+	}
+}
+
+// RelaySiteCheckinLogWhereInput represents a where input for filtering RelaySiteCheckinLog queries.
+type RelaySiteCheckinLogWhereInput struct {
+	Predicates []predicate.RelaySiteCheckinLog  `json:"-"`
+	Not        *RelaySiteCheckinLogWhereInput   `json:"not,omitempty"`
+	Or         []*RelaySiteCheckinLogWhereInput `json:"or,omitempty"`
+	And        []*RelaySiteCheckinLogWhereInput `json:"and,omitempty"`
+
+	// "id" field predicates.
+	ID      *int  `json:"id,omitempty"`
+	IDNEQ   *int  `json:"idNEQ,omitempty"`
+	IDIn    []int `json:"idIn,omitempty"`
+	IDNotIn []int `json:"idNotIn,omitempty"`
+	IDGT    *int  `json:"idGT,omitempty"`
+	IDGTE   *int  `json:"idGTE,omitempty"`
+	IDLT    *int  `json:"idLT,omitempty"`
+	IDLTE   *int  `json:"idLTE,omitempty"`
+
+	// "created_at" field predicates.
+	CreatedAt      *time.Time  `json:"createdAt,omitempty"`
+	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ,omitempty"`
+	CreatedAtIn    []time.Time `json:"createdAtIn,omitempty"`
+	CreatedAtNotIn []time.Time `json:"createdAtNotIn,omitempty"`
+	CreatedAtGT    *time.Time  `json:"createdAtGT,omitempty"`
+	CreatedAtGTE   *time.Time  `json:"createdAtGTE,omitempty"`
+	CreatedAtLT    *time.Time  `json:"createdAtLT,omitempty"`
+	CreatedAtLTE   *time.Time  `json:"createdAtLTE,omitempty"`
+
+	// "updated_at" field predicates.
+	UpdatedAt      *time.Time  `json:"updatedAt,omitempty"`
+	UpdatedAtNEQ   *time.Time  `json:"updatedAtNEQ,omitempty"`
+	UpdatedAtIn    []time.Time `json:"updatedAtIn,omitempty"`
+	UpdatedAtNotIn []time.Time `json:"updatedAtNotIn,omitempty"`
+	UpdatedAtGT    *time.Time  `json:"updatedAtGT,omitempty"`
+	UpdatedAtGTE   *time.Time  `json:"updatedAtGTE,omitempty"`
+	UpdatedAtLT    *time.Time  `json:"updatedAtLT,omitempty"`
+	UpdatedAtLTE   *time.Time  `json:"updatedAtLTE,omitempty"`
+
+	// "relay_site_id" field predicates.
+	RelaySiteID      *int  `json:"relaySiteID,omitempty"`
+	RelaySiteIDNEQ   *int  `json:"relaySiteIDNEQ,omitempty"`
+	RelaySiteIDIn    []int `json:"relaySiteIDIn,omitempty"`
+	RelaySiteIDNotIn []int `json:"relaySiteIDNotIn,omitempty"`
+
+	// "executed_at" field predicates.
+	ExecutedAt      *time.Time  `json:"executedAt,omitempty"`
+	ExecutedAtNEQ   *time.Time  `json:"executedAtNEQ,omitempty"`
+	ExecutedAtIn    []time.Time `json:"executedAtIn,omitempty"`
+	ExecutedAtNotIn []time.Time `json:"executedAtNotIn,omitempty"`
+	ExecutedAtGT    *time.Time  `json:"executedAtGT,omitempty"`
+	ExecutedAtGTE   *time.Time  `json:"executedAtGTE,omitempty"`
+	ExecutedAtLT    *time.Time  `json:"executedAtLT,omitempty"`
+	ExecutedAtLTE   *time.Time  `json:"executedAtLTE,omitempty"`
+
+	// "status" field predicates.
+	Status      *relaysitecheckinlog.Status  `json:"status,omitempty"`
+	StatusNEQ   *relaysitecheckinlog.Status  `json:"statusNEQ,omitempty"`
+	StatusIn    []relaysitecheckinlog.Status `json:"statusIn,omitempty"`
+	StatusNotIn []relaysitecheckinlog.Status `json:"statusNotIn,omitempty"`
+
+	// "message" field predicates.
+	Message             *string  `json:"message,omitempty"`
+	MessageNEQ          *string  `json:"messageNEQ,omitempty"`
+	MessageIn           []string `json:"messageIn,omitempty"`
+	MessageNotIn        []string `json:"messageNotIn,omitempty"`
+	MessageGT           *string  `json:"messageGT,omitempty"`
+	MessageGTE          *string  `json:"messageGTE,omitempty"`
+	MessageLT           *string  `json:"messageLT,omitempty"`
+	MessageLTE          *string  `json:"messageLTE,omitempty"`
+	MessageContains     *string  `json:"messageContains,omitempty"`
+	MessageHasPrefix    *string  `json:"messageHasPrefix,omitempty"`
+	MessageHasSuffix    *string  `json:"messageHasSuffix,omitempty"`
+	MessageIsNil        bool     `json:"messageIsNil,omitempty"`
+	MessageNotNil       bool     `json:"messageNotNil,omitempty"`
+	MessageEqualFold    *string  `json:"messageEqualFold,omitempty"`
+	MessageContainsFold *string  `json:"messageContainsFold,omitempty"`
+
+	// "error_message" field predicates.
+	ErrorMessage             *string  `json:"errorMessage,omitempty"`
+	ErrorMessageNEQ          *string  `json:"errorMessageNEQ,omitempty"`
+	ErrorMessageIn           []string `json:"errorMessageIn,omitempty"`
+	ErrorMessageNotIn        []string `json:"errorMessageNotIn,omitempty"`
+	ErrorMessageGT           *string  `json:"errorMessageGT,omitempty"`
+	ErrorMessageGTE          *string  `json:"errorMessageGTE,omitempty"`
+	ErrorMessageLT           *string  `json:"errorMessageLT,omitempty"`
+	ErrorMessageLTE          *string  `json:"errorMessageLTE,omitempty"`
+	ErrorMessageContains     *string  `json:"errorMessageContains,omitempty"`
+	ErrorMessageHasPrefix    *string  `json:"errorMessageHasPrefix,omitempty"`
+	ErrorMessageHasSuffix    *string  `json:"errorMessageHasSuffix,omitempty"`
+	ErrorMessageIsNil        bool     `json:"errorMessageIsNil,omitempty"`
+	ErrorMessageNotNil       bool     `json:"errorMessageNotNil,omitempty"`
+	ErrorMessageEqualFold    *string  `json:"errorMessageEqualFold,omitempty"`
+	ErrorMessageContainsFold *string  `json:"errorMessageContainsFold,omitempty"`
+
+	// "relay_site" edge predicates.
+	HasRelaySite     *bool                  `json:"hasRelaySite,omitempty"`
+	HasRelaySiteWith []*RelaySiteWhereInput `json:"hasRelaySiteWith,omitempty"`
+}
+
+// AddPredicates adds custom predicates to the where input to be used during the filtering phase.
+func (i *RelaySiteCheckinLogWhereInput) AddPredicates(predicates ...predicate.RelaySiteCheckinLog) {
+	i.Predicates = append(i.Predicates, predicates...)
+}
+
+// Filter applies the RelaySiteCheckinLogWhereInput filter on the RelaySiteCheckinLogQuery builder.
+func (i *RelaySiteCheckinLogWhereInput) Filter(q *RelaySiteCheckinLogQuery) (*RelaySiteCheckinLogQuery, error) {
+	if i == nil {
+		return q, nil
+	}
+	p, err := i.P()
+	if err != nil {
+		if err == ErrEmptyRelaySiteCheckinLogWhereInput {
+			return q, nil
+		}
+		return nil, err
+	}
+	return q.Where(p), nil
+}
+
+// ErrEmptyRelaySiteCheckinLogWhereInput is returned in case the RelaySiteCheckinLogWhereInput is empty.
+var ErrEmptyRelaySiteCheckinLogWhereInput = errors.New("ent: empty predicate RelaySiteCheckinLogWhereInput")
+
+// P returns a predicate for filtering relaysitecheckinlogs.
+// An error is returned if the input is empty or invalid.
+func (i *RelaySiteCheckinLogWhereInput) P() (predicate.RelaySiteCheckinLog, error) {
+	var predicates []predicate.RelaySiteCheckinLog
+	if i.Not != nil {
+		p, err := i.Not.P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'not'", err)
+		}
+		predicates = append(predicates, relaysitecheckinlog.Not(p))
+	}
+	switch n := len(i.Or); {
+	case n == 1:
+		p, err := i.Or[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'or'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		or := make([]predicate.RelaySiteCheckinLog, 0, n)
+		for _, w := range i.Or {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'or'", err)
+			}
+			or = append(or, p)
+		}
+		predicates = append(predicates, relaysitecheckinlog.Or(or...))
+	}
+	switch n := len(i.And); {
+	case n == 1:
+		p, err := i.And[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'and'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		and := make([]predicate.RelaySiteCheckinLog, 0, n)
+		for _, w := range i.And {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'and'", err)
+			}
+			and = append(and, p)
+		}
+		predicates = append(predicates, relaysitecheckinlog.And(and...))
+	}
+	predicates = append(predicates, i.Predicates...)
+	if i.ID != nil {
+		predicates = append(predicates, relaysitecheckinlog.IDEQ(*i.ID))
+	}
+	if i.IDNEQ != nil {
+		predicates = append(predicates, relaysitecheckinlog.IDNEQ(*i.IDNEQ))
+	}
+	if len(i.IDIn) > 0 {
+		predicates = append(predicates, relaysitecheckinlog.IDIn(i.IDIn...))
+	}
+	if len(i.IDNotIn) > 0 {
+		predicates = append(predicates, relaysitecheckinlog.IDNotIn(i.IDNotIn...))
+	}
+	if i.IDGT != nil {
+		predicates = append(predicates, relaysitecheckinlog.IDGT(*i.IDGT))
+	}
+	if i.IDGTE != nil {
+		predicates = append(predicates, relaysitecheckinlog.IDGTE(*i.IDGTE))
+	}
+	if i.IDLT != nil {
+		predicates = append(predicates, relaysitecheckinlog.IDLT(*i.IDLT))
+	}
+	if i.IDLTE != nil {
+		predicates = append(predicates, relaysitecheckinlog.IDLTE(*i.IDLTE))
+	}
+	if i.CreatedAt != nil {
+		predicates = append(predicates, relaysitecheckinlog.CreatedAtEQ(*i.CreatedAt))
+	}
+	if i.CreatedAtNEQ != nil {
+		predicates = append(predicates, relaysitecheckinlog.CreatedAtNEQ(*i.CreatedAtNEQ))
+	}
+	if len(i.CreatedAtIn) > 0 {
+		predicates = append(predicates, relaysitecheckinlog.CreatedAtIn(i.CreatedAtIn...))
+	}
+	if len(i.CreatedAtNotIn) > 0 {
+		predicates = append(predicates, relaysitecheckinlog.CreatedAtNotIn(i.CreatedAtNotIn...))
+	}
+	if i.CreatedAtGT != nil {
+		predicates = append(predicates, relaysitecheckinlog.CreatedAtGT(*i.CreatedAtGT))
+	}
+	if i.CreatedAtGTE != nil {
+		predicates = append(predicates, relaysitecheckinlog.CreatedAtGTE(*i.CreatedAtGTE))
+	}
+	if i.CreatedAtLT != nil {
+		predicates = append(predicates, relaysitecheckinlog.CreatedAtLT(*i.CreatedAtLT))
+	}
+	if i.CreatedAtLTE != nil {
+		predicates = append(predicates, relaysitecheckinlog.CreatedAtLTE(*i.CreatedAtLTE))
+	}
+	if i.UpdatedAt != nil {
+		predicates = append(predicates, relaysitecheckinlog.UpdatedAtEQ(*i.UpdatedAt))
+	}
+	if i.UpdatedAtNEQ != nil {
+		predicates = append(predicates, relaysitecheckinlog.UpdatedAtNEQ(*i.UpdatedAtNEQ))
+	}
+	if len(i.UpdatedAtIn) > 0 {
+		predicates = append(predicates, relaysitecheckinlog.UpdatedAtIn(i.UpdatedAtIn...))
+	}
+	if len(i.UpdatedAtNotIn) > 0 {
+		predicates = append(predicates, relaysitecheckinlog.UpdatedAtNotIn(i.UpdatedAtNotIn...))
+	}
+	if i.UpdatedAtGT != nil {
+		predicates = append(predicates, relaysitecheckinlog.UpdatedAtGT(*i.UpdatedAtGT))
+	}
+	if i.UpdatedAtGTE != nil {
+		predicates = append(predicates, relaysitecheckinlog.UpdatedAtGTE(*i.UpdatedAtGTE))
+	}
+	if i.UpdatedAtLT != nil {
+		predicates = append(predicates, relaysitecheckinlog.UpdatedAtLT(*i.UpdatedAtLT))
+	}
+	if i.UpdatedAtLTE != nil {
+		predicates = append(predicates, relaysitecheckinlog.UpdatedAtLTE(*i.UpdatedAtLTE))
+	}
+	if i.RelaySiteID != nil {
+		predicates = append(predicates, relaysitecheckinlog.RelaySiteIDEQ(*i.RelaySiteID))
+	}
+	if i.RelaySiteIDNEQ != nil {
+		predicates = append(predicates, relaysitecheckinlog.RelaySiteIDNEQ(*i.RelaySiteIDNEQ))
+	}
+	if len(i.RelaySiteIDIn) > 0 {
+		predicates = append(predicates, relaysitecheckinlog.RelaySiteIDIn(i.RelaySiteIDIn...))
+	}
+	if len(i.RelaySiteIDNotIn) > 0 {
+		predicates = append(predicates, relaysitecheckinlog.RelaySiteIDNotIn(i.RelaySiteIDNotIn...))
+	}
+	if i.ExecutedAt != nil {
+		predicates = append(predicates, relaysitecheckinlog.ExecutedAtEQ(*i.ExecutedAt))
+	}
+	if i.ExecutedAtNEQ != nil {
+		predicates = append(predicates, relaysitecheckinlog.ExecutedAtNEQ(*i.ExecutedAtNEQ))
+	}
+	if len(i.ExecutedAtIn) > 0 {
+		predicates = append(predicates, relaysitecheckinlog.ExecutedAtIn(i.ExecutedAtIn...))
+	}
+	if len(i.ExecutedAtNotIn) > 0 {
+		predicates = append(predicates, relaysitecheckinlog.ExecutedAtNotIn(i.ExecutedAtNotIn...))
+	}
+	if i.ExecutedAtGT != nil {
+		predicates = append(predicates, relaysitecheckinlog.ExecutedAtGT(*i.ExecutedAtGT))
+	}
+	if i.ExecutedAtGTE != nil {
+		predicates = append(predicates, relaysitecheckinlog.ExecutedAtGTE(*i.ExecutedAtGTE))
+	}
+	if i.ExecutedAtLT != nil {
+		predicates = append(predicates, relaysitecheckinlog.ExecutedAtLT(*i.ExecutedAtLT))
+	}
+	if i.ExecutedAtLTE != nil {
+		predicates = append(predicates, relaysitecheckinlog.ExecutedAtLTE(*i.ExecutedAtLTE))
+	}
+	if i.Status != nil {
+		predicates = append(predicates, relaysitecheckinlog.StatusEQ(*i.Status))
+	}
+	if i.StatusNEQ != nil {
+		predicates = append(predicates, relaysitecheckinlog.StatusNEQ(*i.StatusNEQ))
+	}
+	if len(i.StatusIn) > 0 {
+		predicates = append(predicates, relaysitecheckinlog.StatusIn(i.StatusIn...))
+	}
+	if len(i.StatusNotIn) > 0 {
+		predicates = append(predicates, relaysitecheckinlog.StatusNotIn(i.StatusNotIn...))
+	}
+	if i.Message != nil {
+		predicates = append(predicates, relaysitecheckinlog.MessageEQ(*i.Message))
+	}
+	if i.MessageNEQ != nil {
+		predicates = append(predicates, relaysitecheckinlog.MessageNEQ(*i.MessageNEQ))
+	}
+	if len(i.MessageIn) > 0 {
+		predicates = append(predicates, relaysitecheckinlog.MessageIn(i.MessageIn...))
+	}
+	if len(i.MessageNotIn) > 0 {
+		predicates = append(predicates, relaysitecheckinlog.MessageNotIn(i.MessageNotIn...))
+	}
+	if i.MessageGT != nil {
+		predicates = append(predicates, relaysitecheckinlog.MessageGT(*i.MessageGT))
+	}
+	if i.MessageGTE != nil {
+		predicates = append(predicates, relaysitecheckinlog.MessageGTE(*i.MessageGTE))
+	}
+	if i.MessageLT != nil {
+		predicates = append(predicates, relaysitecheckinlog.MessageLT(*i.MessageLT))
+	}
+	if i.MessageLTE != nil {
+		predicates = append(predicates, relaysitecheckinlog.MessageLTE(*i.MessageLTE))
+	}
+	if i.MessageContains != nil {
+		predicates = append(predicates, relaysitecheckinlog.MessageContains(*i.MessageContains))
+	}
+	if i.MessageHasPrefix != nil {
+		predicates = append(predicates, relaysitecheckinlog.MessageHasPrefix(*i.MessageHasPrefix))
+	}
+	if i.MessageHasSuffix != nil {
+		predicates = append(predicates, relaysitecheckinlog.MessageHasSuffix(*i.MessageHasSuffix))
+	}
+	if i.MessageIsNil {
+		predicates = append(predicates, relaysitecheckinlog.MessageIsNil())
+	}
+	if i.MessageNotNil {
+		predicates = append(predicates, relaysitecheckinlog.MessageNotNil())
+	}
+	if i.MessageEqualFold != nil {
+		predicates = append(predicates, relaysitecheckinlog.MessageEqualFold(*i.MessageEqualFold))
+	}
+	if i.MessageContainsFold != nil {
+		predicates = append(predicates, relaysitecheckinlog.MessageContainsFold(*i.MessageContainsFold))
+	}
+	if i.ErrorMessage != nil {
+		predicates = append(predicates, relaysitecheckinlog.ErrorMessageEQ(*i.ErrorMessage))
+	}
+	if i.ErrorMessageNEQ != nil {
+		predicates = append(predicates, relaysitecheckinlog.ErrorMessageNEQ(*i.ErrorMessageNEQ))
+	}
+	if len(i.ErrorMessageIn) > 0 {
+		predicates = append(predicates, relaysitecheckinlog.ErrorMessageIn(i.ErrorMessageIn...))
+	}
+	if len(i.ErrorMessageNotIn) > 0 {
+		predicates = append(predicates, relaysitecheckinlog.ErrorMessageNotIn(i.ErrorMessageNotIn...))
+	}
+	if i.ErrorMessageGT != nil {
+		predicates = append(predicates, relaysitecheckinlog.ErrorMessageGT(*i.ErrorMessageGT))
+	}
+	if i.ErrorMessageGTE != nil {
+		predicates = append(predicates, relaysitecheckinlog.ErrorMessageGTE(*i.ErrorMessageGTE))
+	}
+	if i.ErrorMessageLT != nil {
+		predicates = append(predicates, relaysitecheckinlog.ErrorMessageLT(*i.ErrorMessageLT))
+	}
+	if i.ErrorMessageLTE != nil {
+		predicates = append(predicates, relaysitecheckinlog.ErrorMessageLTE(*i.ErrorMessageLTE))
+	}
+	if i.ErrorMessageContains != nil {
+		predicates = append(predicates, relaysitecheckinlog.ErrorMessageContains(*i.ErrorMessageContains))
+	}
+	if i.ErrorMessageHasPrefix != nil {
+		predicates = append(predicates, relaysitecheckinlog.ErrorMessageHasPrefix(*i.ErrorMessageHasPrefix))
+	}
+	if i.ErrorMessageHasSuffix != nil {
+		predicates = append(predicates, relaysitecheckinlog.ErrorMessageHasSuffix(*i.ErrorMessageHasSuffix))
+	}
+	if i.ErrorMessageIsNil {
+		predicates = append(predicates, relaysitecheckinlog.ErrorMessageIsNil())
+	}
+	if i.ErrorMessageNotNil {
+		predicates = append(predicates, relaysitecheckinlog.ErrorMessageNotNil())
+	}
+	if i.ErrorMessageEqualFold != nil {
+		predicates = append(predicates, relaysitecheckinlog.ErrorMessageEqualFold(*i.ErrorMessageEqualFold))
+	}
+	if i.ErrorMessageContainsFold != nil {
+		predicates = append(predicates, relaysitecheckinlog.ErrorMessageContainsFold(*i.ErrorMessageContainsFold))
+	}
+
+	if i.HasRelaySite != nil {
+		p := relaysitecheckinlog.HasRelaySite()
+		if !*i.HasRelaySite {
+			p = relaysitecheckinlog.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasRelaySiteWith) > 0 {
+		with := make([]predicate.RelaySite, 0, len(i.HasRelaySiteWith))
+		for _, w := range i.HasRelaySiteWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasRelaySiteWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, relaysitecheckinlog.HasRelaySiteWith(with...))
+	}
+	switch len(predicates) {
+	case 0:
+		return nil, ErrEmptyRelaySiteCheckinLogWhereInput
+	case 1:
+		return predicates[0], nil
+	default:
+		return relaysitecheckinlog.And(predicates...), nil
+	}
+}
+
+// RelaySiteGroupWhereInput represents a where input for filtering RelaySiteGroup queries.
+type RelaySiteGroupWhereInput struct {
+	Predicates []predicate.RelaySiteGroup  `json:"-"`
+	Not        *RelaySiteGroupWhereInput   `json:"not,omitempty"`
+	Or         []*RelaySiteGroupWhereInput `json:"or,omitempty"`
+	And        []*RelaySiteGroupWhereInput `json:"and,omitempty"`
+
+	// "id" field predicates.
+	ID      *int  `json:"id,omitempty"`
+	IDNEQ   *int  `json:"idNEQ,omitempty"`
+	IDIn    []int `json:"idIn,omitempty"`
+	IDNotIn []int `json:"idNotIn,omitempty"`
+	IDGT    *int  `json:"idGT,omitempty"`
+	IDGTE   *int  `json:"idGTE,omitempty"`
+	IDLT    *int  `json:"idLT,omitempty"`
+	IDLTE   *int  `json:"idLTE,omitempty"`
+
+	// "created_at" field predicates.
+	CreatedAt      *time.Time  `json:"createdAt,omitempty"`
+	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ,omitempty"`
+	CreatedAtIn    []time.Time `json:"createdAtIn,omitempty"`
+	CreatedAtNotIn []time.Time `json:"createdAtNotIn,omitempty"`
+	CreatedAtGT    *time.Time  `json:"createdAtGT,omitempty"`
+	CreatedAtGTE   *time.Time  `json:"createdAtGTE,omitempty"`
+	CreatedAtLT    *time.Time  `json:"createdAtLT,omitempty"`
+	CreatedAtLTE   *time.Time  `json:"createdAtLTE,omitempty"`
+
+	// "updated_at" field predicates.
+	UpdatedAt      *time.Time  `json:"updatedAt,omitempty"`
+	UpdatedAtNEQ   *time.Time  `json:"updatedAtNEQ,omitempty"`
+	UpdatedAtIn    []time.Time `json:"updatedAtIn,omitempty"`
+	UpdatedAtNotIn []time.Time `json:"updatedAtNotIn,omitempty"`
+	UpdatedAtGT    *time.Time  `json:"updatedAtGT,omitempty"`
+	UpdatedAtGTE   *time.Time  `json:"updatedAtGTE,omitempty"`
+	UpdatedAtLT    *time.Time  `json:"updatedAtLT,omitempty"`
+	UpdatedAtLTE   *time.Time  `json:"updatedAtLTE,omitempty"`
+
+	// "relay_site_id" field predicates.
+	RelaySiteID      *int  `json:"relaySiteID,omitempty"`
+	RelaySiteIDNEQ   *int  `json:"relaySiteIDNEQ,omitempty"`
+	RelaySiteIDIn    []int `json:"relaySiteIDIn,omitempty"`
+	RelaySiteIDNotIn []int `json:"relaySiteIDNotIn,omitempty"`
+
+	// "name" field predicates.
+	Name             *string  `json:"name,omitempty"`
+	NameNEQ          *string  `json:"nameNEQ,omitempty"`
+	NameIn           []string `json:"nameIn,omitempty"`
+	NameNotIn        []string `json:"nameNotIn,omitempty"`
+	NameGT           *string  `json:"nameGT,omitempty"`
+	NameGTE          *string  `json:"nameGTE,omitempty"`
+	NameLT           *string  `json:"nameLT,omitempty"`
+	NameLTE          *string  `json:"nameLTE,omitempty"`
+	NameContains     *string  `json:"nameContains,omitempty"`
+	NameHasPrefix    *string  `json:"nameHasPrefix,omitempty"`
+	NameHasSuffix    *string  `json:"nameHasSuffix,omitempty"`
+	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
+	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
+
+	// "ratio" field predicates.
+	Ratio       *float64  `json:"ratio,omitempty"`
+	RatioNEQ    *float64  `json:"ratioNEQ,omitempty"`
+	RatioIn     []float64 `json:"ratioIn,omitempty"`
+	RatioNotIn  []float64 `json:"ratioNotIn,omitempty"`
+	RatioGT     *float64  `json:"ratioGT,omitempty"`
+	RatioGTE    *float64  `json:"ratioGTE,omitempty"`
+	RatioLT     *float64  `json:"ratioLT,omitempty"`
+	RatioLTE    *float64  `json:"ratioLTE,omitempty"`
+	RatioIsNil  bool      `json:"ratioIsNil,omitempty"`
+	RatioNotNil bool      `json:"ratioNotNil,omitempty"`
+
+	// "synced_at" field predicates.
+	SyncedAt      *time.Time  `json:"syncedAt,omitempty"`
+	SyncedAtNEQ   *time.Time  `json:"syncedAtNEQ,omitempty"`
+	SyncedAtIn    []time.Time `json:"syncedAtIn,omitempty"`
+	SyncedAtNotIn []time.Time `json:"syncedAtNotIn,omitempty"`
+	SyncedAtGT    *time.Time  `json:"syncedAtGT,omitempty"`
+	SyncedAtGTE   *time.Time  `json:"syncedAtGTE,omitempty"`
+	SyncedAtLT    *time.Time  `json:"syncedAtLT,omitempty"`
+	SyncedAtLTE   *time.Time  `json:"syncedAtLTE,omitempty"`
+
+	// "relay_site" edge predicates.
+	HasRelaySite     *bool                  `json:"hasRelaySite,omitempty"`
+	HasRelaySiteWith []*RelaySiteWhereInput `json:"hasRelaySiteWith,omitempty"`
+}
+
+// AddPredicates adds custom predicates to the where input to be used during the filtering phase.
+func (i *RelaySiteGroupWhereInput) AddPredicates(predicates ...predicate.RelaySiteGroup) {
+	i.Predicates = append(i.Predicates, predicates...)
+}
+
+// Filter applies the RelaySiteGroupWhereInput filter on the RelaySiteGroupQuery builder.
+func (i *RelaySiteGroupWhereInput) Filter(q *RelaySiteGroupQuery) (*RelaySiteGroupQuery, error) {
+	if i == nil {
+		return q, nil
+	}
+	p, err := i.P()
+	if err != nil {
+		if err == ErrEmptyRelaySiteGroupWhereInput {
+			return q, nil
+		}
+		return nil, err
+	}
+	return q.Where(p), nil
+}
+
+// ErrEmptyRelaySiteGroupWhereInput is returned in case the RelaySiteGroupWhereInput is empty.
+var ErrEmptyRelaySiteGroupWhereInput = errors.New("ent: empty predicate RelaySiteGroupWhereInput")
+
+// P returns a predicate for filtering relaysitegroups.
+// An error is returned if the input is empty or invalid.
+func (i *RelaySiteGroupWhereInput) P() (predicate.RelaySiteGroup, error) {
+	var predicates []predicate.RelaySiteGroup
+	if i.Not != nil {
+		p, err := i.Not.P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'not'", err)
+		}
+		predicates = append(predicates, relaysitegroup.Not(p))
+	}
+	switch n := len(i.Or); {
+	case n == 1:
+		p, err := i.Or[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'or'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		or := make([]predicate.RelaySiteGroup, 0, n)
+		for _, w := range i.Or {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'or'", err)
+			}
+			or = append(or, p)
+		}
+		predicates = append(predicates, relaysitegroup.Or(or...))
+	}
+	switch n := len(i.And); {
+	case n == 1:
+		p, err := i.And[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'and'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		and := make([]predicate.RelaySiteGroup, 0, n)
+		for _, w := range i.And {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'and'", err)
+			}
+			and = append(and, p)
+		}
+		predicates = append(predicates, relaysitegroup.And(and...))
+	}
+	predicates = append(predicates, i.Predicates...)
+	if i.ID != nil {
+		predicates = append(predicates, relaysitegroup.IDEQ(*i.ID))
+	}
+	if i.IDNEQ != nil {
+		predicates = append(predicates, relaysitegroup.IDNEQ(*i.IDNEQ))
+	}
+	if len(i.IDIn) > 0 {
+		predicates = append(predicates, relaysitegroup.IDIn(i.IDIn...))
+	}
+	if len(i.IDNotIn) > 0 {
+		predicates = append(predicates, relaysitegroup.IDNotIn(i.IDNotIn...))
+	}
+	if i.IDGT != nil {
+		predicates = append(predicates, relaysitegroup.IDGT(*i.IDGT))
+	}
+	if i.IDGTE != nil {
+		predicates = append(predicates, relaysitegroup.IDGTE(*i.IDGTE))
+	}
+	if i.IDLT != nil {
+		predicates = append(predicates, relaysitegroup.IDLT(*i.IDLT))
+	}
+	if i.IDLTE != nil {
+		predicates = append(predicates, relaysitegroup.IDLTE(*i.IDLTE))
+	}
+	if i.CreatedAt != nil {
+		predicates = append(predicates, relaysitegroup.CreatedAtEQ(*i.CreatedAt))
+	}
+	if i.CreatedAtNEQ != nil {
+		predicates = append(predicates, relaysitegroup.CreatedAtNEQ(*i.CreatedAtNEQ))
+	}
+	if len(i.CreatedAtIn) > 0 {
+		predicates = append(predicates, relaysitegroup.CreatedAtIn(i.CreatedAtIn...))
+	}
+	if len(i.CreatedAtNotIn) > 0 {
+		predicates = append(predicates, relaysitegroup.CreatedAtNotIn(i.CreatedAtNotIn...))
+	}
+	if i.CreatedAtGT != nil {
+		predicates = append(predicates, relaysitegroup.CreatedAtGT(*i.CreatedAtGT))
+	}
+	if i.CreatedAtGTE != nil {
+		predicates = append(predicates, relaysitegroup.CreatedAtGTE(*i.CreatedAtGTE))
+	}
+	if i.CreatedAtLT != nil {
+		predicates = append(predicates, relaysitegroup.CreatedAtLT(*i.CreatedAtLT))
+	}
+	if i.CreatedAtLTE != nil {
+		predicates = append(predicates, relaysitegroup.CreatedAtLTE(*i.CreatedAtLTE))
+	}
+	if i.UpdatedAt != nil {
+		predicates = append(predicates, relaysitegroup.UpdatedAtEQ(*i.UpdatedAt))
+	}
+	if i.UpdatedAtNEQ != nil {
+		predicates = append(predicates, relaysitegroup.UpdatedAtNEQ(*i.UpdatedAtNEQ))
+	}
+	if len(i.UpdatedAtIn) > 0 {
+		predicates = append(predicates, relaysitegroup.UpdatedAtIn(i.UpdatedAtIn...))
+	}
+	if len(i.UpdatedAtNotIn) > 0 {
+		predicates = append(predicates, relaysitegroup.UpdatedAtNotIn(i.UpdatedAtNotIn...))
+	}
+	if i.UpdatedAtGT != nil {
+		predicates = append(predicates, relaysitegroup.UpdatedAtGT(*i.UpdatedAtGT))
+	}
+	if i.UpdatedAtGTE != nil {
+		predicates = append(predicates, relaysitegroup.UpdatedAtGTE(*i.UpdatedAtGTE))
+	}
+	if i.UpdatedAtLT != nil {
+		predicates = append(predicates, relaysitegroup.UpdatedAtLT(*i.UpdatedAtLT))
+	}
+	if i.UpdatedAtLTE != nil {
+		predicates = append(predicates, relaysitegroup.UpdatedAtLTE(*i.UpdatedAtLTE))
+	}
+	if i.RelaySiteID != nil {
+		predicates = append(predicates, relaysitegroup.RelaySiteIDEQ(*i.RelaySiteID))
+	}
+	if i.RelaySiteIDNEQ != nil {
+		predicates = append(predicates, relaysitegroup.RelaySiteIDNEQ(*i.RelaySiteIDNEQ))
+	}
+	if len(i.RelaySiteIDIn) > 0 {
+		predicates = append(predicates, relaysitegroup.RelaySiteIDIn(i.RelaySiteIDIn...))
+	}
+	if len(i.RelaySiteIDNotIn) > 0 {
+		predicates = append(predicates, relaysitegroup.RelaySiteIDNotIn(i.RelaySiteIDNotIn...))
+	}
+	if i.Name != nil {
+		predicates = append(predicates, relaysitegroup.NameEQ(*i.Name))
+	}
+	if i.NameNEQ != nil {
+		predicates = append(predicates, relaysitegroup.NameNEQ(*i.NameNEQ))
+	}
+	if len(i.NameIn) > 0 {
+		predicates = append(predicates, relaysitegroup.NameIn(i.NameIn...))
+	}
+	if len(i.NameNotIn) > 0 {
+		predicates = append(predicates, relaysitegroup.NameNotIn(i.NameNotIn...))
+	}
+	if i.NameGT != nil {
+		predicates = append(predicates, relaysitegroup.NameGT(*i.NameGT))
+	}
+	if i.NameGTE != nil {
+		predicates = append(predicates, relaysitegroup.NameGTE(*i.NameGTE))
+	}
+	if i.NameLT != nil {
+		predicates = append(predicates, relaysitegroup.NameLT(*i.NameLT))
+	}
+	if i.NameLTE != nil {
+		predicates = append(predicates, relaysitegroup.NameLTE(*i.NameLTE))
+	}
+	if i.NameContains != nil {
+		predicates = append(predicates, relaysitegroup.NameContains(*i.NameContains))
+	}
+	if i.NameHasPrefix != nil {
+		predicates = append(predicates, relaysitegroup.NameHasPrefix(*i.NameHasPrefix))
+	}
+	if i.NameHasSuffix != nil {
+		predicates = append(predicates, relaysitegroup.NameHasSuffix(*i.NameHasSuffix))
+	}
+	if i.NameEqualFold != nil {
+		predicates = append(predicates, relaysitegroup.NameEqualFold(*i.NameEqualFold))
+	}
+	if i.NameContainsFold != nil {
+		predicates = append(predicates, relaysitegroup.NameContainsFold(*i.NameContainsFold))
+	}
+	if i.Ratio != nil {
+		predicates = append(predicates, relaysitegroup.RatioEQ(*i.Ratio))
+	}
+	if i.RatioNEQ != nil {
+		predicates = append(predicates, relaysitegroup.RatioNEQ(*i.RatioNEQ))
+	}
+	if len(i.RatioIn) > 0 {
+		predicates = append(predicates, relaysitegroup.RatioIn(i.RatioIn...))
+	}
+	if len(i.RatioNotIn) > 0 {
+		predicates = append(predicates, relaysitegroup.RatioNotIn(i.RatioNotIn...))
+	}
+	if i.RatioGT != nil {
+		predicates = append(predicates, relaysitegroup.RatioGT(*i.RatioGT))
+	}
+	if i.RatioGTE != nil {
+		predicates = append(predicates, relaysitegroup.RatioGTE(*i.RatioGTE))
+	}
+	if i.RatioLT != nil {
+		predicates = append(predicates, relaysitegroup.RatioLT(*i.RatioLT))
+	}
+	if i.RatioLTE != nil {
+		predicates = append(predicates, relaysitegroup.RatioLTE(*i.RatioLTE))
+	}
+	if i.RatioIsNil {
+		predicates = append(predicates, relaysitegroup.RatioIsNil())
+	}
+	if i.RatioNotNil {
+		predicates = append(predicates, relaysitegroup.RatioNotNil())
+	}
+	if i.SyncedAt != nil {
+		predicates = append(predicates, relaysitegroup.SyncedAtEQ(*i.SyncedAt))
+	}
+	if i.SyncedAtNEQ != nil {
+		predicates = append(predicates, relaysitegroup.SyncedAtNEQ(*i.SyncedAtNEQ))
+	}
+	if len(i.SyncedAtIn) > 0 {
+		predicates = append(predicates, relaysitegroup.SyncedAtIn(i.SyncedAtIn...))
+	}
+	if len(i.SyncedAtNotIn) > 0 {
+		predicates = append(predicates, relaysitegroup.SyncedAtNotIn(i.SyncedAtNotIn...))
+	}
+	if i.SyncedAtGT != nil {
+		predicates = append(predicates, relaysitegroup.SyncedAtGT(*i.SyncedAtGT))
+	}
+	if i.SyncedAtGTE != nil {
+		predicates = append(predicates, relaysitegroup.SyncedAtGTE(*i.SyncedAtGTE))
+	}
+	if i.SyncedAtLT != nil {
+		predicates = append(predicates, relaysitegroup.SyncedAtLT(*i.SyncedAtLT))
+	}
+	if i.SyncedAtLTE != nil {
+		predicates = append(predicates, relaysitegroup.SyncedAtLTE(*i.SyncedAtLTE))
+	}
+
+	if i.HasRelaySite != nil {
+		p := relaysitegroup.HasRelaySite()
+		if !*i.HasRelaySite {
+			p = relaysitegroup.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasRelaySiteWith) > 0 {
+		with := make([]predicate.RelaySite, 0, len(i.HasRelaySiteWith))
+		for _, w := range i.HasRelaySiteWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasRelaySiteWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, relaysitegroup.HasRelaySiteWith(with...))
+	}
+	switch len(predicates) {
+	case 0:
+		return nil, ErrEmptyRelaySiteGroupWhereInput
+	case 1:
+		return predicates[0], nil
+	default:
+		return relaysitegroup.And(predicates...), nil
+	}
+}
+
+// RelaySiteModelPriceWhereInput represents a where input for filtering RelaySiteModelPrice queries.
+type RelaySiteModelPriceWhereInput struct {
+	Predicates []predicate.RelaySiteModelPrice  `json:"-"`
+	Not        *RelaySiteModelPriceWhereInput   `json:"not,omitempty"`
+	Or         []*RelaySiteModelPriceWhereInput `json:"or,omitempty"`
+	And        []*RelaySiteModelPriceWhereInput `json:"and,omitempty"`
+
+	// "id" field predicates.
+	ID      *int  `json:"id,omitempty"`
+	IDNEQ   *int  `json:"idNEQ,omitempty"`
+	IDIn    []int `json:"idIn,omitempty"`
+	IDNotIn []int `json:"idNotIn,omitempty"`
+	IDGT    *int  `json:"idGT,omitempty"`
+	IDGTE   *int  `json:"idGTE,omitempty"`
+	IDLT    *int  `json:"idLT,omitempty"`
+	IDLTE   *int  `json:"idLTE,omitempty"`
+
+	// "created_at" field predicates.
+	CreatedAt      *time.Time  `json:"createdAt,omitempty"`
+	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ,omitempty"`
+	CreatedAtIn    []time.Time `json:"createdAtIn,omitempty"`
+	CreatedAtNotIn []time.Time `json:"createdAtNotIn,omitempty"`
+	CreatedAtGT    *time.Time  `json:"createdAtGT,omitempty"`
+	CreatedAtGTE   *time.Time  `json:"createdAtGTE,omitempty"`
+	CreatedAtLT    *time.Time  `json:"createdAtLT,omitempty"`
+	CreatedAtLTE   *time.Time  `json:"createdAtLTE,omitempty"`
+
+	// "updated_at" field predicates.
+	UpdatedAt      *time.Time  `json:"updatedAt,omitempty"`
+	UpdatedAtNEQ   *time.Time  `json:"updatedAtNEQ,omitempty"`
+	UpdatedAtIn    []time.Time `json:"updatedAtIn,omitempty"`
+	UpdatedAtNotIn []time.Time `json:"updatedAtNotIn,omitempty"`
+	UpdatedAtGT    *time.Time  `json:"updatedAtGT,omitempty"`
+	UpdatedAtGTE   *time.Time  `json:"updatedAtGTE,omitempty"`
+	UpdatedAtLT    *time.Time  `json:"updatedAtLT,omitempty"`
+	UpdatedAtLTE   *time.Time  `json:"updatedAtLTE,omitempty"`
+
+	// "relay_site_id" field predicates.
+	RelaySiteID      *int  `json:"relaySiteID,omitempty"`
+	RelaySiteIDNEQ   *int  `json:"relaySiteIDNEQ,omitempty"`
+	RelaySiteIDIn    []int `json:"relaySiteIDIn,omitempty"`
+	RelaySiteIDNotIn []int `json:"relaySiteIDNotIn,omitempty"`
+
+	// "model_id" field predicates.
+	ModelID             *string  `json:"modelID,omitempty"`
+	ModelIDNEQ          *string  `json:"modelIDNEQ,omitempty"`
+	ModelIDIn           []string `json:"modelIDIn,omitempty"`
+	ModelIDNotIn        []string `json:"modelIDNotIn,omitempty"`
+	ModelIDGT           *string  `json:"modelIDGT,omitempty"`
+	ModelIDGTE          *string  `json:"modelIDGTE,omitempty"`
+	ModelIDLT           *string  `json:"modelIDLT,omitempty"`
+	ModelIDLTE          *string  `json:"modelIDLTE,omitempty"`
+	ModelIDContains     *string  `json:"modelIDContains,omitempty"`
+	ModelIDHasPrefix    *string  `json:"modelIDHasPrefix,omitempty"`
+	ModelIDHasSuffix    *string  `json:"modelIDHasSuffix,omitempty"`
+	ModelIDEqualFold    *string  `json:"modelIDEqualFold,omitempty"`
+	ModelIDContainsFold *string  `json:"modelIDContainsFold,omitempty"`
+
+	// "synced_at" field predicates.
+	SyncedAt      *time.Time  `json:"syncedAt,omitempty"`
+	SyncedAtNEQ   *time.Time  `json:"syncedAtNEQ,omitempty"`
+	SyncedAtIn    []time.Time `json:"syncedAtIn,omitempty"`
+	SyncedAtNotIn []time.Time `json:"syncedAtNotIn,omitempty"`
+	SyncedAtGT    *time.Time  `json:"syncedAtGT,omitempty"`
+	SyncedAtGTE   *time.Time  `json:"syncedAtGTE,omitempty"`
+	SyncedAtLT    *time.Time  `json:"syncedAtLT,omitempty"`
+	SyncedAtLTE   *time.Time  `json:"syncedAtLTE,omitempty"`
+
+	// "relay_site" edge predicates.
+	HasRelaySite     *bool                  `json:"hasRelaySite,omitempty"`
+	HasRelaySiteWith []*RelaySiteWhereInput `json:"hasRelaySiteWith,omitempty"`
+}
+
+// AddPredicates adds custom predicates to the where input to be used during the filtering phase.
+func (i *RelaySiteModelPriceWhereInput) AddPredicates(predicates ...predicate.RelaySiteModelPrice) {
+	i.Predicates = append(i.Predicates, predicates...)
+}
+
+// Filter applies the RelaySiteModelPriceWhereInput filter on the RelaySiteModelPriceQuery builder.
+func (i *RelaySiteModelPriceWhereInput) Filter(q *RelaySiteModelPriceQuery) (*RelaySiteModelPriceQuery, error) {
+	if i == nil {
+		return q, nil
+	}
+	p, err := i.P()
+	if err != nil {
+		if err == ErrEmptyRelaySiteModelPriceWhereInput {
+			return q, nil
+		}
+		return nil, err
+	}
+	return q.Where(p), nil
+}
+
+// ErrEmptyRelaySiteModelPriceWhereInput is returned in case the RelaySiteModelPriceWhereInput is empty.
+var ErrEmptyRelaySiteModelPriceWhereInput = errors.New("ent: empty predicate RelaySiteModelPriceWhereInput")
+
+// P returns a predicate for filtering relaysitemodelprices.
+// An error is returned if the input is empty or invalid.
+func (i *RelaySiteModelPriceWhereInput) P() (predicate.RelaySiteModelPrice, error) {
+	var predicates []predicate.RelaySiteModelPrice
+	if i.Not != nil {
+		p, err := i.Not.P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'not'", err)
+		}
+		predicates = append(predicates, relaysitemodelprice.Not(p))
+	}
+	switch n := len(i.Or); {
+	case n == 1:
+		p, err := i.Or[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'or'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		or := make([]predicate.RelaySiteModelPrice, 0, n)
+		for _, w := range i.Or {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'or'", err)
+			}
+			or = append(or, p)
+		}
+		predicates = append(predicates, relaysitemodelprice.Or(or...))
+	}
+	switch n := len(i.And); {
+	case n == 1:
+		p, err := i.And[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'and'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		and := make([]predicate.RelaySiteModelPrice, 0, n)
+		for _, w := range i.And {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'and'", err)
+			}
+			and = append(and, p)
+		}
+		predicates = append(predicates, relaysitemodelprice.And(and...))
+	}
+	predicates = append(predicates, i.Predicates...)
+	if i.ID != nil {
+		predicates = append(predicates, relaysitemodelprice.IDEQ(*i.ID))
+	}
+	if i.IDNEQ != nil {
+		predicates = append(predicates, relaysitemodelprice.IDNEQ(*i.IDNEQ))
+	}
+	if len(i.IDIn) > 0 {
+		predicates = append(predicates, relaysitemodelprice.IDIn(i.IDIn...))
+	}
+	if len(i.IDNotIn) > 0 {
+		predicates = append(predicates, relaysitemodelprice.IDNotIn(i.IDNotIn...))
+	}
+	if i.IDGT != nil {
+		predicates = append(predicates, relaysitemodelprice.IDGT(*i.IDGT))
+	}
+	if i.IDGTE != nil {
+		predicates = append(predicates, relaysitemodelprice.IDGTE(*i.IDGTE))
+	}
+	if i.IDLT != nil {
+		predicates = append(predicates, relaysitemodelprice.IDLT(*i.IDLT))
+	}
+	if i.IDLTE != nil {
+		predicates = append(predicates, relaysitemodelprice.IDLTE(*i.IDLTE))
+	}
+	if i.CreatedAt != nil {
+		predicates = append(predicates, relaysitemodelprice.CreatedAtEQ(*i.CreatedAt))
+	}
+	if i.CreatedAtNEQ != nil {
+		predicates = append(predicates, relaysitemodelprice.CreatedAtNEQ(*i.CreatedAtNEQ))
+	}
+	if len(i.CreatedAtIn) > 0 {
+		predicates = append(predicates, relaysitemodelprice.CreatedAtIn(i.CreatedAtIn...))
+	}
+	if len(i.CreatedAtNotIn) > 0 {
+		predicates = append(predicates, relaysitemodelprice.CreatedAtNotIn(i.CreatedAtNotIn...))
+	}
+	if i.CreatedAtGT != nil {
+		predicates = append(predicates, relaysitemodelprice.CreatedAtGT(*i.CreatedAtGT))
+	}
+	if i.CreatedAtGTE != nil {
+		predicates = append(predicates, relaysitemodelprice.CreatedAtGTE(*i.CreatedAtGTE))
+	}
+	if i.CreatedAtLT != nil {
+		predicates = append(predicates, relaysitemodelprice.CreatedAtLT(*i.CreatedAtLT))
+	}
+	if i.CreatedAtLTE != nil {
+		predicates = append(predicates, relaysitemodelprice.CreatedAtLTE(*i.CreatedAtLTE))
+	}
+	if i.UpdatedAt != nil {
+		predicates = append(predicates, relaysitemodelprice.UpdatedAtEQ(*i.UpdatedAt))
+	}
+	if i.UpdatedAtNEQ != nil {
+		predicates = append(predicates, relaysitemodelprice.UpdatedAtNEQ(*i.UpdatedAtNEQ))
+	}
+	if len(i.UpdatedAtIn) > 0 {
+		predicates = append(predicates, relaysitemodelprice.UpdatedAtIn(i.UpdatedAtIn...))
+	}
+	if len(i.UpdatedAtNotIn) > 0 {
+		predicates = append(predicates, relaysitemodelprice.UpdatedAtNotIn(i.UpdatedAtNotIn...))
+	}
+	if i.UpdatedAtGT != nil {
+		predicates = append(predicates, relaysitemodelprice.UpdatedAtGT(*i.UpdatedAtGT))
+	}
+	if i.UpdatedAtGTE != nil {
+		predicates = append(predicates, relaysitemodelprice.UpdatedAtGTE(*i.UpdatedAtGTE))
+	}
+	if i.UpdatedAtLT != nil {
+		predicates = append(predicates, relaysitemodelprice.UpdatedAtLT(*i.UpdatedAtLT))
+	}
+	if i.UpdatedAtLTE != nil {
+		predicates = append(predicates, relaysitemodelprice.UpdatedAtLTE(*i.UpdatedAtLTE))
+	}
+	if i.RelaySiteID != nil {
+		predicates = append(predicates, relaysitemodelprice.RelaySiteIDEQ(*i.RelaySiteID))
+	}
+	if i.RelaySiteIDNEQ != nil {
+		predicates = append(predicates, relaysitemodelprice.RelaySiteIDNEQ(*i.RelaySiteIDNEQ))
+	}
+	if len(i.RelaySiteIDIn) > 0 {
+		predicates = append(predicates, relaysitemodelprice.RelaySiteIDIn(i.RelaySiteIDIn...))
+	}
+	if len(i.RelaySiteIDNotIn) > 0 {
+		predicates = append(predicates, relaysitemodelprice.RelaySiteIDNotIn(i.RelaySiteIDNotIn...))
+	}
+	if i.ModelID != nil {
+		predicates = append(predicates, relaysitemodelprice.ModelIDEQ(*i.ModelID))
+	}
+	if i.ModelIDNEQ != nil {
+		predicates = append(predicates, relaysitemodelprice.ModelIDNEQ(*i.ModelIDNEQ))
+	}
+	if len(i.ModelIDIn) > 0 {
+		predicates = append(predicates, relaysitemodelprice.ModelIDIn(i.ModelIDIn...))
+	}
+	if len(i.ModelIDNotIn) > 0 {
+		predicates = append(predicates, relaysitemodelprice.ModelIDNotIn(i.ModelIDNotIn...))
+	}
+	if i.ModelIDGT != nil {
+		predicates = append(predicates, relaysitemodelprice.ModelIDGT(*i.ModelIDGT))
+	}
+	if i.ModelIDGTE != nil {
+		predicates = append(predicates, relaysitemodelprice.ModelIDGTE(*i.ModelIDGTE))
+	}
+	if i.ModelIDLT != nil {
+		predicates = append(predicates, relaysitemodelprice.ModelIDLT(*i.ModelIDLT))
+	}
+	if i.ModelIDLTE != nil {
+		predicates = append(predicates, relaysitemodelprice.ModelIDLTE(*i.ModelIDLTE))
+	}
+	if i.ModelIDContains != nil {
+		predicates = append(predicates, relaysitemodelprice.ModelIDContains(*i.ModelIDContains))
+	}
+	if i.ModelIDHasPrefix != nil {
+		predicates = append(predicates, relaysitemodelprice.ModelIDHasPrefix(*i.ModelIDHasPrefix))
+	}
+	if i.ModelIDHasSuffix != nil {
+		predicates = append(predicates, relaysitemodelprice.ModelIDHasSuffix(*i.ModelIDHasSuffix))
+	}
+	if i.ModelIDEqualFold != nil {
+		predicates = append(predicates, relaysitemodelprice.ModelIDEqualFold(*i.ModelIDEqualFold))
+	}
+	if i.ModelIDContainsFold != nil {
+		predicates = append(predicates, relaysitemodelprice.ModelIDContainsFold(*i.ModelIDContainsFold))
+	}
+	if i.SyncedAt != nil {
+		predicates = append(predicates, relaysitemodelprice.SyncedAtEQ(*i.SyncedAt))
+	}
+	if i.SyncedAtNEQ != nil {
+		predicates = append(predicates, relaysitemodelprice.SyncedAtNEQ(*i.SyncedAtNEQ))
+	}
+	if len(i.SyncedAtIn) > 0 {
+		predicates = append(predicates, relaysitemodelprice.SyncedAtIn(i.SyncedAtIn...))
+	}
+	if len(i.SyncedAtNotIn) > 0 {
+		predicates = append(predicates, relaysitemodelprice.SyncedAtNotIn(i.SyncedAtNotIn...))
+	}
+	if i.SyncedAtGT != nil {
+		predicates = append(predicates, relaysitemodelprice.SyncedAtGT(*i.SyncedAtGT))
+	}
+	if i.SyncedAtGTE != nil {
+		predicates = append(predicates, relaysitemodelprice.SyncedAtGTE(*i.SyncedAtGTE))
+	}
+	if i.SyncedAtLT != nil {
+		predicates = append(predicates, relaysitemodelprice.SyncedAtLT(*i.SyncedAtLT))
+	}
+	if i.SyncedAtLTE != nil {
+		predicates = append(predicates, relaysitemodelprice.SyncedAtLTE(*i.SyncedAtLTE))
+	}
+
+	if i.HasRelaySite != nil {
+		p := relaysitemodelprice.HasRelaySite()
+		if !*i.HasRelaySite {
+			p = relaysitemodelprice.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasRelaySiteWith) > 0 {
+		with := make([]predicate.RelaySite, 0, len(i.HasRelaySiteWith))
+		for _, w := range i.HasRelaySiteWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasRelaySiteWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, relaysitemodelprice.HasRelaySiteWith(with...))
+	}
+	switch len(predicates) {
+	case 0:
+		return nil, ErrEmptyRelaySiteModelPriceWhereInput
+	case 1:
+		return predicates[0], nil
+	default:
+		return relaysitemodelprice.And(predicates...), nil
 	}
 }
 

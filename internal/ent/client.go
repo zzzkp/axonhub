@@ -29,6 +29,14 @@ import (
 	"github.com/looplj/axonhub/internal/ent/prompt"
 	"github.com/looplj/axonhub/internal/ent/promptprotectionrule"
 	"github.com/looplj/axonhub/internal/ent/providerquotastatus"
+	"github.com/looplj/axonhub/internal/ent/relaysite"
+	"github.com/looplj/axonhub/internal/ent/relaysiteannouncement"
+	"github.com/looplj/axonhub/internal/ent/relaysiteapikey"
+	"github.com/looplj/axonhub/internal/ent/relaysitebalancesnapshot"
+	"github.com/looplj/axonhub/internal/ent/relaysitecheckinlog"
+	"github.com/looplj/axonhub/internal/ent/relaysitecredential"
+	"github.com/looplj/axonhub/internal/ent/relaysitegroup"
+	"github.com/looplj/axonhub/internal/ent/relaysitemodelprice"
 	"github.com/looplj/axonhub/internal/ent/request"
 	"github.com/looplj/axonhub/internal/ent/requestexecution"
 	"github.com/looplj/axonhub/internal/ent/role"
@@ -74,6 +82,22 @@ type Client struct {
 	PromptProtectionRule *PromptProtectionRuleClient
 	// ProviderQuotaStatus is the client for interacting with the ProviderQuotaStatus builders.
 	ProviderQuotaStatus *ProviderQuotaStatusClient
+	// RelaySite is the client for interacting with the RelaySite builders.
+	RelaySite *RelaySiteClient
+	// RelaySiteAPIKey is the client for interacting with the RelaySiteAPIKey builders.
+	RelaySiteAPIKey *RelaySiteAPIKeyClient
+	// RelaySiteAnnouncement is the client for interacting with the RelaySiteAnnouncement builders.
+	RelaySiteAnnouncement *RelaySiteAnnouncementClient
+	// RelaySiteBalanceSnapshot is the client for interacting with the RelaySiteBalanceSnapshot builders.
+	RelaySiteBalanceSnapshot *RelaySiteBalanceSnapshotClient
+	// RelaySiteCheckinLog is the client for interacting with the RelaySiteCheckinLog builders.
+	RelaySiteCheckinLog *RelaySiteCheckinLogClient
+	// RelaySiteCredential is the client for interacting with the RelaySiteCredential builders.
+	RelaySiteCredential *RelaySiteCredentialClient
+	// RelaySiteGroup is the client for interacting with the RelaySiteGroup builders.
+	RelaySiteGroup *RelaySiteGroupClient
+	// RelaySiteModelPrice is the client for interacting with the RelaySiteModelPrice builders.
+	RelaySiteModelPrice *RelaySiteModelPriceClient
 	// Request is the client for interacting with the Request builders.
 	Request *RequestClient
 	// RequestExecution is the client for interacting with the RequestExecution builders.
@@ -121,6 +145,14 @@ func (c *Client) init() {
 	c.Prompt = NewPromptClient(c.config)
 	c.PromptProtectionRule = NewPromptProtectionRuleClient(c.config)
 	c.ProviderQuotaStatus = NewProviderQuotaStatusClient(c.config)
+	c.RelaySite = NewRelaySiteClient(c.config)
+	c.RelaySiteAPIKey = NewRelaySiteAPIKeyClient(c.config)
+	c.RelaySiteAnnouncement = NewRelaySiteAnnouncementClient(c.config)
+	c.RelaySiteBalanceSnapshot = NewRelaySiteBalanceSnapshotClient(c.config)
+	c.RelaySiteCheckinLog = NewRelaySiteCheckinLogClient(c.config)
+	c.RelaySiteCredential = NewRelaySiteCredentialClient(c.config)
+	c.RelaySiteGroup = NewRelaySiteGroupClient(c.config)
+	c.RelaySiteModelPrice = NewRelaySiteModelPriceClient(c.config)
 	c.Request = NewRequestClient(c.config)
 	c.RequestExecution = NewRequestExecutionClient(c.config)
 	c.Role = NewRoleClient(c.config)
@@ -237,6 +269,14 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Prompt:                   NewPromptClient(cfg),
 		PromptProtectionRule:     NewPromptProtectionRuleClient(cfg),
 		ProviderQuotaStatus:      NewProviderQuotaStatusClient(cfg),
+		RelaySite:                NewRelaySiteClient(cfg),
+		RelaySiteAPIKey:          NewRelaySiteAPIKeyClient(cfg),
+		RelaySiteAnnouncement:    NewRelaySiteAnnouncementClient(cfg),
+		RelaySiteBalanceSnapshot: NewRelaySiteBalanceSnapshotClient(cfg),
+		RelaySiteCheckinLog:      NewRelaySiteCheckinLogClient(cfg),
+		RelaySiteCredential:      NewRelaySiteCredentialClient(cfg),
+		RelaySiteGroup:           NewRelaySiteGroupClient(cfg),
+		RelaySiteModelPrice:      NewRelaySiteModelPriceClient(cfg),
 		Request:                  NewRequestClient(cfg),
 		RequestExecution:         NewRequestExecutionClient(cfg),
 		Role:                     NewRoleClient(cfg),
@@ -280,6 +320,14 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Prompt:                   NewPromptClient(cfg),
 		PromptProtectionRule:     NewPromptProtectionRuleClient(cfg),
 		ProviderQuotaStatus:      NewProviderQuotaStatusClient(cfg),
+		RelaySite:                NewRelaySiteClient(cfg),
+		RelaySiteAPIKey:          NewRelaySiteAPIKeyClient(cfg),
+		RelaySiteAnnouncement:    NewRelaySiteAnnouncementClient(cfg),
+		RelaySiteBalanceSnapshot: NewRelaySiteBalanceSnapshotClient(cfg),
+		RelaySiteCheckinLog:      NewRelaySiteCheckinLogClient(cfg),
+		RelaySiteCredential:      NewRelaySiteCredentialClient(cfg),
+		RelaySiteGroup:           NewRelaySiteGroupClient(cfg),
+		RelaySiteModelPrice:      NewRelaySiteModelPriceClient(cfg),
 		Request:                  NewRequestClient(cfg),
 		RequestExecution:         NewRequestExecutionClient(cfg),
 		Role:                     NewRoleClient(cfg),
@@ -322,9 +370,11 @@ func (c *Client) Use(hooks ...Hook) {
 		c.APIKey, c.APIKeyProfileTemplate, c.Channel, c.ChannelModelPrice,
 		c.ChannelModelPriceVersion, c.ChannelOverrideTemplate, c.ChannelProbe,
 		c.DataStorage, c.Model, c.OIDCIdentity, c.Project, c.Prompt,
-		c.PromptProtectionRule, c.ProviderQuotaStatus, c.Request, c.RequestExecution,
-		c.Role, c.System, c.Thread, c.Trace, c.UsageLog, c.User, c.UserProject,
-		c.UserRole,
+		c.PromptProtectionRule, c.ProviderQuotaStatus, c.RelaySite, c.RelaySiteAPIKey,
+		c.RelaySiteAnnouncement, c.RelaySiteBalanceSnapshot, c.RelaySiteCheckinLog,
+		c.RelaySiteCredential, c.RelaySiteGroup, c.RelaySiteModelPrice, c.Request,
+		c.RequestExecution, c.Role, c.System, c.Thread, c.Trace, c.UsageLog, c.User,
+		c.UserProject, c.UserRole,
 	} {
 		n.Use(hooks...)
 	}
@@ -337,9 +387,11 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 		c.APIKey, c.APIKeyProfileTemplate, c.Channel, c.ChannelModelPrice,
 		c.ChannelModelPriceVersion, c.ChannelOverrideTemplate, c.ChannelProbe,
 		c.DataStorage, c.Model, c.OIDCIdentity, c.Project, c.Prompt,
-		c.PromptProtectionRule, c.ProviderQuotaStatus, c.Request, c.RequestExecution,
-		c.Role, c.System, c.Thread, c.Trace, c.UsageLog, c.User, c.UserProject,
-		c.UserRole,
+		c.PromptProtectionRule, c.ProviderQuotaStatus, c.RelaySite, c.RelaySiteAPIKey,
+		c.RelaySiteAnnouncement, c.RelaySiteBalanceSnapshot, c.RelaySiteCheckinLog,
+		c.RelaySiteCredential, c.RelaySiteGroup, c.RelaySiteModelPrice, c.Request,
+		c.RequestExecution, c.Role, c.System, c.Thread, c.Trace, c.UsageLog, c.User,
+		c.UserProject, c.UserRole,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -376,6 +428,22 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.PromptProtectionRule.mutate(ctx, m)
 	case *ProviderQuotaStatusMutation:
 		return c.ProviderQuotaStatus.mutate(ctx, m)
+	case *RelaySiteMutation:
+		return c.RelaySite.mutate(ctx, m)
+	case *RelaySiteAPIKeyMutation:
+		return c.RelaySiteAPIKey.mutate(ctx, m)
+	case *RelaySiteAnnouncementMutation:
+		return c.RelaySiteAnnouncement.mutate(ctx, m)
+	case *RelaySiteBalanceSnapshotMutation:
+		return c.RelaySiteBalanceSnapshot.mutate(ctx, m)
+	case *RelaySiteCheckinLogMutation:
+		return c.RelaySiteCheckinLog.mutate(ctx, m)
+	case *RelaySiteCredentialMutation:
+		return c.RelaySiteCredential.mutate(ctx, m)
+	case *RelaySiteGroupMutation:
+		return c.RelaySiteGroup.mutate(ctx, m)
+	case *RelaySiteModelPriceMutation:
+		return c.RelaySiteModelPrice.mutate(ctx, m)
 	case *RequestMutation:
 		return c.Request.mutate(ctx, m)
 	case *RequestExecutionMutation:
@@ -2768,6 +2836,1306 @@ func (c *ProviderQuotaStatusClient) mutate(ctx context.Context, m *ProviderQuota
 	}
 }
 
+// RelaySiteClient is a client for the RelaySite schema.
+type RelaySiteClient struct {
+	config
+}
+
+// NewRelaySiteClient returns a client for the RelaySite from the given config.
+func NewRelaySiteClient(c config) *RelaySiteClient {
+	return &RelaySiteClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `relaysite.Hooks(f(g(h())))`.
+func (c *RelaySiteClient) Use(hooks ...Hook) {
+	c.hooks.RelaySite = append(c.hooks.RelaySite, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `relaysite.Intercept(f(g(h())))`.
+func (c *RelaySiteClient) Intercept(interceptors ...Interceptor) {
+	c.inters.RelaySite = append(c.inters.RelaySite, interceptors...)
+}
+
+// Create returns a builder for creating a RelaySite entity.
+func (c *RelaySiteClient) Create() *RelaySiteCreate {
+	mutation := newRelaySiteMutation(c.config, OpCreate)
+	return &RelaySiteCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of RelaySite entities.
+func (c *RelaySiteClient) CreateBulk(builders ...*RelaySiteCreate) *RelaySiteCreateBulk {
+	return &RelaySiteCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *RelaySiteClient) MapCreateBulk(slice any, setFunc func(*RelaySiteCreate, int)) *RelaySiteCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &RelaySiteCreateBulk{err: fmt.Errorf("calling to RelaySiteClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*RelaySiteCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &RelaySiteCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for RelaySite.
+func (c *RelaySiteClient) Update() *RelaySiteUpdate {
+	mutation := newRelaySiteMutation(c.config, OpUpdate)
+	return &RelaySiteUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *RelaySiteClient) UpdateOne(_m *RelaySite) *RelaySiteUpdateOne {
+	mutation := newRelaySiteMutation(c.config, OpUpdateOne, withRelaySite(_m))
+	return &RelaySiteUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *RelaySiteClient) UpdateOneID(id int) *RelaySiteUpdateOne {
+	mutation := newRelaySiteMutation(c.config, OpUpdateOne, withRelaySiteID(id))
+	return &RelaySiteUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for RelaySite.
+func (c *RelaySiteClient) Delete() *RelaySiteDelete {
+	mutation := newRelaySiteMutation(c.config, OpDelete)
+	return &RelaySiteDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *RelaySiteClient) DeleteOne(_m *RelaySite) *RelaySiteDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *RelaySiteClient) DeleteOneID(id int) *RelaySiteDeleteOne {
+	builder := c.Delete().Where(relaysite.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &RelaySiteDeleteOne{builder}
+}
+
+// Query returns a query builder for RelaySite.
+func (c *RelaySiteClient) Query() *RelaySiteQuery {
+	return &RelaySiteQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeRelaySite},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a RelaySite entity by its id.
+func (c *RelaySiteClient) Get(ctx context.Context, id int) (*RelaySite, error) {
+	return c.Query().Where(relaysite.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *RelaySiteClient) GetX(ctx context.Context, id int) *RelaySite {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryCredential queries the credential edge of a RelaySite.
+func (c *RelaySiteClient) QueryCredential(_m *RelaySite) *RelaySiteCredentialQuery {
+	query := (&RelaySiteCredentialClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(relaysite.Table, relaysite.FieldID, id),
+			sqlgraph.To(relaysitecredential.Table, relaysitecredential.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, relaysite.CredentialTable, relaysite.CredentialColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAPIKeys queries the api_keys edge of a RelaySite.
+func (c *RelaySiteClient) QueryAPIKeys(_m *RelaySite) *RelaySiteAPIKeyQuery {
+	query := (&RelaySiteAPIKeyClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(relaysite.Table, relaysite.FieldID, id),
+			sqlgraph.To(relaysiteapikey.Table, relaysiteapikey.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, relaysite.APIKeysTable, relaysite.APIKeysColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryGroups queries the groups edge of a RelaySite.
+func (c *RelaySiteClient) QueryGroups(_m *RelaySite) *RelaySiteGroupQuery {
+	query := (&RelaySiteGroupClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(relaysite.Table, relaysite.FieldID, id),
+			sqlgraph.To(relaysitegroup.Table, relaysitegroup.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, relaysite.GroupsTable, relaysite.GroupsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryBalanceSnapshots queries the balance_snapshots edge of a RelaySite.
+func (c *RelaySiteClient) QueryBalanceSnapshots(_m *RelaySite) *RelaySiteBalanceSnapshotQuery {
+	query := (&RelaySiteBalanceSnapshotClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(relaysite.Table, relaysite.FieldID, id),
+			sqlgraph.To(relaysitebalancesnapshot.Table, relaysitebalancesnapshot.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, relaysite.BalanceSnapshotsTable, relaysite.BalanceSnapshotsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryModelPrices queries the model_prices edge of a RelaySite.
+func (c *RelaySiteClient) QueryModelPrices(_m *RelaySite) *RelaySiteModelPriceQuery {
+	query := (&RelaySiteModelPriceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(relaysite.Table, relaysite.FieldID, id),
+			sqlgraph.To(relaysitemodelprice.Table, relaysitemodelprice.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, relaysite.ModelPricesTable, relaysite.ModelPricesColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCheckinLogs queries the checkin_logs edge of a RelaySite.
+func (c *RelaySiteClient) QueryCheckinLogs(_m *RelaySite) *RelaySiteCheckinLogQuery {
+	query := (&RelaySiteCheckinLogClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(relaysite.Table, relaysite.FieldID, id),
+			sqlgraph.To(relaysitecheckinlog.Table, relaysitecheckinlog.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, relaysite.CheckinLogsTable, relaysite.CheckinLogsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAnnouncements queries the announcements edge of a RelaySite.
+func (c *RelaySiteClient) QueryAnnouncements(_m *RelaySite) *RelaySiteAnnouncementQuery {
+	query := (&RelaySiteAnnouncementClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(relaysite.Table, relaysite.FieldID, id),
+			sqlgraph.To(relaysiteannouncement.Table, relaysiteannouncement.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, relaysite.AnnouncementsTable, relaysite.AnnouncementsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *RelaySiteClient) Hooks() []Hook {
+	hooks := c.hooks.RelaySite
+	return append(hooks[:len(hooks):len(hooks)], relaysite.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *RelaySiteClient) Interceptors() []Interceptor {
+	inters := c.inters.RelaySite
+	return append(inters[:len(inters):len(inters)], relaysite.Interceptors[:]...)
+}
+
+func (c *RelaySiteClient) mutate(ctx context.Context, m *RelaySiteMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&RelaySiteCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&RelaySiteUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&RelaySiteUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&RelaySiteDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown RelaySite mutation op: %q", m.Op())
+	}
+}
+
+// RelaySiteAPIKeyClient is a client for the RelaySiteAPIKey schema.
+type RelaySiteAPIKeyClient struct {
+	config
+}
+
+// NewRelaySiteAPIKeyClient returns a client for the RelaySiteAPIKey from the given config.
+func NewRelaySiteAPIKeyClient(c config) *RelaySiteAPIKeyClient {
+	return &RelaySiteAPIKeyClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `relaysiteapikey.Hooks(f(g(h())))`.
+func (c *RelaySiteAPIKeyClient) Use(hooks ...Hook) {
+	c.hooks.RelaySiteAPIKey = append(c.hooks.RelaySiteAPIKey, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `relaysiteapikey.Intercept(f(g(h())))`.
+func (c *RelaySiteAPIKeyClient) Intercept(interceptors ...Interceptor) {
+	c.inters.RelaySiteAPIKey = append(c.inters.RelaySiteAPIKey, interceptors...)
+}
+
+// Create returns a builder for creating a RelaySiteAPIKey entity.
+func (c *RelaySiteAPIKeyClient) Create() *RelaySiteAPIKeyCreate {
+	mutation := newRelaySiteAPIKeyMutation(c.config, OpCreate)
+	return &RelaySiteAPIKeyCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of RelaySiteAPIKey entities.
+func (c *RelaySiteAPIKeyClient) CreateBulk(builders ...*RelaySiteAPIKeyCreate) *RelaySiteAPIKeyCreateBulk {
+	return &RelaySiteAPIKeyCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *RelaySiteAPIKeyClient) MapCreateBulk(slice any, setFunc func(*RelaySiteAPIKeyCreate, int)) *RelaySiteAPIKeyCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &RelaySiteAPIKeyCreateBulk{err: fmt.Errorf("calling to RelaySiteAPIKeyClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*RelaySiteAPIKeyCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &RelaySiteAPIKeyCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for RelaySiteAPIKey.
+func (c *RelaySiteAPIKeyClient) Update() *RelaySiteAPIKeyUpdate {
+	mutation := newRelaySiteAPIKeyMutation(c.config, OpUpdate)
+	return &RelaySiteAPIKeyUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *RelaySiteAPIKeyClient) UpdateOne(_m *RelaySiteAPIKey) *RelaySiteAPIKeyUpdateOne {
+	mutation := newRelaySiteAPIKeyMutation(c.config, OpUpdateOne, withRelaySiteAPIKey(_m))
+	return &RelaySiteAPIKeyUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *RelaySiteAPIKeyClient) UpdateOneID(id int) *RelaySiteAPIKeyUpdateOne {
+	mutation := newRelaySiteAPIKeyMutation(c.config, OpUpdateOne, withRelaySiteAPIKeyID(id))
+	return &RelaySiteAPIKeyUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for RelaySiteAPIKey.
+func (c *RelaySiteAPIKeyClient) Delete() *RelaySiteAPIKeyDelete {
+	mutation := newRelaySiteAPIKeyMutation(c.config, OpDelete)
+	return &RelaySiteAPIKeyDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *RelaySiteAPIKeyClient) DeleteOne(_m *RelaySiteAPIKey) *RelaySiteAPIKeyDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *RelaySiteAPIKeyClient) DeleteOneID(id int) *RelaySiteAPIKeyDeleteOne {
+	builder := c.Delete().Where(relaysiteapikey.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &RelaySiteAPIKeyDeleteOne{builder}
+}
+
+// Query returns a query builder for RelaySiteAPIKey.
+func (c *RelaySiteAPIKeyClient) Query() *RelaySiteAPIKeyQuery {
+	return &RelaySiteAPIKeyQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeRelaySiteAPIKey},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a RelaySiteAPIKey entity by its id.
+func (c *RelaySiteAPIKeyClient) Get(ctx context.Context, id int) (*RelaySiteAPIKey, error) {
+	return c.Query().Where(relaysiteapikey.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *RelaySiteAPIKeyClient) GetX(ctx context.Context, id int) *RelaySiteAPIKey {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryRelaySite queries the relay_site edge of a RelaySiteAPIKey.
+func (c *RelaySiteAPIKeyClient) QueryRelaySite(_m *RelaySiteAPIKey) *RelaySiteQuery {
+	query := (&RelaySiteClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(relaysiteapikey.Table, relaysiteapikey.FieldID, id),
+			sqlgraph.To(relaysite.Table, relaysite.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, relaysiteapikey.RelaySiteTable, relaysiteapikey.RelaySiteColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *RelaySiteAPIKeyClient) Hooks() []Hook {
+	hooks := c.hooks.RelaySiteAPIKey
+	return append(hooks[:len(hooks):len(hooks)], relaysiteapikey.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *RelaySiteAPIKeyClient) Interceptors() []Interceptor {
+	inters := c.inters.RelaySiteAPIKey
+	return append(inters[:len(inters):len(inters)], relaysiteapikey.Interceptors[:]...)
+}
+
+func (c *RelaySiteAPIKeyClient) mutate(ctx context.Context, m *RelaySiteAPIKeyMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&RelaySiteAPIKeyCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&RelaySiteAPIKeyUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&RelaySiteAPIKeyUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&RelaySiteAPIKeyDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown RelaySiteAPIKey mutation op: %q", m.Op())
+	}
+}
+
+// RelaySiteAnnouncementClient is a client for the RelaySiteAnnouncement schema.
+type RelaySiteAnnouncementClient struct {
+	config
+}
+
+// NewRelaySiteAnnouncementClient returns a client for the RelaySiteAnnouncement from the given config.
+func NewRelaySiteAnnouncementClient(c config) *RelaySiteAnnouncementClient {
+	return &RelaySiteAnnouncementClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `relaysiteannouncement.Hooks(f(g(h())))`.
+func (c *RelaySiteAnnouncementClient) Use(hooks ...Hook) {
+	c.hooks.RelaySiteAnnouncement = append(c.hooks.RelaySiteAnnouncement, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `relaysiteannouncement.Intercept(f(g(h())))`.
+func (c *RelaySiteAnnouncementClient) Intercept(interceptors ...Interceptor) {
+	c.inters.RelaySiteAnnouncement = append(c.inters.RelaySiteAnnouncement, interceptors...)
+}
+
+// Create returns a builder for creating a RelaySiteAnnouncement entity.
+func (c *RelaySiteAnnouncementClient) Create() *RelaySiteAnnouncementCreate {
+	mutation := newRelaySiteAnnouncementMutation(c.config, OpCreate)
+	return &RelaySiteAnnouncementCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of RelaySiteAnnouncement entities.
+func (c *RelaySiteAnnouncementClient) CreateBulk(builders ...*RelaySiteAnnouncementCreate) *RelaySiteAnnouncementCreateBulk {
+	return &RelaySiteAnnouncementCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *RelaySiteAnnouncementClient) MapCreateBulk(slice any, setFunc func(*RelaySiteAnnouncementCreate, int)) *RelaySiteAnnouncementCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &RelaySiteAnnouncementCreateBulk{err: fmt.Errorf("calling to RelaySiteAnnouncementClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*RelaySiteAnnouncementCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &RelaySiteAnnouncementCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for RelaySiteAnnouncement.
+func (c *RelaySiteAnnouncementClient) Update() *RelaySiteAnnouncementUpdate {
+	mutation := newRelaySiteAnnouncementMutation(c.config, OpUpdate)
+	return &RelaySiteAnnouncementUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *RelaySiteAnnouncementClient) UpdateOne(_m *RelaySiteAnnouncement) *RelaySiteAnnouncementUpdateOne {
+	mutation := newRelaySiteAnnouncementMutation(c.config, OpUpdateOne, withRelaySiteAnnouncement(_m))
+	return &RelaySiteAnnouncementUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *RelaySiteAnnouncementClient) UpdateOneID(id int) *RelaySiteAnnouncementUpdateOne {
+	mutation := newRelaySiteAnnouncementMutation(c.config, OpUpdateOne, withRelaySiteAnnouncementID(id))
+	return &RelaySiteAnnouncementUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for RelaySiteAnnouncement.
+func (c *RelaySiteAnnouncementClient) Delete() *RelaySiteAnnouncementDelete {
+	mutation := newRelaySiteAnnouncementMutation(c.config, OpDelete)
+	return &RelaySiteAnnouncementDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *RelaySiteAnnouncementClient) DeleteOne(_m *RelaySiteAnnouncement) *RelaySiteAnnouncementDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *RelaySiteAnnouncementClient) DeleteOneID(id int) *RelaySiteAnnouncementDeleteOne {
+	builder := c.Delete().Where(relaysiteannouncement.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &RelaySiteAnnouncementDeleteOne{builder}
+}
+
+// Query returns a query builder for RelaySiteAnnouncement.
+func (c *RelaySiteAnnouncementClient) Query() *RelaySiteAnnouncementQuery {
+	return &RelaySiteAnnouncementQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeRelaySiteAnnouncement},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a RelaySiteAnnouncement entity by its id.
+func (c *RelaySiteAnnouncementClient) Get(ctx context.Context, id int) (*RelaySiteAnnouncement, error) {
+	return c.Query().Where(relaysiteannouncement.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *RelaySiteAnnouncementClient) GetX(ctx context.Context, id int) *RelaySiteAnnouncement {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryRelaySite queries the relay_site edge of a RelaySiteAnnouncement.
+func (c *RelaySiteAnnouncementClient) QueryRelaySite(_m *RelaySiteAnnouncement) *RelaySiteQuery {
+	query := (&RelaySiteClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(relaysiteannouncement.Table, relaysiteannouncement.FieldID, id),
+			sqlgraph.To(relaysite.Table, relaysite.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, relaysiteannouncement.RelaySiteTable, relaysiteannouncement.RelaySiteColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *RelaySiteAnnouncementClient) Hooks() []Hook {
+	hooks := c.hooks.RelaySiteAnnouncement
+	return append(hooks[:len(hooks):len(hooks)], relaysiteannouncement.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *RelaySiteAnnouncementClient) Interceptors() []Interceptor {
+	return c.inters.RelaySiteAnnouncement
+}
+
+func (c *RelaySiteAnnouncementClient) mutate(ctx context.Context, m *RelaySiteAnnouncementMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&RelaySiteAnnouncementCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&RelaySiteAnnouncementUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&RelaySiteAnnouncementUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&RelaySiteAnnouncementDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown RelaySiteAnnouncement mutation op: %q", m.Op())
+	}
+}
+
+// RelaySiteBalanceSnapshotClient is a client for the RelaySiteBalanceSnapshot schema.
+type RelaySiteBalanceSnapshotClient struct {
+	config
+}
+
+// NewRelaySiteBalanceSnapshotClient returns a client for the RelaySiteBalanceSnapshot from the given config.
+func NewRelaySiteBalanceSnapshotClient(c config) *RelaySiteBalanceSnapshotClient {
+	return &RelaySiteBalanceSnapshotClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `relaysitebalancesnapshot.Hooks(f(g(h())))`.
+func (c *RelaySiteBalanceSnapshotClient) Use(hooks ...Hook) {
+	c.hooks.RelaySiteBalanceSnapshot = append(c.hooks.RelaySiteBalanceSnapshot, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `relaysitebalancesnapshot.Intercept(f(g(h())))`.
+func (c *RelaySiteBalanceSnapshotClient) Intercept(interceptors ...Interceptor) {
+	c.inters.RelaySiteBalanceSnapshot = append(c.inters.RelaySiteBalanceSnapshot, interceptors...)
+}
+
+// Create returns a builder for creating a RelaySiteBalanceSnapshot entity.
+func (c *RelaySiteBalanceSnapshotClient) Create() *RelaySiteBalanceSnapshotCreate {
+	mutation := newRelaySiteBalanceSnapshotMutation(c.config, OpCreate)
+	return &RelaySiteBalanceSnapshotCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of RelaySiteBalanceSnapshot entities.
+func (c *RelaySiteBalanceSnapshotClient) CreateBulk(builders ...*RelaySiteBalanceSnapshotCreate) *RelaySiteBalanceSnapshotCreateBulk {
+	return &RelaySiteBalanceSnapshotCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *RelaySiteBalanceSnapshotClient) MapCreateBulk(slice any, setFunc func(*RelaySiteBalanceSnapshotCreate, int)) *RelaySiteBalanceSnapshotCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &RelaySiteBalanceSnapshotCreateBulk{err: fmt.Errorf("calling to RelaySiteBalanceSnapshotClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*RelaySiteBalanceSnapshotCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &RelaySiteBalanceSnapshotCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for RelaySiteBalanceSnapshot.
+func (c *RelaySiteBalanceSnapshotClient) Update() *RelaySiteBalanceSnapshotUpdate {
+	mutation := newRelaySiteBalanceSnapshotMutation(c.config, OpUpdate)
+	return &RelaySiteBalanceSnapshotUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *RelaySiteBalanceSnapshotClient) UpdateOne(_m *RelaySiteBalanceSnapshot) *RelaySiteBalanceSnapshotUpdateOne {
+	mutation := newRelaySiteBalanceSnapshotMutation(c.config, OpUpdateOne, withRelaySiteBalanceSnapshot(_m))
+	return &RelaySiteBalanceSnapshotUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *RelaySiteBalanceSnapshotClient) UpdateOneID(id int) *RelaySiteBalanceSnapshotUpdateOne {
+	mutation := newRelaySiteBalanceSnapshotMutation(c.config, OpUpdateOne, withRelaySiteBalanceSnapshotID(id))
+	return &RelaySiteBalanceSnapshotUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for RelaySiteBalanceSnapshot.
+func (c *RelaySiteBalanceSnapshotClient) Delete() *RelaySiteBalanceSnapshotDelete {
+	mutation := newRelaySiteBalanceSnapshotMutation(c.config, OpDelete)
+	return &RelaySiteBalanceSnapshotDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *RelaySiteBalanceSnapshotClient) DeleteOne(_m *RelaySiteBalanceSnapshot) *RelaySiteBalanceSnapshotDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *RelaySiteBalanceSnapshotClient) DeleteOneID(id int) *RelaySiteBalanceSnapshotDeleteOne {
+	builder := c.Delete().Where(relaysitebalancesnapshot.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &RelaySiteBalanceSnapshotDeleteOne{builder}
+}
+
+// Query returns a query builder for RelaySiteBalanceSnapshot.
+func (c *RelaySiteBalanceSnapshotClient) Query() *RelaySiteBalanceSnapshotQuery {
+	return &RelaySiteBalanceSnapshotQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeRelaySiteBalanceSnapshot},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a RelaySiteBalanceSnapshot entity by its id.
+func (c *RelaySiteBalanceSnapshotClient) Get(ctx context.Context, id int) (*RelaySiteBalanceSnapshot, error) {
+	return c.Query().Where(relaysitebalancesnapshot.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *RelaySiteBalanceSnapshotClient) GetX(ctx context.Context, id int) *RelaySiteBalanceSnapshot {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryRelaySite queries the relay_site edge of a RelaySiteBalanceSnapshot.
+func (c *RelaySiteBalanceSnapshotClient) QueryRelaySite(_m *RelaySiteBalanceSnapshot) *RelaySiteQuery {
+	query := (&RelaySiteClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(relaysitebalancesnapshot.Table, relaysitebalancesnapshot.FieldID, id),
+			sqlgraph.To(relaysite.Table, relaysite.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, relaysitebalancesnapshot.RelaySiteTable, relaysitebalancesnapshot.RelaySiteColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *RelaySiteBalanceSnapshotClient) Hooks() []Hook {
+	hooks := c.hooks.RelaySiteBalanceSnapshot
+	return append(hooks[:len(hooks):len(hooks)], relaysitebalancesnapshot.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *RelaySiteBalanceSnapshotClient) Interceptors() []Interceptor {
+	return c.inters.RelaySiteBalanceSnapshot
+}
+
+func (c *RelaySiteBalanceSnapshotClient) mutate(ctx context.Context, m *RelaySiteBalanceSnapshotMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&RelaySiteBalanceSnapshotCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&RelaySiteBalanceSnapshotUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&RelaySiteBalanceSnapshotUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&RelaySiteBalanceSnapshotDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown RelaySiteBalanceSnapshot mutation op: %q", m.Op())
+	}
+}
+
+// RelaySiteCheckinLogClient is a client for the RelaySiteCheckinLog schema.
+type RelaySiteCheckinLogClient struct {
+	config
+}
+
+// NewRelaySiteCheckinLogClient returns a client for the RelaySiteCheckinLog from the given config.
+func NewRelaySiteCheckinLogClient(c config) *RelaySiteCheckinLogClient {
+	return &RelaySiteCheckinLogClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `relaysitecheckinlog.Hooks(f(g(h())))`.
+func (c *RelaySiteCheckinLogClient) Use(hooks ...Hook) {
+	c.hooks.RelaySiteCheckinLog = append(c.hooks.RelaySiteCheckinLog, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `relaysitecheckinlog.Intercept(f(g(h())))`.
+func (c *RelaySiteCheckinLogClient) Intercept(interceptors ...Interceptor) {
+	c.inters.RelaySiteCheckinLog = append(c.inters.RelaySiteCheckinLog, interceptors...)
+}
+
+// Create returns a builder for creating a RelaySiteCheckinLog entity.
+func (c *RelaySiteCheckinLogClient) Create() *RelaySiteCheckinLogCreate {
+	mutation := newRelaySiteCheckinLogMutation(c.config, OpCreate)
+	return &RelaySiteCheckinLogCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of RelaySiteCheckinLog entities.
+func (c *RelaySiteCheckinLogClient) CreateBulk(builders ...*RelaySiteCheckinLogCreate) *RelaySiteCheckinLogCreateBulk {
+	return &RelaySiteCheckinLogCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *RelaySiteCheckinLogClient) MapCreateBulk(slice any, setFunc func(*RelaySiteCheckinLogCreate, int)) *RelaySiteCheckinLogCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &RelaySiteCheckinLogCreateBulk{err: fmt.Errorf("calling to RelaySiteCheckinLogClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*RelaySiteCheckinLogCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &RelaySiteCheckinLogCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for RelaySiteCheckinLog.
+func (c *RelaySiteCheckinLogClient) Update() *RelaySiteCheckinLogUpdate {
+	mutation := newRelaySiteCheckinLogMutation(c.config, OpUpdate)
+	return &RelaySiteCheckinLogUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *RelaySiteCheckinLogClient) UpdateOne(_m *RelaySiteCheckinLog) *RelaySiteCheckinLogUpdateOne {
+	mutation := newRelaySiteCheckinLogMutation(c.config, OpUpdateOne, withRelaySiteCheckinLog(_m))
+	return &RelaySiteCheckinLogUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *RelaySiteCheckinLogClient) UpdateOneID(id int) *RelaySiteCheckinLogUpdateOne {
+	mutation := newRelaySiteCheckinLogMutation(c.config, OpUpdateOne, withRelaySiteCheckinLogID(id))
+	return &RelaySiteCheckinLogUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for RelaySiteCheckinLog.
+func (c *RelaySiteCheckinLogClient) Delete() *RelaySiteCheckinLogDelete {
+	mutation := newRelaySiteCheckinLogMutation(c.config, OpDelete)
+	return &RelaySiteCheckinLogDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *RelaySiteCheckinLogClient) DeleteOne(_m *RelaySiteCheckinLog) *RelaySiteCheckinLogDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *RelaySiteCheckinLogClient) DeleteOneID(id int) *RelaySiteCheckinLogDeleteOne {
+	builder := c.Delete().Where(relaysitecheckinlog.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &RelaySiteCheckinLogDeleteOne{builder}
+}
+
+// Query returns a query builder for RelaySiteCheckinLog.
+func (c *RelaySiteCheckinLogClient) Query() *RelaySiteCheckinLogQuery {
+	return &RelaySiteCheckinLogQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeRelaySiteCheckinLog},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a RelaySiteCheckinLog entity by its id.
+func (c *RelaySiteCheckinLogClient) Get(ctx context.Context, id int) (*RelaySiteCheckinLog, error) {
+	return c.Query().Where(relaysitecheckinlog.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *RelaySiteCheckinLogClient) GetX(ctx context.Context, id int) *RelaySiteCheckinLog {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryRelaySite queries the relay_site edge of a RelaySiteCheckinLog.
+func (c *RelaySiteCheckinLogClient) QueryRelaySite(_m *RelaySiteCheckinLog) *RelaySiteQuery {
+	query := (&RelaySiteClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(relaysitecheckinlog.Table, relaysitecheckinlog.FieldID, id),
+			sqlgraph.To(relaysite.Table, relaysite.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, relaysitecheckinlog.RelaySiteTable, relaysitecheckinlog.RelaySiteColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *RelaySiteCheckinLogClient) Hooks() []Hook {
+	hooks := c.hooks.RelaySiteCheckinLog
+	return append(hooks[:len(hooks):len(hooks)], relaysitecheckinlog.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *RelaySiteCheckinLogClient) Interceptors() []Interceptor {
+	return c.inters.RelaySiteCheckinLog
+}
+
+func (c *RelaySiteCheckinLogClient) mutate(ctx context.Context, m *RelaySiteCheckinLogMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&RelaySiteCheckinLogCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&RelaySiteCheckinLogUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&RelaySiteCheckinLogUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&RelaySiteCheckinLogDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown RelaySiteCheckinLog mutation op: %q", m.Op())
+	}
+}
+
+// RelaySiteCredentialClient is a client for the RelaySiteCredential schema.
+type RelaySiteCredentialClient struct {
+	config
+}
+
+// NewRelaySiteCredentialClient returns a client for the RelaySiteCredential from the given config.
+func NewRelaySiteCredentialClient(c config) *RelaySiteCredentialClient {
+	return &RelaySiteCredentialClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `relaysitecredential.Hooks(f(g(h())))`.
+func (c *RelaySiteCredentialClient) Use(hooks ...Hook) {
+	c.hooks.RelaySiteCredential = append(c.hooks.RelaySiteCredential, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `relaysitecredential.Intercept(f(g(h())))`.
+func (c *RelaySiteCredentialClient) Intercept(interceptors ...Interceptor) {
+	c.inters.RelaySiteCredential = append(c.inters.RelaySiteCredential, interceptors...)
+}
+
+// Create returns a builder for creating a RelaySiteCredential entity.
+func (c *RelaySiteCredentialClient) Create() *RelaySiteCredentialCreate {
+	mutation := newRelaySiteCredentialMutation(c.config, OpCreate)
+	return &RelaySiteCredentialCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of RelaySiteCredential entities.
+func (c *RelaySiteCredentialClient) CreateBulk(builders ...*RelaySiteCredentialCreate) *RelaySiteCredentialCreateBulk {
+	return &RelaySiteCredentialCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *RelaySiteCredentialClient) MapCreateBulk(slice any, setFunc func(*RelaySiteCredentialCreate, int)) *RelaySiteCredentialCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &RelaySiteCredentialCreateBulk{err: fmt.Errorf("calling to RelaySiteCredentialClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*RelaySiteCredentialCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &RelaySiteCredentialCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for RelaySiteCredential.
+func (c *RelaySiteCredentialClient) Update() *RelaySiteCredentialUpdate {
+	mutation := newRelaySiteCredentialMutation(c.config, OpUpdate)
+	return &RelaySiteCredentialUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *RelaySiteCredentialClient) UpdateOne(_m *RelaySiteCredential) *RelaySiteCredentialUpdateOne {
+	mutation := newRelaySiteCredentialMutation(c.config, OpUpdateOne, withRelaySiteCredential(_m))
+	return &RelaySiteCredentialUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *RelaySiteCredentialClient) UpdateOneID(id int) *RelaySiteCredentialUpdateOne {
+	mutation := newRelaySiteCredentialMutation(c.config, OpUpdateOne, withRelaySiteCredentialID(id))
+	return &RelaySiteCredentialUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for RelaySiteCredential.
+func (c *RelaySiteCredentialClient) Delete() *RelaySiteCredentialDelete {
+	mutation := newRelaySiteCredentialMutation(c.config, OpDelete)
+	return &RelaySiteCredentialDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *RelaySiteCredentialClient) DeleteOne(_m *RelaySiteCredential) *RelaySiteCredentialDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *RelaySiteCredentialClient) DeleteOneID(id int) *RelaySiteCredentialDeleteOne {
+	builder := c.Delete().Where(relaysitecredential.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &RelaySiteCredentialDeleteOne{builder}
+}
+
+// Query returns a query builder for RelaySiteCredential.
+func (c *RelaySiteCredentialClient) Query() *RelaySiteCredentialQuery {
+	return &RelaySiteCredentialQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeRelaySiteCredential},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a RelaySiteCredential entity by its id.
+func (c *RelaySiteCredentialClient) Get(ctx context.Context, id int) (*RelaySiteCredential, error) {
+	return c.Query().Where(relaysitecredential.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *RelaySiteCredentialClient) GetX(ctx context.Context, id int) *RelaySiteCredential {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryRelaySite queries the relay_site edge of a RelaySiteCredential.
+func (c *RelaySiteCredentialClient) QueryRelaySite(_m *RelaySiteCredential) *RelaySiteQuery {
+	query := (&RelaySiteClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(relaysitecredential.Table, relaysitecredential.FieldID, id),
+			sqlgraph.To(relaysite.Table, relaysite.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, relaysitecredential.RelaySiteTable, relaysitecredential.RelaySiteColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *RelaySiteCredentialClient) Hooks() []Hook {
+	hooks := c.hooks.RelaySiteCredential
+	return append(hooks[:len(hooks):len(hooks)], relaysitecredential.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *RelaySiteCredentialClient) Interceptors() []Interceptor {
+	return c.inters.RelaySiteCredential
+}
+
+func (c *RelaySiteCredentialClient) mutate(ctx context.Context, m *RelaySiteCredentialMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&RelaySiteCredentialCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&RelaySiteCredentialUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&RelaySiteCredentialUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&RelaySiteCredentialDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown RelaySiteCredential mutation op: %q", m.Op())
+	}
+}
+
+// RelaySiteGroupClient is a client for the RelaySiteGroup schema.
+type RelaySiteGroupClient struct {
+	config
+}
+
+// NewRelaySiteGroupClient returns a client for the RelaySiteGroup from the given config.
+func NewRelaySiteGroupClient(c config) *RelaySiteGroupClient {
+	return &RelaySiteGroupClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `relaysitegroup.Hooks(f(g(h())))`.
+func (c *RelaySiteGroupClient) Use(hooks ...Hook) {
+	c.hooks.RelaySiteGroup = append(c.hooks.RelaySiteGroup, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `relaysitegroup.Intercept(f(g(h())))`.
+func (c *RelaySiteGroupClient) Intercept(interceptors ...Interceptor) {
+	c.inters.RelaySiteGroup = append(c.inters.RelaySiteGroup, interceptors...)
+}
+
+// Create returns a builder for creating a RelaySiteGroup entity.
+func (c *RelaySiteGroupClient) Create() *RelaySiteGroupCreate {
+	mutation := newRelaySiteGroupMutation(c.config, OpCreate)
+	return &RelaySiteGroupCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of RelaySiteGroup entities.
+func (c *RelaySiteGroupClient) CreateBulk(builders ...*RelaySiteGroupCreate) *RelaySiteGroupCreateBulk {
+	return &RelaySiteGroupCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *RelaySiteGroupClient) MapCreateBulk(slice any, setFunc func(*RelaySiteGroupCreate, int)) *RelaySiteGroupCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &RelaySiteGroupCreateBulk{err: fmt.Errorf("calling to RelaySiteGroupClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*RelaySiteGroupCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &RelaySiteGroupCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for RelaySiteGroup.
+func (c *RelaySiteGroupClient) Update() *RelaySiteGroupUpdate {
+	mutation := newRelaySiteGroupMutation(c.config, OpUpdate)
+	return &RelaySiteGroupUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *RelaySiteGroupClient) UpdateOne(_m *RelaySiteGroup) *RelaySiteGroupUpdateOne {
+	mutation := newRelaySiteGroupMutation(c.config, OpUpdateOne, withRelaySiteGroup(_m))
+	return &RelaySiteGroupUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *RelaySiteGroupClient) UpdateOneID(id int) *RelaySiteGroupUpdateOne {
+	mutation := newRelaySiteGroupMutation(c.config, OpUpdateOne, withRelaySiteGroupID(id))
+	return &RelaySiteGroupUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for RelaySiteGroup.
+func (c *RelaySiteGroupClient) Delete() *RelaySiteGroupDelete {
+	mutation := newRelaySiteGroupMutation(c.config, OpDelete)
+	return &RelaySiteGroupDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *RelaySiteGroupClient) DeleteOne(_m *RelaySiteGroup) *RelaySiteGroupDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *RelaySiteGroupClient) DeleteOneID(id int) *RelaySiteGroupDeleteOne {
+	builder := c.Delete().Where(relaysitegroup.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &RelaySiteGroupDeleteOne{builder}
+}
+
+// Query returns a query builder for RelaySiteGroup.
+func (c *RelaySiteGroupClient) Query() *RelaySiteGroupQuery {
+	return &RelaySiteGroupQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeRelaySiteGroup},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a RelaySiteGroup entity by its id.
+func (c *RelaySiteGroupClient) Get(ctx context.Context, id int) (*RelaySiteGroup, error) {
+	return c.Query().Where(relaysitegroup.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *RelaySiteGroupClient) GetX(ctx context.Context, id int) *RelaySiteGroup {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryRelaySite queries the relay_site edge of a RelaySiteGroup.
+func (c *RelaySiteGroupClient) QueryRelaySite(_m *RelaySiteGroup) *RelaySiteQuery {
+	query := (&RelaySiteClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(relaysitegroup.Table, relaysitegroup.FieldID, id),
+			sqlgraph.To(relaysite.Table, relaysite.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, relaysitegroup.RelaySiteTable, relaysitegroup.RelaySiteColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *RelaySiteGroupClient) Hooks() []Hook {
+	hooks := c.hooks.RelaySiteGroup
+	return append(hooks[:len(hooks):len(hooks)], relaysitegroup.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *RelaySiteGroupClient) Interceptors() []Interceptor {
+	inters := c.inters.RelaySiteGroup
+	return append(inters[:len(inters):len(inters)], relaysitegroup.Interceptors[:]...)
+}
+
+func (c *RelaySiteGroupClient) mutate(ctx context.Context, m *RelaySiteGroupMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&RelaySiteGroupCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&RelaySiteGroupUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&RelaySiteGroupUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&RelaySiteGroupDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown RelaySiteGroup mutation op: %q", m.Op())
+	}
+}
+
+// RelaySiteModelPriceClient is a client for the RelaySiteModelPrice schema.
+type RelaySiteModelPriceClient struct {
+	config
+}
+
+// NewRelaySiteModelPriceClient returns a client for the RelaySiteModelPrice from the given config.
+func NewRelaySiteModelPriceClient(c config) *RelaySiteModelPriceClient {
+	return &RelaySiteModelPriceClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `relaysitemodelprice.Hooks(f(g(h())))`.
+func (c *RelaySiteModelPriceClient) Use(hooks ...Hook) {
+	c.hooks.RelaySiteModelPrice = append(c.hooks.RelaySiteModelPrice, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `relaysitemodelprice.Intercept(f(g(h())))`.
+func (c *RelaySiteModelPriceClient) Intercept(interceptors ...Interceptor) {
+	c.inters.RelaySiteModelPrice = append(c.inters.RelaySiteModelPrice, interceptors...)
+}
+
+// Create returns a builder for creating a RelaySiteModelPrice entity.
+func (c *RelaySiteModelPriceClient) Create() *RelaySiteModelPriceCreate {
+	mutation := newRelaySiteModelPriceMutation(c.config, OpCreate)
+	return &RelaySiteModelPriceCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of RelaySiteModelPrice entities.
+func (c *RelaySiteModelPriceClient) CreateBulk(builders ...*RelaySiteModelPriceCreate) *RelaySiteModelPriceCreateBulk {
+	return &RelaySiteModelPriceCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *RelaySiteModelPriceClient) MapCreateBulk(slice any, setFunc func(*RelaySiteModelPriceCreate, int)) *RelaySiteModelPriceCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &RelaySiteModelPriceCreateBulk{err: fmt.Errorf("calling to RelaySiteModelPriceClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*RelaySiteModelPriceCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &RelaySiteModelPriceCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for RelaySiteModelPrice.
+func (c *RelaySiteModelPriceClient) Update() *RelaySiteModelPriceUpdate {
+	mutation := newRelaySiteModelPriceMutation(c.config, OpUpdate)
+	return &RelaySiteModelPriceUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *RelaySiteModelPriceClient) UpdateOne(_m *RelaySiteModelPrice) *RelaySiteModelPriceUpdateOne {
+	mutation := newRelaySiteModelPriceMutation(c.config, OpUpdateOne, withRelaySiteModelPrice(_m))
+	return &RelaySiteModelPriceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *RelaySiteModelPriceClient) UpdateOneID(id int) *RelaySiteModelPriceUpdateOne {
+	mutation := newRelaySiteModelPriceMutation(c.config, OpUpdateOne, withRelaySiteModelPriceID(id))
+	return &RelaySiteModelPriceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for RelaySiteModelPrice.
+func (c *RelaySiteModelPriceClient) Delete() *RelaySiteModelPriceDelete {
+	mutation := newRelaySiteModelPriceMutation(c.config, OpDelete)
+	return &RelaySiteModelPriceDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *RelaySiteModelPriceClient) DeleteOne(_m *RelaySiteModelPrice) *RelaySiteModelPriceDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *RelaySiteModelPriceClient) DeleteOneID(id int) *RelaySiteModelPriceDeleteOne {
+	builder := c.Delete().Where(relaysitemodelprice.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &RelaySiteModelPriceDeleteOne{builder}
+}
+
+// Query returns a query builder for RelaySiteModelPrice.
+func (c *RelaySiteModelPriceClient) Query() *RelaySiteModelPriceQuery {
+	return &RelaySiteModelPriceQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeRelaySiteModelPrice},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a RelaySiteModelPrice entity by its id.
+func (c *RelaySiteModelPriceClient) Get(ctx context.Context, id int) (*RelaySiteModelPrice, error) {
+	return c.Query().Where(relaysitemodelprice.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *RelaySiteModelPriceClient) GetX(ctx context.Context, id int) *RelaySiteModelPrice {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryRelaySite queries the relay_site edge of a RelaySiteModelPrice.
+func (c *RelaySiteModelPriceClient) QueryRelaySite(_m *RelaySiteModelPrice) *RelaySiteQuery {
+	query := (&RelaySiteClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(relaysitemodelprice.Table, relaysitemodelprice.FieldID, id),
+			sqlgraph.To(relaysite.Table, relaysite.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, relaysitemodelprice.RelaySiteTable, relaysitemodelprice.RelaySiteColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *RelaySiteModelPriceClient) Hooks() []Hook {
+	hooks := c.hooks.RelaySiteModelPrice
+	return append(hooks[:len(hooks):len(hooks)], relaysitemodelprice.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *RelaySiteModelPriceClient) Interceptors() []Interceptor {
+	inters := c.inters.RelaySiteModelPrice
+	return append(inters[:len(inters):len(inters)], relaysitemodelprice.Interceptors[:]...)
+}
+
+func (c *RelaySiteModelPriceClient) mutate(ctx context.Context, m *RelaySiteModelPriceMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&RelaySiteModelPriceCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&RelaySiteModelPriceUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&RelaySiteModelPriceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&RelaySiteModelPriceDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown RelaySiteModelPrice mutation op: %q", m.Op())
+	}
+}
+
 // RequestClient is a client for the Request schema.
 type RequestClient struct {
 	config
@@ -4627,14 +5995,18 @@ type (
 		APIKey, APIKeyProfileTemplate, Channel, ChannelModelPrice,
 		ChannelModelPriceVersion, ChannelOverrideTemplate, ChannelProbe, DataStorage,
 		Model, OIDCIdentity, Project, Prompt, PromptProtectionRule,
-		ProviderQuotaStatus, Request, RequestExecution, Role, System, Thread, Trace,
-		UsageLog, User, UserProject, UserRole []ent.Hook
+		ProviderQuotaStatus, RelaySite, RelaySiteAPIKey, RelaySiteAnnouncement,
+		RelaySiteBalanceSnapshot, RelaySiteCheckinLog, RelaySiteCredential,
+		RelaySiteGroup, RelaySiteModelPrice, Request, RequestExecution, Role, System,
+		Thread, Trace, UsageLog, User, UserProject, UserRole []ent.Hook
 	}
 	inters struct {
 		APIKey, APIKeyProfileTemplate, Channel, ChannelModelPrice,
 		ChannelModelPriceVersion, ChannelOverrideTemplate, ChannelProbe, DataStorage,
 		Model, OIDCIdentity, Project, Prompt, PromptProtectionRule,
-		ProviderQuotaStatus, Request, RequestExecution, Role, System, Thread, Trace,
-		UsageLog, User, UserProject, UserRole []ent.Interceptor
+		ProviderQuotaStatus, RelaySite, RelaySiteAPIKey, RelaySiteAnnouncement,
+		RelaySiteBalanceSnapshot, RelaySiteCheckinLog, RelaySiteCredential,
+		RelaySiteGroup, RelaySiteModelPrice, Request, RequestExecution, Role, System,
+		Thread, Trace, UsageLog, User, UserProject, UserRole []ent.Interceptor
 	}
 )

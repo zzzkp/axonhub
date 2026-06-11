@@ -177,6 +177,102 @@ func (f ProviderQuotaStatusFunc) Mutate(ctx context.Context, m ent.Mutation) (en
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ProviderQuotaStatusMutation", m)
 }
 
+// The RelaySiteFunc type is an adapter to allow the use of ordinary
+// function as RelaySite mutator.
+type RelaySiteFunc func(context.Context, *ent.RelaySiteMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f RelaySiteFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.RelaySiteMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.RelaySiteMutation", m)
+}
+
+// The RelaySiteAPIKeyFunc type is an adapter to allow the use of ordinary
+// function as RelaySiteAPIKey mutator.
+type RelaySiteAPIKeyFunc func(context.Context, *ent.RelaySiteAPIKeyMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f RelaySiteAPIKeyFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.RelaySiteAPIKeyMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.RelaySiteAPIKeyMutation", m)
+}
+
+// The RelaySiteAnnouncementFunc type is an adapter to allow the use of ordinary
+// function as RelaySiteAnnouncement mutator.
+type RelaySiteAnnouncementFunc func(context.Context, *ent.RelaySiteAnnouncementMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f RelaySiteAnnouncementFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.RelaySiteAnnouncementMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.RelaySiteAnnouncementMutation", m)
+}
+
+// The RelaySiteBalanceSnapshotFunc type is an adapter to allow the use of ordinary
+// function as RelaySiteBalanceSnapshot mutator.
+type RelaySiteBalanceSnapshotFunc func(context.Context, *ent.RelaySiteBalanceSnapshotMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f RelaySiteBalanceSnapshotFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.RelaySiteBalanceSnapshotMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.RelaySiteBalanceSnapshotMutation", m)
+}
+
+// The RelaySiteCheckinLogFunc type is an adapter to allow the use of ordinary
+// function as RelaySiteCheckinLog mutator.
+type RelaySiteCheckinLogFunc func(context.Context, *ent.RelaySiteCheckinLogMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f RelaySiteCheckinLogFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.RelaySiteCheckinLogMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.RelaySiteCheckinLogMutation", m)
+}
+
+// The RelaySiteCredentialFunc type is an adapter to allow the use of ordinary
+// function as RelaySiteCredential mutator.
+type RelaySiteCredentialFunc func(context.Context, *ent.RelaySiteCredentialMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f RelaySiteCredentialFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.RelaySiteCredentialMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.RelaySiteCredentialMutation", m)
+}
+
+// The RelaySiteGroupFunc type is an adapter to allow the use of ordinary
+// function as RelaySiteGroup mutator.
+type RelaySiteGroupFunc func(context.Context, *ent.RelaySiteGroupMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f RelaySiteGroupFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.RelaySiteGroupMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.RelaySiteGroupMutation", m)
+}
+
+// The RelaySiteModelPriceFunc type is an adapter to allow the use of ordinary
+// function as RelaySiteModelPrice mutator.
+type RelaySiteModelPriceFunc func(context.Context, *ent.RelaySiteModelPriceMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f RelaySiteModelPriceFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.RelaySiteModelPriceMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.RelaySiteModelPriceMutation", m)
+}
+
 // The RequestFunc type is an adapter to allow the use of ordinary
 // function as Request mutator.
 type RequestFunc func(context.Context, *ent.RequestMutation) (ent.Value, error)

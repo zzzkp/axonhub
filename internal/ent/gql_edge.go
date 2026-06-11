@@ -481,6 +481,180 @@ func (_m *ProviderQuotaStatus) Channel(ctx context.Context) (*Channel, error) {
 	return result, err
 }
 
+func (_m *RelaySite) APIKeys(
+	ctx context.Context, after *Cursor, first *int, before *Cursor, last *int, orderBy *RelaySiteAPIKeyOrder, where *RelaySiteAPIKeyWhereInput,
+) (*RelaySiteAPIKeyConnection, error) {
+	opts := []RelaySiteAPIKeyPaginateOption{
+		WithRelaySiteAPIKeyOrder(orderBy),
+		WithRelaySiteAPIKeyFilter(where.Filter),
+	}
+	alias := graphql.GetFieldContext(ctx).Field.Alias
+	totalCount, hasTotalCount := _m.Edges.totalCount[0][alias]
+	if nodes, err := _m.NamedAPIKeys(alias); err == nil || hasTotalCount {
+		pager, err := newRelaySiteAPIKeyPager(opts, last != nil)
+		if err != nil {
+			return nil, err
+		}
+		conn := &RelaySiteAPIKeyConnection{Edges: []*RelaySiteAPIKeyEdge{}, TotalCount: totalCount}
+		conn.build(nodes, pager, after, first, before, last)
+		return conn, nil
+	}
+	return _m.QueryAPIKeys().Paginate(ctx, after, first, before, last, opts...)
+}
+
+func (_m *RelaySite) Groups(
+	ctx context.Context, after *Cursor, first *int, before *Cursor, last *int, orderBy *RelaySiteGroupOrder, where *RelaySiteGroupWhereInput,
+) (*RelaySiteGroupConnection, error) {
+	opts := []RelaySiteGroupPaginateOption{
+		WithRelaySiteGroupOrder(orderBy),
+		WithRelaySiteGroupFilter(where.Filter),
+	}
+	alias := graphql.GetFieldContext(ctx).Field.Alias
+	totalCount, hasTotalCount := _m.Edges.totalCount[1][alias]
+	if nodes, err := _m.NamedGroups(alias); err == nil || hasTotalCount {
+		pager, err := newRelaySiteGroupPager(opts, last != nil)
+		if err != nil {
+			return nil, err
+		}
+		conn := &RelaySiteGroupConnection{Edges: []*RelaySiteGroupEdge{}, TotalCount: totalCount}
+		conn.build(nodes, pager, after, first, before, last)
+		return conn, nil
+	}
+	return _m.QueryGroups().Paginate(ctx, after, first, before, last, opts...)
+}
+
+func (_m *RelaySite) BalanceSnapshots(
+	ctx context.Context, after *Cursor, first *int, before *Cursor, last *int, orderBy *RelaySiteBalanceSnapshotOrder, where *RelaySiteBalanceSnapshotWhereInput,
+) (*RelaySiteBalanceSnapshotConnection, error) {
+	opts := []RelaySiteBalanceSnapshotPaginateOption{
+		WithRelaySiteBalanceSnapshotOrder(orderBy),
+		WithRelaySiteBalanceSnapshotFilter(where.Filter),
+	}
+	alias := graphql.GetFieldContext(ctx).Field.Alias
+	totalCount, hasTotalCount := _m.Edges.totalCount[2][alias]
+	if nodes, err := _m.NamedBalanceSnapshots(alias); err == nil || hasTotalCount {
+		pager, err := newRelaySiteBalanceSnapshotPager(opts, last != nil)
+		if err != nil {
+			return nil, err
+		}
+		conn := &RelaySiteBalanceSnapshotConnection{Edges: []*RelaySiteBalanceSnapshotEdge{}, TotalCount: totalCount}
+		conn.build(nodes, pager, after, first, before, last)
+		return conn, nil
+	}
+	return _m.QueryBalanceSnapshots().Paginate(ctx, after, first, before, last, opts...)
+}
+
+func (_m *RelaySite) ModelPrices(
+	ctx context.Context, after *Cursor, first *int, before *Cursor, last *int, orderBy *RelaySiteModelPriceOrder, where *RelaySiteModelPriceWhereInput,
+) (*RelaySiteModelPriceConnection, error) {
+	opts := []RelaySiteModelPricePaginateOption{
+		WithRelaySiteModelPriceOrder(orderBy),
+		WithRelaySiteModelPriceFilter(where.Filter),
+	}
+	alias := graphql.GetFieldContext(ctx).Field.Alias
+	totalCount, hasTotalCount := _m.Edges.totalCount[3][alias]
+	if nodes, err := _m.NamedModelPrices(alias); err == nil || hasTotalCount {
+		pager, err := newRelaySiteModelPricePager(opts, last != nil)
+		if err != nil {
+			return nil, err
+		}
+		conn := &RelaySiteModelPriceConnection{Edges: []*RelaySiteModelPriceEdge{}, TotalCount: totalCount}
+		conn.build(nodes, pager, after, first, before, last)
+		return conn, nil
+	}
+	return _m.QueryModelPrices().Paginate(ctx, after, first, before, last, opts...)
+}
+
+func (_m *RelaySite) CheckinLogs(
+	ctx context.Context, after *Cursor, first *int, before *Cursor, last *int, orderBy *RelaySiteCheckinLogOrder, where *RelaySiteCheckinLogWhereInput,
+) (*RelaySiteCheckinLogConnection, error) {
+	opts := []RelaySiteCheckinLogPaginateOption{
+		WithRelaySiteCheckinLogOrder(orderBy),
+		WithRelaySiteCheckinLogFilter(where.Filter),
+	}
+	alias := graphql.GetFieldContext(ctx).Field.Alias
+	totalCount, hasTotalCount := _m.Edges.totalCount[4][alias]
+	if nodes, err := _m.NamedCheckinLogs(alias); err == nil || hasTotalCount {
+		pager, err := newRelaySiteCheckinLogPager(opts, last != nil)
+		if err != nil {
+			return nil, err
+		}
+		conn := &RelaySiteCheckinLogConnection{Edges: []*RelaySiteCheckinLogEdge{}, TotalCount: totalCount}
+		conn.build(nodes, pager, after, first, before, last)
+		return conn, nil
+	}
+	return _m.QueryCheckinLogs().Paginate(ctx, after, first, before, last, opts...)
+}
+
+func (_m *RelaySite) Announcements(
+	ctx context.Context, after *Cursor, first *int, before *Cursor, last *int, orderBy *RelaySiteAnnouncementOrder, where *RelaySiteAnnouncementWhereInput,
+) (*RelaySiteAnnouncementConnection, error) {
+	opts := []RelaySiteAnnouncementPaginateOption{
+		WithRelaySiteAnnouncementOrder(orderBy),
+		WithRelaySiteAnnouncementFilter(where.Filter),
+	}
+	alias := graphql.GetFieldContext(ctx).Field.Alias
+	totalCount, hasTotalCount := _m.Edges.totalCount[5][alias]
+	if nodes, err := _m.NamedAnnouncements(alias); err == nil || hasTotalCount {
+		pager, err := newRelaySiteAnnouncementPager(opts, last != nil)
+		if err != nil {
+			return nil, err
+		}
+		conn := &RelaySiteAnnouncementConnection{Edges: []*RelaySiteAnnouncementEdge{}, TotalCount: totalCount}
+		conn.build(nodes, pager, after, first, before, last)
+		return conn, nil
+	}
+	return _m.QueryAnnouncements().Paginate(ctx, after, first, before, last, opts...)
+}
+
+func (_m *RelaySiteAPIKey) RelaySite(ctx context.Context) (*RelaySite, error) {
+	result, err := _m.Edges.RelaySiteOrErr()
+	if IsNotLoaded(err) {
+		result, err = _m.QueryRelaySite().Only(ctx)
+	}
+	return result, err
+}
+
+func (_m *RelaySiteAnnouncement) RelaySite(ctx context.Context) (*RelaySite, error) {
+	result, err := _m.Edges.RelaySiteOrErr()
+	if IsNotLoaded(err) {
+		result, err = _m.QueryRelaySite().Only(ctx)
+	}
+	return result, err
+}
+
+func (_m *RelaySiteBalanceSnapshot) RelaySite(ctx context.Context) (*RelaySite, error) {
+	result, err := _m.Edges.RelaySiteOrErr()
+	if IsNotLoaded(err) {
+		result, err = _m.QueryRelaySite().Only(ctx)
+	}
+	return result, err
+}
+
+func (_m *RelaySiteCheckinLog) RelaySite(ctx context.Context) (*RelaySite, error) {
+	result, err := _m.Edges.RelaySiteOrErr()
+	if IsNotLoaded(err) {
+		result, err = _m.QueryRelaySite().Only(ctx)
+	}
+	return result, err
+}
+
+func (_m *RelaySiteGroup) RelaySite(ctx context.Context) (*RelaySite, error) {
+	result, err := _m.Edges.RelaySiteOrErr()
+	if IsNotLoaded(err) {
+		result, err = _m.QueryRelaySite().Only(ctx)
+	}
+	return result, err
+}
+
+func (_m *RelaySiteModelPrice) RelaySite(ctx context.Context) (*RelaySite, error) {
+	result, err := _m.Edges.RelaySiteOrErr()
+	if IsNotLoaded(err) {
+		result, err = _m.QueryRelaySite().Only(ctx)
+	}
+	return result, err
+}
+
 func (_m *Request) APIKey(ctx context.Context) (*APIKey, error) {
 	result, err := _m.Edges.APIKeyOrErr()
 	if IsNotLoaded(err) {
