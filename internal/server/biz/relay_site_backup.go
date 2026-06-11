@@ -313,7 +313,7 @@ func (s *RelaySiteService) importBackupSite(ctx context.Context, client *ent.Cli
 	if siteType == "" {
 		siteType = relaysite.TypeNewAPI
 	}
-	if siteType != relaysite.TypeNewAPI {
+	if siteType != relaysite.TypeNewAPI && siteType != relaysite.TypeSub2api {
 		return fmt.Errorf("unsupported relay site type in backup %q: %s", backup.Name, siteType)
 	}
 	status := backup.Status
@@ -321,7 +321,7 @@ func (s *RelaySiteService) importBackupSite(ctx context.Context, client *ent.Cli
 		status = relaysite.StatusDisabled
 	}
 
-	authType, credential, err := normalizeRelaySiteCredential(backup.Credential)
+	authType, credential, err := normalizeRelaySiteCredential(siteType, backup.Credential)
 	if err != nil {
 		return fmt.Errorf("invalid relay site credential for %q: %w", backup.Name, err)
 	}

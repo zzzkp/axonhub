@@ -26,7 +26,7 @@ type RelaySite struct {
 	DeletedAt int `json:"deleted_at,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
-	// Relay site type. new_api represents a new-api relay site.
+	// Relay site type. new_api represents a new-api relay site, sub2api represents a sub2api relay site.
 	Type relaysite.Type `json:"type,omitempty"`
 	// BaseURL holds the value of the "base_url" field.
 	BaseURL string `json:"base_url,omitempty"`

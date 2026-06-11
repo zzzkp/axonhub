@@ -1456,11 +1456,13 @@ type ComplexityRoot struct {
 	}
 
 	RelaySiteDisplayCredential struct {
-		AuthType func(childComplexity int) int
-		Password func(childComplexity int) int
-		Token    func(childComplexity int) int
-		UserID   func(childComplexity int) int
-		Username func(childComplexity int) int
+		AuthType       func(childComplexity int) int
+		Password       func(childComplexity int) int
+		RefreshToken   func(childComplexity int) int
+		Token          func(childComplexity int) int
+		TokenExpiresAt func(childComplexity int) int
+		UserID         func(childComplexity int) int
+		Username       func(childComplexity int) int
 	}
 
 	RelaySiteEdge struct {
@@ -8978,12 +8980,24 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.RelaySiteDisplayCredential.Password(childComplexity), true
+	case "RelaySiteDisplayCredential.refreshToken":
+		if e.complexity.RelaySiteDisplayCredential.RefreshToken == nil {
+			break
+		}
+
+		return e.complexity.RelaySiteDisplayCredential.RefreshToken(childComplexity), true
 	case "RelaySiteDisplayCredential.token":
 		if e.complexity.RelaySiteDisplayCredential.Token == nil {
 			break
 		}
 
 		return e.complexity.RelaySiteDisplayCredential.Token(childComplexity), true
+	case "RelaySiteDisplayCredential.tokenExpiresAt":
+		if e.complexity.RelaySiteDisplayCredential.TokenExpiresAt == nil {
+			break
+		}
+
+		return e.complexity.RelaySiteDisplayCredential.TokenExpiresAt(childComplexity), true
 	case "RelaySiteDisplayCredential.userId":
 		if e.complexity.RelaySiteDisplayCredential.UserID == nil {
 			break
@@ -46526,6 +46540,10 @@ func (ec *executionContext) fieldContext_RelaySite_displayCredential(_ context.C
 				return ec.fieldContext_RelaySiteDisplayCredential_username(ctx, field)
 			case "password":
 				return ec.fieldContext_RelaySiteDisplayCredential_password(ctx, field)
+			case "refreshToken":
+				return ec.fieldContext_RelaySiteDisplayCredential_refreshToken(ctx, field)
+			case "tokenExpiresAt":
+				return ec.fieldContext_RelaySiteDisplayCredential_tokenExpiresAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type RelaySiteDisplayCredential", field.Name)
 		},
@@ -48982,6 +49000,64 @@ func (ec *executionContext) fieldContext_RelaySiteDisplayCredential_password(_ c
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _RelaySiteDisplayCredential_refreshToken(ctx context.Context, field graphql.CollectedField, obj *RelaySiteDisplayCredential) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_RelaySiteDisplayCredential_refreshToken,
+		func(ctx context.Context) (any, error) {
+			return obj.RefreshToken, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_RelaySiteDisplayCredential_refreshToken(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "RelaySiteDisplayCredential",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _RelaySiteDisplayCredential_tokenExpiresAt(ctx context.Context, field graphql.CollectedField, obj *RelaySiteDisplayCredential) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_RelaySiteDisplayCredential_tokenExpiresAt,
+		func(ctx context.Context) (any, error) {
+			return obj.TokenExpiresAt, nil
+		},
+		nil,
+		ec.marshalOTime2ᚖtimeᚐTime,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_RelaySiteDisplayCredential_tokenExpiresAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "RelaySiteDisplayCredential",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
 		},
 	}
 	return fc, nil
@@ -72107,7 +72183,7 @@ func (ec *executionContext) unmarshalInputCreateRelaySiteConfigInput(ctx context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "baseURL", "status", "autoCheckinEnabled", "remark", "credential", "checkinPageURL", "externalCheckinPageURL"}
+	fieldsInOrder := [...]string{"name", "type", "baseURL", "status", "autoCheckinEnabled", "remark", "credential", "checkinPageURL", "externalCheckinPageURL"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -72121,6 +72197,13 @@ func (ec *executionContext) unmarshalInputCreateRelaySiteConfigInput(ctx context
 				return it, err
 			}
 			it.Name = data
+		case "type":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
+			data, err := ec.unmarshalORelaySiteType2ᚖgithubᚗcomᚋloopljᚋaxonhubᚋinternalᚋentᚋrelaysiteᚐType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Type = data
 		case "baseURL":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("baseURL"))
 			data, err := ec.unmarshalNString2string(ctx, v)
@@ -82812,7 +82895,7 @@ func (ec *executionContext) unmarshalInputRelaySiteCredentialInput(ctx context.C
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"authType", "token", "userId", "username", "password"}
+	fieldsInOrder := [...]string{"authType", "token", "userId", "username", "password", "refreshToken", "tokenExpiresAt"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -82854,6 +82937,20 @@ func (ec *executionContext) unmarshalInputRelaySiteCredentialInput(ctx context.C
 				return it, err
 			}
 			it.Password = data
+		case "refreshToken":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("refreshToken"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.RefreshToken = data
+		case "tokenExpiresAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tokenExpiresAt"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TokenExpiresAt = data
 		}
 	}
 
@@ -110077,6 +110174,10 @@ func (ec *executionContext) _RelaySiteDisplayCredential(ctx context.Context, sel
 			out.Values[i] = ec._RelaySiteDisplayCredential_username(ctx, field, obj)
 		case "password":
 			out.Values[i] = ec._RelaySiteDisplayCredential_password(ctx, field, obj)
+		case "refreshToken":
+			out.Values[i] = ec._RelaySiteDisplayCredential_refreshToken(ctx, field, obj)
+		case "tokenExpiresAt":
+			out.Values[i] = ec._RelaySiteDisplayCredential_tokenExpiresAt(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

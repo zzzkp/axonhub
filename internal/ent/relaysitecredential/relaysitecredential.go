@@ -84,6 +84,7 @@ type AuthType string
 const (
 	AuthTypeToken    AuthType = "token"
 	AuthTypePassword AuthType = "password"
+	AuthTypeJwt      AuthType = "jwt"
 )
 
 func (at AuthType) String() string {
@@ -93,7 +94,7 @@ func (at AuthType) String() string {
 // AuthTypeValidator is a validator for the "auth_type" field enum values. It is called by the builders before save.
 func AuthTypeValidator(at AuthType) error {
 	switch at {
-	case AuthTypeToken, AuthTypePassword:
+	case AuthTypeToken, AuthTypePassword, AuthTypeJwt:
 		return nil
 	default:
 		return fmt.Errorf("relaysitecredential: invalid enum value for auth_type field: %q", at)

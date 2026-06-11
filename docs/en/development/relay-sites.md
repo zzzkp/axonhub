@@ -1,10 +1,10 @@
 # Relay Sites Implementation Notes
 
-This document describes the implementation structure and maintenance boundaries of the AxonHub relay sites module. The first implementation supports `new-api` sites and manages external new-api backend resources without participating directly in model request routing.
+This document describes the implementation structure and maintenance boundaries of the AxonHub relay sites module. The current implementation supports `new-api` and `sub2api` sites and manages external relay-site backend resources without participating directly in model request routing.
 
 ## Module Boundary
 
-The relay sites module stores external site configuration, protects credentials, calls remote new-api management endpoints, syncs remote API keys, groups, balance, model pricing, and site announcements, and records check-in and sync results.
+The relay sites module stores external site configuration, protects credentials, calls remote management endpoints, syncs remote API keys, groups, balance, model data, and site announcements, and records check-in and sync results.
 
 Relay sites do not replace `Channel` and do not depend on remote relay site backends during request handling. The relationship with `Channel` is established only through an explicit import action: the user selects a remote API key snapshot, the relay site service fetches the plain key, and the existing `ChannelService.CreateChannel` creates a normal channel.
 
@@ -17,7 +17,7 @@ Relay sites use independent Ent schemas so that remote resource state does not l
 | Entity | Purpose |
 |--------|---------|
 | `RelaySite` | Main site record, including name, type, Base URL, status, remark, latest sync state, and automatic check-in flag |
-| `RelaySiteCredential` | Site credentials, including authentication method and sensitive token or username/password fields |
+| `RelaySiteCredential` | Site credentials, including authentication method and sensitive token, username/password, or JWT fields |
 | `RelaySiteAPIKey` | Remote API key snapshot, including key identifier, name, status, quota, and group |
 | `RelaySiteGroup` | Remote group snapshot, including group name and related configuration |
 | `RelaySiteBalanceSnapshot` | Balance snapshot, including balance, unit, raw quota, and fetch time |
@@ -51,7 +51,7 @@ During sync, remote endpoint calls run outside the database transaction. After r
 
 ## Adapter Design
 
-The shared adapter interface lives in `internal/server/biz/relay_site_adapter.go`. Site type dispatch is handled by an adapter factory. The current implementation is `new-api`.
+The shared adapter interface lives in `internal/server/biz/relay_site_adapter.go`. Site type dispatch is handled by an adapter factory. The current implementations are `new-api` and `sub2api`.
 
 Adapters hide backend-specific endpoint differences and expose a unified service surface:
 
@@ -88,6 +88,28 @@ Access token authentication sends `Authorization` and `New-Api-User`; username/p
 The internal quota returned by new-api is displayed as USD using `500000 quota = 1 USD`, while the raw quota is preserved for verification.
 
 Announcements are fetched from `GET /api/status`, and that request does not send site credentials. The adapter reads `announcements_enabled` and `announcements`; when `announcements_enabled` is `false`, local announcement snapshots are synced as an empty list. The remote `publishDate` field is parsed as UTC publish time.
+
+The `sub2api` adapter is implemented in `internal/server/biz/relay_site_sub2api.go`. Current remote endpoints include:
+
+- `GET /api/v1/keys`
+- `GET /api/v1/keys/:id`
+- `POST /api/v1/keys`
+- `PUT /api/v1/keys/:id`
+- `DELETE /api/v1/keys/:id`
+- `GET /api/v1/groups/available`
+- `GET /api/v1/groups/rates`
+- `GET /api/v1/auth/me`
+- `GET /api/v1/user/profile`
+- `GET /api/v1/announcements`
+- `GET /v1/models`
+
+sub2api uses dashboard JWT credentials. The relay site credential type is `jwt`: `token` stores the access token, while `refreshToken` and `tokenExpiresAt` are reserved for future token-refresh support. The current adapter does not refresh access tokens automatically.
+
+Remote sub2api API keys use numeric `group_id`. Local snapshots map that value back to the group name so frontend group filtering and Channel import use the same group key. When creating or updating a remote API key, the adapter resolves the selected group name back to the remote `group_id` before sending the request.
+
+Some sub2api sites do not expose a pricing endpoint. The sub2api adapter does not depend on pricing for model sync; it calls the OpenAI-compatible `GET /v1/models` endpoint with each synchronized remote API key and writes the key's group into the model snapshot `enable_groups`. A model-list failure for one key is skipped and does not fail the entire site sync.
+
+sub2api does not currently support built-in check-in; check-in calls return “not supported”. Its model snapshots are primarily for model selection and Channel import and do not include new-api-style price ratios.
 
 ## GraphQL API
 
@@ -155,10 +177,10 @@ When Endpoint Config is enabled, the frontend keeps existing custom endpoints an
 
 ## Adding New Site Types
 
-When adding `one-api` or other site types, keep the existing boundary:
+When adding `done-hub` or other site types, keep the existing boundary:
 
 - Keep the `RelaySite` Ent model family stable.
-- Add site type dispatch in the adapter factory. The current `new-api` site type maps to the internal value `new_api`.
+- Add site type dispatch in the adapter factory. The current `new-api` site type maps to the internal value `new_api`; `sub2api` maps to `sub2api`.
 - Implement a concrete adapter for remote endpoint differences.
 - Extend credential or snapshot fields only when the new backend requires it.
 - Do not connect relay site logic to `llm`, orchestrator, request, or the Channel request routing path.

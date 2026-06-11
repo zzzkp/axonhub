@@ -1,13 +1,19 @@
 package objects
 
-import "github.com/shopspring/decimal"
+import (
+	"time"
+
+	"github.com/shopspring/decimal"
+)
 
 type RelaySiteCredential struct {
-	AuthType string `json:"authType"`
-	Token    string `json:"token,omitempty"`
-	UserID   int    `json:"userId,omitempty"`
-	Username string `json:"username,omitempty"`
-	Password string `json:"password,omitempty"`
+	AuthType       string     `json:"authType"`
+	Token          string     `json:"token,omitempty"`
+	UserID         int        `json:"userId,omitempty"`
+	Username       string     `json:"username,omitempty"`
+	Password       string     `json:"password,omitempty"`
+	RefreshToken   string     `json:"refreshToken,omitempty"`
+	TokenExpiresAt *time.Time `json:"tokenExpiresAt,omitempty"`
 }
 
 type RelaySiteAPIKeyMetadata struct {
