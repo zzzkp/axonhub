@@ -10,6 +10,7 @@ import {
   importedRelaySiteChannelSchema,
   relaySiteAnnouncementResultSchema,
   relaySiteAPIKeyConfigInputSchema,
+  relaySiteBatchOperationResultSchema,
   relaySiteCheckinLogSchema,
   relaySiteFormResultSchema,
   relaySiteSchema,
@@ -23,6 +24,7 @@ import {
   type RelaySiteAnnouncement,
   type RelaySiteAnnouncementResult,
   type RelaySiteAPIKey,
+  type RelaySiteBatchOperationResult,
   type RelaySiteAPIKeyConfigInput,
   type RelaySiteCheckinLog,
   type RelaySiteFormResult,
@@ -34,7 +36,7 @@ import {
 export { useUpdateChannelStatus } from '@/features/channels/data/channels';
 
 export type { CreateRelaySiteInput, RelaySite, RelaySiteAnnouncement, RelaySiteAnnouncementResult, RelaySiteAPIKey, RelaySiteCheckinLog, RelaySiteModelPrice, RelaySitesConnection, UpdateRelaySiteInput };
-export type { ImportedRelaySiteChannel, ImportRelaySiteAPIKeyToChannelInput, ImportRelaySitesBackupInput, RelaySiteAPIKeyConfigInput };
+export type { ImportedRelaySiteChannel, ImportRelaySiteAPIKeyToChannelInput, ImportRelaySitesBackupInput, RelaySiteAPIKeyConfigInput, RelaySiteBatchOperationResult };
 
 const RELAY_SITE_FIELDS = `
   id
@@ -167,7 +169,7 @@ const SYNC_RELAY_SITE_MUTATION = `
 
 const SYNC_ALL_RELAY_SITES_MUTATION = `
   mutation SyncAllRelaySites {
-    syncAllRelaySites
+    syncAllRelaySites { totalCount successCount failedCount failures { relaySiteID relaySiteName errorMessage } }
   }
 `;
 
@@ -179,7 +181,7 @@ const CHECKIN_RELAY_SITE_MUTATION = `
 
 const CHECKIN_ALL_RELAY_SITES_MUTATION = `
   mutation CheckinAllRelaySites {
-    checkinAllRelaySites
+    checkinAllRelaySites { totalCount successCount failedCount failures { relaySiteID relaySiteName errorMessage } }
   }
 `;
 
@@ -423,16 +425,26 @@ export function useSyncAllRelaySites() {
   return useMutation({
     mutationFn: async () => {
       try {
-        const data = await graphqlRequest<{ syncAllRelaySites: boolean }>(SYNC_ALL_RELAY_SITES_MUTATION);
-        return data.syncAllRelaySites;
+        const data = await graphqlRequest<{ syncAllRelaySites: RelaySiteBatchOperationResult }>(SYNC_ALL_RELAY_SITES_MUTATION);
+        return relaySiteBatchOperationResultSchema.parse(data.syncAllRelaySites);
       } catch (error) {
         handleError(error, { context: t('relaySites.buttons.syncAll') });
         throw error;
       }
     },
-    onSuccess: () => {
+    onSuccess: result => {
       queryClient.invalidateQueries({ queryKey: ['relaySites'] });
-      toast.success(t('relaySites.messages.syncAllSuccess'));
+      toastBatchOperationResult(
+        result,
+        t('relaySites.messages.syncAllSuccess'),
+        t('relaySites.messages.syncAllPartialFailure'),
+        t('relaySites.messages.batchOperationSummary', { success: result.successCount, total: result.totalCount }),
+        t('relaySites.messages.batchOperationFailureSummary', {
+          success: result.successCount,
+          total: result.totalCount,
+          failedSites: result.failures.map(failure => failure.relaySiteName).join(', '),
+        })
+      );
     },
   });
 }
@@ -467,18 +479,37 @@ export function useCheckinAllRelaySites() {
   return useMutation({
     mutationFn: async () => {
       try {
-        const data = await graphqlRequest<{ checkinAllRelaySites: boolean }>(CHECKIN_ALL_RELAY_SITES_MUTATION);
-        return data.checkinAllRelaySites;
+        const data = await graphqlRequest<{ checkinAllRelaySites: RelaySiteBatchOperationResult }>(CHECKIN_ALL_RELAY_SITES_MUTATION);
+        return relaySiteBatchOperationResultSchema.parse(data.checkinAllRelaySites);
       } catch (error) {
         handleError(error, { context: t('relaySites.buttons.checkinAll') });
         throw error;
       }
     },
-    onSuccess: () => {
+    onSuccess: result => {
       queryClient.invalidateQueries({ queryKey: ['relaySites'] });
-      toast.success(t('relaySites.messages.checkinAllSuccess'));
+      toastBatchOperationResult(
+        result,
+        t('relaySites.messages.checkinAllSuccess'),
+        t('relaySites.messages.checkinAllPartialFailure'),
+        t('relaySites.messages.batchOperationSummary', { success: result.successCount, total: result.totalCount }),
+        t('relaySites.messages.batchOperationFailureSummary', {
+          success: result.successCount,
+          total: result.totalCount,
+          failedSites: result.failures.map(failure => failure.relaySiteName).join(', '),
+        })
+      );
     },
   });
+}
+
+function toastBatchOperationResult(result: RelaySiteBatchOperationResult, successMessage: string, partialFailureMessage: string, summary: string, failureSummary: string) {
+  if (result.failedCount > 0) {
+    toast.warning(partialFailureMessage, { description: failureSummary });
+    return;
+  }
+
+  toast.success(successMessage, { description: summary });
 }
 
 async function fetchRelaySiteAnnouncements(id: string) {

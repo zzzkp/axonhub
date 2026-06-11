@@ -153,6 +153,21 @@ export const relaySitesConnectionSchema = z.object({
 });
 export type RelaySitesConnection = z.infer<typeof relaySitesConnectionSchema>;
 
+export const relaySiteBatchOperationFailureSchema = z.object({
+  relaySiteID: z.string(),
+  relaySiteName: z.string(),
+  errorMessage: z.string(),
+});
+export type RelaySiteBatchOperationFailure = z.infer<typeof relaySiteBatchOperationFailureSchema>;
+
+export const relaySiteBatchOperationResultSchema = z.object({
+  totalCount: z.number(),
+  successCount: z.number(),
+  failedCount: z.number(),
+  failures: z.array(relaySiteBatchOperationFailureSchema),
+});
+export type RelaySiteBatchOperationResult = z.infer<typeof relaySiteBatchOperationResultSchema>;
+
 export const relaySiteCredentialInputSchema = z.object({
   authType: relaySiteCredentialAuthTypeSchema,
   token: z.string().optional(),

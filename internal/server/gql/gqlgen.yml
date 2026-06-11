@@ -697,3 +697,9 @@ models:
   DeleteDisabledAPIKeysPayload:
     model:
       - github.com/looplj/axonhub/internal/server/biz.DeleteDisabledAPIKeysResult
+  RelaySiteBatchOperationFailure:
+    model:
+      - github.com/looplj/axonhub/internal/server/biz.RelaySiteBatchOperationFailure
+  RelaySiteBatchOperationResult:
+    model:
+      - github.com/looplj/axonhub/internal/server/biz.RelaySiteBatchOperationResult

@@ -87,6 +87,19 @@ extend type RelaySite {
   hasUnreadAnnouncements: Boolean!
 }
 
+type RelaySiteBatchOperationFailure {
+  relaySiteID: ID!
+  relaySiteName: String!
+  errorMessage: String!
+}
+
+type RelaySiteBatchOperationResult {
+  totalCount: Int!
+  successCount: Int!
+  failedCount: Int!
+  failures: [RelaySiteBatchOperationFailure!]!
+}
+
 extend type Mutation {
   createRelaySiteConfig(input: CreateRelaySiteConfigInput!): RelaySite!
   updateRelaySiteConfig(id: ID!, input: UpdateRelaySiteConfigInput!): RelaySite!
@@ -94,9 +107,9 @@ extend type Mutation {
   exportRelaySitesBackup: String!
   importRelaySitesBackup(payload: String!): Boolean!
   syncRelaySite(id: ID!): RelaySite!
-  syncAllRelaySites: Boolean!
+  syncAllRelaySites: RelaySiteBatchOperationResult!
   checkinRelaySite(id: ID!): RelaySiteCheckinLog!
-  checkinAllRelaySites: Boolean!
+  checkinAllRelaySites: RelaySiteBatchOperationResult!
   refreshRelaySiteAnnouncements(id: ID!): RelaySite!
   markRelaySiteAnnouncementsRead(id: ID!): RelaySite!
   createRelaySiteAPIKey(relaySiteID: ID!, input: RelaySiteAPIKeyConfigInput!): RelaySite!
