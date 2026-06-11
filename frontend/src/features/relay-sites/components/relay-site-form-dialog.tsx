@@ -1,0 +1,249 @@
+'use client';
+
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { PasswordInput } from '@/components/password-input';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
+import { useRelaySitesContext } from '../context/relay-sites-context';
+import { useCreateRelaySite, useUpdateRelaySite, type CreateRelaySiteInput, type UpdateRelaySiteInput } from '../data/relay-sites';
+
+type RelaySiteFormValues = {
+  name: string;
+  baseURL: string;
+  status: 'enabled' | 'disabled' | 'archived';
+  autoCheckinEnabled: boolean;
+  remark: string;
+  authType: 'token' | 'password';
+  token: string;
+  userId: string;
+  username: string;
+  password: string;
+};
+
+function normalizeBaseURL(value: string) {
+  return value.trim().replace(/\/+$/, '');
+}
+
+function buildCredential(data: RelaySiteFormValues, credentialRequired: boolean) {
+  if (data.authType === 'token') {
+    const token = data.token.trim();
+    const userId = Number(data.userId.trim());
+    if (!token && !data.userId.trim() && !credentialRequired) return undefined;
+    return { authType: 'token' as const, token, userId };
+  }
+
+  const username = data.username.trim();
+  const password = data.password.trim();
+  if (!username && !password && !credentialRequired) return undefined;
+  return { authType: 'password' as const, username, password };
+}
+
+const emptyRelaySiteFormValues: RelaySiteFormValues = {
+  name: '',
+  baseURL: '',
+  status: 'enabled',
+  autoCheckinEnabled: false,
+  remark: '',
+  authType: 'token',
+  token: '',
+  userId: '',
+  username: '',
+  password: '',
+};
+
+export function RelaySiteFormDialog({ mode }: { mode: 'create' | 'edit' }) {
+  const { t } = useTranslation();
+  const {
+    isCreateDialogOpen,
+    setIsCreateDialogOpen,
+    isEditDialogOpen,
+    setIsEditDialogOpen,
+    editingRelaySite,
+    setEditingRelaySite,
+  } = useRelaySitesContext();
+  const createMutation = useCreateRelaySite();
+  const updateMutation = useUpdateRelaySite();
+  const isCreate = mode === 'create';
+  const open = isCreate ? isCreateDialogOpen : isEditDialogOpen;
+  const pending = isCreate ? createMutation.isPending : updateMutation.isPending;
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm<RelaySiteFormValues>({
+    defaultValues: {
+      ...emptyRelaySiteFormValues,
+    },
+  });
+
+  const authType = watch('authType');
+  const token = watch('token');
+  const userId = watch('userId');
+  const username = watch('username');
+  const password = watch('password');
+
+  useEffect(() => {
+    if (!open) return;
+    if (isCreate) {
+      reset(emptyRelaySiteFormValues);
+      return;
+    }
+    if (editingRelaySite) {
+      const credential = editingRelaySite.displayCredential;
+      reset({
+        name: editingRelaySite.name,
+        baseURL: editingRelaySite.baseURL,
+        status: editingRelaySite.status,
+        autoCheckinEnabled: editingRelaySite.autoCheckinEnabled,
+        remark: editingRelaySite.remark ?? '',
+        authType: credential?.authType ?? 'token',
+        token: credential?.token ?? '',
+        userId: credential?.userId ? String(credential.userId) : '',
+        username: credential?.username ?? '',
+        password: credential?.password ?? '',
+      });
+    }
+  }, [editingRelaySite, isCreate, open, reset]);
+
+  const setOpen = (nextOpen: boolean) => {
+    if (isCreate) {
+      setIsCreateDialogOpen(nextOpen);
+      return;
+    }
+    setIsEditDialogOpen(nextOpen);
+    if (!nextOpen) setEditingRelaySite(null);
+  };
+
+  const onSubmit = async (data: RelaySiteFormValues) => {
+    const credential = buildCredential(data, isCreate);
+    if (isCreate && !credential) return;
+
+    if (isCreate) {
+      const input: CreateRelaySiteInput = {
+        name: data.name.trim(),
+        baseURL: normalizeBaseURL(data.baseURL),
+        status: data.status,
+        autoCheckinEnabled: data.autoCheckinEnabled,
+        remark: data.remark.trim(),
+        credential: credential!,
+      };
+      await createMutation.mutateAsync(input);
+      setOpen(false);
+      return;
+    }
+
+    if (!editingRelaySite) return;
+    const input: UpdateRelaySiteInput = {
+      name: data.name.trim(),
+      baseURL: normalizeBaseURL(data.baseURL),
+      status: data.status,
+      autoCheckinEnabled: data.autoCheckinEnabled,
+      remark: data.remark.trim(),
+      ...(credential ? { credential } : {}),
+    };
+    await updateMutation.mutateAsync({ id: editingRelaySite.id, input });
+    setOpen(false);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent className='sm:max-w-[640px]'>
+        <DialogHeader>
+          <DialogTitle>{t(isCreate ? 'relaySites.dialogs.create.title' : 'relaySites.dialogs.edit.title')}</DialogTitle>
+          <DialogDescription>{t(isCreate ? 'relaySites.dialogs.create.description' : 'relaySites.dialogs.edit.description')}</DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit(onSubmit, () => {})} noValidate>
+          <div className='grid max-h-[72vh] gap-4 overflow-y-auto py-4'>
+            <div className='grid gap-2'>
+              <Label htmlFor={`${mode}-relay-site-name`}>{t('relaySites.fields.name')}</Label>
+              <Input id={`${mode}-relay-site-name`} {...register('name', { required: t('relaySites.validation.nameRequired') })} />
+              {errors.name && <span className='text-sm text-red-500'>{errors.name.message}</span>}
+            </div>
+            <div className='grid gap-2'>
+              <Label htmlFor={`${mode}-relay-site-base-url`}>{t('relaySites.fields.baseURL')}</Label>
+              <Input id={`${mode}-relay-site-base-url`} placeholder='https://new-api.example.com' {...register('baseURL', { required: t('relaySites.validation.baseURLRequired') })} />
+              {errors.baseURL && <span className='text-sm text-red-500'>{errors.baseURL.message}</span>}
+            </div>
+            <div className='grid gap-2'>
+              <Label htmlFor={`${mode}-relay-site-status`}>{t('relaySites.fields.status')}</Label>
+              <Select value={watch('status')} onValueChange={(value) => setValue('status', value as RelaySiteFormValues['status'])}>
+                <SelectTrigger id={`${mode}-relay-site-status`}><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value='enabled'>{t('relaySites.status.enabled')}</SelectItem>
+                  <SelectItem value='disabled'>{t('relaySites.status.disabled')}</SelectItem>
+                  {!isCreate && <SelectItem value='archived'>{t('relaySites.status.archived')}</SelectItem>}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className='flex items-center justify-between gap-4 rounded-md border p-3'>
+              <Label htmlFor={`${mode}-relay-site-auto-checkin`} className='cursor-pointer'>
+                {t('relaySites.fields.autoCheckinEnabled')}
+              </Label>
+              <Switch
+                id={`${mode}-relay-site-auto-checkin`}
+                checked={watch('autoCheckinEnabled')}
+                onCheckedChange={(checked) => setValue('autoCheckinEnabled', checked)}
+              />
+            </div>
+            <div className='grid gap-2'>
+              <Label htmlFor={`${mode}-relay-site-remark`}>{t('relaySites.fields.remark')}</Label>
+              <Textarea id={`${mode}-relay-site-remark`} rows={3} {...register('remark')} />
+            </div>
+            <div className='grid gap-2'>
+              <Label htmlFor={`${mode}-relay-site-auth-type`}>{t('relaySites.fields.authType')}</Label>
+              <Select value={authType} onValueChange={(value) => setValue('authType', value as RelaySiteFormValues['authType'])}>
+                <SelectTrigger id={`${mode}-relay-site-auth-type`}><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value='token'>{t('relaySites.authTypes.token')}</SelectItem>
+                  <SelectItem value='password'>{t('relaySites.authTypes.password')}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {authType === 'token' ? (
+              <div className='grid gap-4 sm:grid-cols-2'>
+                <div className='grid gap-2'>
+                  <Label htmlFor={`${mode}-relay-site-token`}>{t('relaySites.fields.token')}</Label>
+                  <PasswordInput id={`${mode}-relay-site-token`} autoComplete='off' className='[&_input]:pr-9' {...register('token', { validate: (value) => (isCreate || userId.trim()) ? Boolean(value.trim()) || t('relaySites.validation.tokenRequired') : true })} />
+                  {errors.token && <span className='text-sm text-red-500'>{errors.token.message}</span>}
+                </div>
+                <div className='grid gap-2'>
+                  <Label htmlFor={`${mode}-relay-site-user-id`}>{t('relaySites.fields.userId')}</Label>
+                  <Input id={`${mode}-relay-site-user-id`} inputMode='numeric' autoComplete='off' {...register('userId', { validate: (value) => (isCreate || token.trim()) ? Number(value.trim()) > 0 || t('relaySites.validation.userIdRequired') : true })} />
+                  {errors.userId && <span className='text-sm text-red-500'>{errors.userId.message}</span>}
+                </div>
+              </div>
+            ) : (
+              <div className='grid gap-4 sm:grid-cols-2'>
+                <div className='grid gap-2'>
+                  <Label htmlFor={`${mode}-relay-site-username`}>{t('relaySites.fields.username')}</Label>
+                  <Input id={`${mode}-relay-site-username`} autoComplete='off' {...register('username', { validate: (value) => (isCreate || password.trim()) ? Boolean(value.trim()) || t('relaySites.validation.usernameRequired') : true })} />
+                  {errors.username && <span className='text-sm text-red-500'>{errors.username.message}</span>}
+                </div>
+                <div className='grid gap-2'>
+                  <Label htmlFor={`${mode}-relay-site-password`}>{t('relaySites.fields.password')}</Label>
+                  <Input id={`${mode}-relay-site-password`} type='password' autoComplete='off' {...register('password', { validate: (value) => (isCreate || username.trim()) ? Boolean(value.trim()) || t('relaySites.validation.passwordRequired') : true })} />
+                  {errors.password && <span className='text-sm text-red-500'>{errors.password.message}</span>}
+                </div>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button type='button' variant='outline' onClick={() => setOpen(false)}>{t('common.buttons.cancel')}</Button>
+            <Button type='submit' disabled={pending}>{pending ? t('common.buttons.saving') : t(isCreate ? 'common.buttons.create' : 'common.buttons.saveChanges')}</Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}

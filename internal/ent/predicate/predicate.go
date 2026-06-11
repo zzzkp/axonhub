@@ -51,6 +51,30 @@ type PromptProtectionRule func(*sql.Selector)
 // ProviderQuotaStatus is the predicate function for providerquotastatus builders.
 type ProviderQuotaStatus func(*sql.Selector)
 
+// RelaySite is the predicate function for relaysite builders.
+type RelaySite func(*sql.Selector)
+
+// RelaySiteAPIKey is the predicate function for relaysiteapikey builders.
+type RelaySiteAPIKey func(*sql.Selector)
+
+// RelaySiteAnnouncement is the predicate function for relaysiteannouncement builders.
+type RelaySiteAnnouncement func(*sql.Selector)
+
+// RelaySiteBalanceSnapshot is the predicate function for relaysitebalancesnapshot builders.
+type RelaySiteBalanceSnapshot func(*sql.Selector)
+
+// RelaySiteCheckinLog is the predicate function for relaysitecheckinlog builders.
+type RelaySiteCheckinLog func(*sql.Selector)
+
+// RelaySiteCredential is the predicate function for relaysitecredential builders.
+type RelaySiteCredential func(*sql.Selector)
+
+// RelaySiteGroup is the predicate function for relaysitegroup builders.
+type RelaySiteGroup func(*sql.Selector)
+
+// RelaySiteModelPrice is the predicate function for relaysitemodelprice builders.
+type RelaySiteModelPrice func(*sql.Selector)
+
 // Request is the predicate function for request builders.
 type Request func(*sql.Selector)
 

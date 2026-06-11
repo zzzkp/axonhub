@@ -28,6 +28,13 @@ import (
 	"github.com/looplj/axonhub/internal/ent/model"
 	"github.com/looplj/axonhub/internal/ent/project"
 	"github.com/looplj/axonhub/internal/ent/prompt"
+	"github.com/looplj/axonhub/internal/ent/relaysite"
+	"github.com/looplj/axonhub/internal/ent/relaysiteannouncement"
+	"github.com/looplj/axonhub/internal/ent/relaysiteapikey"
+	"github.com/looplj/axonhub/internal/ent/relaysitebalancesnapshot"
+	"github.com/looplj/axonhub/internal/ent/relaysitecheckinlog"
+	"github.com/looplj/axonhub/internal/ent/relaysitegroup"
+	"github.com/looplj/axonhub/internal/ent/relaysitemodelprice"
 	"github.com/looplj/axonhub/internal/ent/request"
 	"github.com/looplj/axonhub/internal/ent/requestexecution"
 	"github.com/looplj/axonhub/internal/ent/role"
@@ -73,6 +80,7 @@ type Dependencies struct {
 	PromptService                  *biz.PromptService
 	PromptProtectionRuleService    *biz.PromptProtectionRuleService
 	ProviderQuotaService           *biz.ProviderQuotaService
+	RelaySiteService               *biz.RelaySiteService
 	Scheduler                      *scheduler.Scheduler
 	DefaultSelector                *orchestrator.DefaultSelector
 	CandidateSelectorDiagnostics   *orchestrator.CandidateSelectorDiagnostics
@@ -112,6 +120,7 @@ func NewGraphqlHandlers(deps Dependencies) *GraphqlHandler {
 			deps.PromptService,
 			deps.PromptProtectionRuleService,
 			deps.ProviderQuotaService,
+			deps.RelaySiteService,
 			deps.Scheduler,
 			deps.DefaultSelector,
 			deps.CandidateSelectorDiagnostics,
@@ -134,16 +143,29 @@ func NewGraphqlHandlers(deps Dependencies) *GraphqlHandler {
 		Cache: lru.New[string](1024),
 	})
 	gqlSrv.Use(&loggingTracer{})
-	skipTestChannelTransaction := entgql.SkipOperations("TestChannel", "TestChannelAPIKeys")
-	skipBulkImportTransaction := entgql.SkipIfHasFields("bulkImportChannels")
 	gqlSrv.Use(entgql.Transactioner{
 		TxOpener: deps.Ent,
-		// TestChannel performs long-running parallel provider requests whose database
-		// operations do not require one transaction. BulkImportChannels manages one
-		// transaction per row to preserve its partial-success behavior.
-		SkipTxFunc: func(op *ast.OperationDefinition) bool {
-			return skipTestChannelTransaction(op) || skipBulkImportTransaction(op)
-		},
+		// Skip transaction for TestChannel mutation to avoid transaction conflicts
+		// when multiple test requests are sent in parallel from the frontend.
+		// TestChannel performs LLM API calls which can be long-running, and the
+		// database operations within don't require transactional consistency.
+		SkipTxFunc: entgql.SkipOperations(
+			"TestChannel",
+			"TestChannelAPIKeys",
+			"CreateRelaySiteConfig",
+			"UpdateRelaySiteConfig",
+			"SyncRelaySite",
+			"SyncAllRelaySites",
+			"CheckinRelaySite",
+			"CheckinAllRelaySites",
+			"RefreshRelaySiteAnnouncements",
+			"MarkRelaySiteAnnouncementsRead",
+			"CreateRelaySiteAPIKey",
+			"UpdateRelaySiteAPIKey",
+			"DeleteRelaySiteAPIKey",
+			"CreateRelaySiteAPIKeysForAllGroups",
+			"ImportRelaySiteAPIKeyToChannel",
+		),
 	})
 
 	// Set error presenter to handle CodedError and add extensions.code
@@ -181,25 +203,32 @@ func NewGraphqlHandlers(deps Dependencies) *GraphqlHandler {
 }
 
 var guidTypeToNodeType = map[string]string{
-	ent.TypeUser:                    user.Table,
-	ent.TypeAPIKey:                  apikey.Table,
-	ent.TypeAPIKeyProfileTemplate:   apikeyprofiletemplate.Table,
-	ent.TypeModel:                   model.Table,
-	ent.TypeChannel:                 channel.Table,
-	ent.TypeChannelProbe:            channelprobe.Table,
-	ent.TypeChannelOverrideTemplate: channeloverridetemplate.Table,
-	ent.TypeRequest:                 request.Table,
-	ent.TypeRequestExecution:        requestexecution.Table,
-	ent.TypeRole:                    role.Table,
-	ent.TypeSystem:                  system.Table,
-	ent.TypeUsageLog:                usagelog.Table,
-	ent.TypeProject:                 project.Table,
-	ent.TypeUserProject:             userproject.Table,
-	ent.TypeUserRole:                userrole.Table,
-	ent.TypeThread:                  thread.Table,
-	ent.TypeTrace:                   trace.Table,
-	ent.TypeDataStorage:             datastorage.Table,
-	ent.TypePrompt:                  prompt.Table,
+	ent.TypeUser:                     user.Table,
+	ent.TypeAPIKey:                   apikey.Table,
+	ent.TypeAPIKeyProfileTemplate:    apikeyprofiletemplate.Table,
+	ent.TypeModel:                    model.Table,
+	ent.TypeChannel:                  channel.Table,
+	ent.TypeChannelProbe:             channelprobe.Table,
+	ent.TypeChannelOverrideTemplate:  channeloverridetemplate.Table,
+	ent.TypeRequest:                  request.Table,
+	ent.TypeRequestExecution:         requestexecution.Table,
+	ent.TypeRole:                     role.Table,
+	ent.TypeSystem:                   system.Table,
+	ent.TypeUsageLog:                 usagelog.Table,
+	ent.TypeProject:                  project.Table,
+	ent.TypeUserProject:              userproject.Table,
+	ent.TypeUserRole:                 userrole.Table,
+	ent.TypeThread:                   thread.Table,
+	ent.TypeTrace:                    trace.Table,
+	ent.TypeDataStorage:              datastorage.Table,
+	ent.TypePrompt:                   prompt.Table,
+	ent.TypeRelaySite:                relaysite.Table,
+	ent.TypeRelaySiteAnnouncement:    relaysiteannouncement.Table,
+	ent.TypeRelaySiteAPIKey:          relaysiteapikey.Table,
+	ent.TypeRelaySiteBalanceSnapshot: relaysitebalancesnapshot.Table,
+	ent.TypeRelaySiteCheckinLog:      relaysitecheckinlog.Table,
+	ent.TypeRelaySiteGroup:           relaysitegroup.Table,
+	ent.TypeRelaySiteModelPrice:      relaysitemodelprice.Table,
 }
 
 func getNilableChannel(ctx context.Context, client *ent.Client, channelID int) (*ent.Channel, error) {

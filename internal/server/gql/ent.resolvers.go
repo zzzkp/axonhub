@@ -460,6 +460,22 @@ func (r *queryResolver) PromptProtectionRules(ctx context.Context, after *entgql
 	)
 }
 
+// RelaySites is the resolver for the relaySites field.
+func (r *queryResolver) RelaySites(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.RelaySiteOrder, where *ent.RelaySiteWhereInput) (*ent.RelaySiteConnection, error) {
+	if err := validatePaginationArgs(first, last); err != nil {
+		return nil, err
+	}
+
+	if orderBy != nil && orderBy.Field.String() == "CREATED_AT" {
+		orderBy.Field = ent.DefaultRelaySiteOrder.Field
+	}
+
+	return r.client.RelaySite.Query().Paginate(ctx, after, first, before, last,
+		ent.WithRelaySiteOrder(orderBy),
+		ent.WithRelaySiteFilter(where.Filter),
+	)
+}
+
 // Requests is the resolver for the requests field.
 func (r *queryResolver) Requests(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.RequestOrder, where *ent.RequestWhereInput) (*ent.RequestConnection, error) {
 	if err := validatePaginationArgs(first, last); err != nil {
@@ -566,6 +582,71 @@ func (r *queryResolver) Users(ctx context.Context, after *entgql.Cursor[int], fi
 		ent.WithUserOrder(orderBy),
 		ent.WithUserFilter(where.Filter),
 	)
+}
+
+// ID is the resolver for the id field.
+func (r *relaySiteResolver) ID(ctx context.Context, obj *ent.RelaySite) (*objects.GUID, error) {
+	return &objects.GUID{Type: ent.TypeRelaySite, ID: obj.ID}, nil
+}
+
+// ID is the resolver for the id field.
+func (r *relaySiteAPIKeyResolver) ID(ctx context.Context, obj *ent.RelaySiteAPIKey) (*objects.GUID, error) {
+	return &objects.GUID{Type: ent.TypeRelaySiteAPIKey, ID: obj.ID}, nil
+}
+
+// RelaySiteID is the resolver for the relaySiteID field.
+func (r *relaySiteAPIKeyResolver) RelaySiteID(ctx context.Context, obj *ent.RelaySiteAPIKey) (*objects.GUID, error) {
+	return &objects.GUID{Type: ent.TypeRelaySite, ID: obj.RelaySiteID}, nil
+}
+
+// ID is the resolver for the id field.
+func (r *relaySiteAnnouncementResolver) ID(ctx context.Context, obj *ent.RelaySiteAnnouncement) (*objects.GUID, error) {
+	return &objects.GUID{Type: ent.TypeRelaySiteAnnouncement, ID: obj.ID}, nil
+}
+
+// RelaySiteID is the resolver for the relaySiteID field.
+func (r *relaySiteAnnouncementResolver) RelaySiteID(ctx context.Context, obj *ent.RelaySiteAnnouncement) (*objects.GUID, error) {
+	return &objects.GUID{Type: ent.TypeRelaySite, ID: obj.RelaySiteID}, nil
+}
+
+// ID is the resolver for the id field.
+func (r *relaySiteBalanceSnapshotResolver) ID(ctx context.Context, obj *ent.RelaySiteBalanceSnapshot) (*objects.GUID, error) {
+	return &objects.GUID{Type: ent.TypeRelaySiteBalanceSnapshot, ID: obj.ID}, nil
+}
+
+// RelaySiteID is the resolver for the relaySiteID field.
+func (r *relaySiteBalanceSnapshotResolver) RelaySiteID(ctx context.Context, obj *ent.RelaySiteBalanceSnapshot) (*objects.GUID, error) {
+	return &objects.GUID{Type: ent.TypeRelaySite, ID: obj.RelaySiteID}, nil
+}
+
+// ID is the resolver for the id field.
+func (r *relaySiteCheckinLogResolver) ID(ctx context.Context, obj *ent.RelaySiteCheckinLog) (*objects.GUID, error) {
+	return &objects.GUID{Type: ent.TypeRelaySiteCheckinLog, ID: obj.ID}, nil
+}
+
+// RelaySiteID is the resolver for the relaySiteID field.
+func (r *relaySiteCheckinLogResolver) RelaySiteID(ctx context.Context, obj *ent.RelaySiteCheckinLog) (*objects.GUID, error) {
+	return &objects.GUID{Type: ent.TypeRelaySite, ID: obj.RelaySiteID}, nil
+}
+
+// ID is the resolver for the id field.
+func (r *relaySiteGroupResolver) ID(ctx context.Context, obj *ent.RelaySiteGroup) (*objects.GUID, error) {
+	return &objects.GUID{Type: ent.TypeRelaySiteGroup, ID: obj.ID}, nil
+}
+
+// RelaySiteID is the resolver for the relaySiteID field.
+func (r *relaySiteGroupResolver) RelaySiteID(ctx context.Context, obj *ent.RelaySiteGroup) (*objects.GUID, error) {
+	return &objects.GUID{Type: ent.TypeRelaySite, ID: obj.RelaySiteID}, nil
+}
+
+// ID is the resolver for the id field.
+func (r *relaySiteModelPriceResolver) ID(ctx context.Context, obj *ent.RelaySiteModelPrice) (*objects.GUID, error) {
+	return &objects.GUID{Type: ent.TypeRelaySiteModelPrice, ID: obj.ID}, nil
+}
+
+// RelaySiteID is the resolver for the relaySiteID field.
+func (r *relaySiteModelPriceResolver) RelaySiteID(ctx context.Context, obj *ent.RelaySiteModelPrice) (*objects.GUID, error) {
+	return &objects.GUID{Type: ent.TypeRelaySite, ID: obj.RelaySiteID}, nil
 }
 
 // ID is the resolver for the id field.
@@ -983,6 +1064,35 @@ func (r *Resolver) ProviderQuotaStatus() ProviderQuotaStatusResolver {
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
+// RelaySite returns RelaySiteResolver implementation.
+func (r *Resolver) RelaySite() RelaySiteResolver { return &relaySiteResolver{r} }
+
+// RelaySiteAPIKey returns RelaySiteAPIKeyResolver implementation.
+func (r *Resolver) RelaySiteAPIKey() RelaySiteAPIKeyResolver { return &relaySiteAPIKeyResolver{r} }
+
+// RelaySiteAnnouncement returns RelaySiteAnnouncementResolver implementation.
+func (r *Resolver) RelaySiteAnnouncement() RelaySiteAnnouncementResolver {
+	return &relaySiteAnnouncementResolver{r}
+}
+
+// RelaySiteBalanceSnapshot returns RelaySiteBalanceSnapshotResolver implementation.
+func (r *Resolver) RelaySiteBalanceSnapshot() RelaySiteBalanceSnapshotResolver {
+	return &relaySiteBalanceSnapshotResolver{r}
+}
+
+// RelaySiteCheckinLog returns RelaySiteCheckinLogResolver implementation.
+func (r *Resolver) RelaySiteCheckinLog() RelaySiteCheckinLogResolver {
+	return &relaySiteCheckinLogResolver{r}
+}
+
+// RelaySiteGroup returns RelaySiteGroupResolver implementation.
+func (r *Resolver) RelaySiteGroup() RelaySiteGroupResolver { return &relaySiteGroupResolver{r} }
+
+// RelaySiteModelPrice returns RelaySiteModelPriceResolver implementation.
+func (r *Resolver) RelaySiteModelPrice() RelaySiteModelPriceResolver {
+	return &relaySiteModelPriceResolver{r}
+}
+
 // Request returns RequestResolver implementation.
 func (r *Resolver) Request() RequestResolver { return &requestResolver{r} }
 
@@ -1028,6 +1138,13 @@ type promptResolver struct{ *Resolver }
 type promptProtectionRuleResolver struct{ *Resolver }
 type providerQuotaStatusResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+type relaySiteResolver struct{ *Resolver }
+type relaySiteAPIKeyResolver struct{ *Resolver }
+type relaySiteAnnouncementResolver struct{ *Resolver }
+type relaySiteBalanceSnapshotResolver struct{ *Resolver }
+type relaySiteCheckinLogResolver struct{ *Resolver }
+type relaySiteGroupResolver struct{ *Resolver }
+type relaySiteModelPriceResolver struct{ *Resolver }
 type requestResolver struct{ *Resolver }
 type requestExecutionResolver struct{ *Resolver }
 type roleResolver struct{ *Resolver }

@@ -24,6 +24,13 @@ import (
 	"github.com/looplj/axonhub/internal/ent/prompt"
 	"github.com/looplj/axonhub/internal/ent/promptprotectionrule"
 	"github.com/looplj/axonhub/internal/ent/providerquotastatus"
+	"github.com/looplj/axonhub/internal/ent/relaysite"
+	"github.com/looplj/axonhub/internal/ent/relaysiteannouncement"
+	"github.com/looplj/axonhub/internal/ent/relaysiteapikey"
+	"github.com/looplj/axonhub/internal/ent/relaysitebalancesnapshot"
+	"github.com/looplj/axonhub/internal/ent/relaysitecheckinlog"
+	"github.com/looplj/axonhub/internal/ent/relaysitegroup"
+	"github.com/looplj/axonhub/internal/ent/relaysitemodelprice"
 	"github.com/looplj/axonhub/internal/ent/request"
 	"github.com/looplj/axonhub/internal/ent/requestexecution"
 	"github.com/looplj/axonhub/internal/ent/role"
@@ -3449,6 +3456,1508 @@ func newProviderQuotaStatusPaginateArgs(rv map[string]any) *providerquotastatusP
 	}
 	if v, ok := rv[whereField].(*ProviderQuotaStatusWhereInput); ok {
 		args.opts = append(args.opts, WithProviderQuotaStatusFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (_q *RelaySiteQuery) CollectFields(ctx context.Context, satisfies ...string) (*RelaySiteQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return _q, nil
+	}
+	if err := _q.collectField(ctx, false, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return _q, nil
+}
+
+func (_q *RelaySiteQuery) collectField(ctx context.Context, oneNode bool, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(relaysite.Columns))
+		selectedFields = []string{relaysite.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+
+		case "apiKeys":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&RelaySiteAPIKeyClient{config: _q.config}).Query()
+			)
+			args := newRelaySiteAPIKeyPaginateArgs(fieldArgs(ctx, new(RelaySiteAPIKeyWhereInput), path...))
+			if err := validateFirstLast(args.first, args.last); err != nil {
+				return fmt.Errorf("validate first and last in path %q: %w", path, err)
+			}
+			pager, err := newRelaySiteAPIKeyPager(args.opts, args.last != nil)
+			if err != nil {
+				return fmt.Errorf("create new pager in path %q: %w", path, err)
+			}
+			if query, err = pager.applyFilter(query); err != nil {
+				return err
+			}
+			ignoredEdges := !hasCollectedField(ctx, append(path, edgesField)...)
+			if hasCollectedField(ctx, append(path, totalCountField)...) || hasCollectedField(ctx, append(path, pageInfoField)...) {
+				hasPagination := args.after != nil || args.first != nil || args.before != nil || args.last != nil
+				if hasPagination || ignoredEdges {
+					query := query.Clone()
+					_q.loadTotal = append(_q.loadTotal, func(ctx context.Context, nodes []*RelaySite) error {
+						ids := make([]driver.Value, len(nodes))
+						for i := range nodes {
+							ids[i] = nodes[i].ID
+						}
+						var v []struct {
+							NodeID int `sql:"relay_site_id"`
+							Count  int `sql:"count"`
+						}
+						query.Where(func(s *sql.Selector) {
+							s.Where(sql.InValues(s.C(relaysite.APIKeysColumn), ids...))
+						})
+						if err := query.GroupBy(relaysite.APIKeysColumn).Aggregate(Count()).Scan(ctx, &v); err != nil {
+							return err
+						}
+						m := make(map[int]int, len(v))
+						for i := range v {
+							m[v[i].NodeID] = v[i].Count
+						}
+						for i := range nodes {
+							n := m[nodes[i].ID]
+							if nodes[i].Edges.totalCount[0] == nil {
+								nodes[i].Edges.totalCount[0] = make(map[string]int)
+							}
+							nodes[i].Edges.totalCount[0][alias] = n
+						}
+						return nil
+					})
+				} else {
+					_q.loadTotal = append(_q.loadTotal, func(_ context.Context, nodes []*RelaySite) error {
+						for i := range nodes {
+							n := len(nodes[i].Edges.APIKeys)
+							if nodes[i].Edges.totalCount[0] == nil {
+								nodes[i].Edges.totalCount[0] = make(map[string]int)
+							}
+							nodes[i].Edges.totalCount[0][alias] = n
+						}
+						return nil
+					})
+				}
+			}
+			if ignoredEdges || (args.first != nil && *args.first == 0) || (args.last != nil && *args.last == 0) {
+				continue
+			}
+			if query, err = pager.applyCursors(query, args.after, args.before); err != nil {
+				return err
+			}
+			path = append(path, edgesField, nodeField)
+			if field := collectedField(ctx, path...); field != nil {
+				if err := query.collectField(ctx, false, opCtx, *field, path, mayAddCondition(satisfies, relaysiteapikeyImplementors)...); err != nil {
+					return err
+				}
+			}
+			if limit := paginateLimit(args.first, args.last); limit > 0 {
+				if oneNode {
+					pager.applyOrder(query.Limit(limit))
+				} else {
+					modify := entgql.LimitPerRow(relaysite.APIKeysColumn, limit, pager.orderExpr(query))
+					query.modifiers = append(query.modifiers, modify)
+				}
+			} else {
+				query = pager.applyOrder(query)
+			}
+			_q.WithNamedAPIKeys(alias, func(wq *RelaySiteAPIKeyQuery) {
+				*wq = *query
+			})
+
+		case "groups":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&RelaySiteGroupClient{config: _q.config}).Query()
+			)
+			args := newRelaySiteGroupPaginateArgs(fieldArgs(ctx, new(RelaySiteGroupWhereInput), path...))
+			if err := validateFirstLast(args.first, args.last); err != nil {
+				return fmt.Errorf("validate first and last in path %q: %w", path, err)
+			}
+			pager, err := newRelaySiteGroupPager(args.opts, args.last != nil)
+			if err != nil {
+				return fmt.Errorf("create new pager in path %q: %w", path, err)
+			}
+			if query, err = pager.applyFilter(query); err != nil {
+				return err
+			}
+			ignoredEdges := !hasCollectedField(ctx, append(path, edgesField)...)
+			if hasCollectedField(ctx, append(path, totalCountField)...) || hasCollectedField(ctx, append(path, pageInfoField)...) {
+				hasPagination := args.after != nil || args.first != nil || args.before != nil || args.last != nil
+				if hasPagination || ignoredEdges {
+					query := query.Clone()
+					_q.loadTotal = append(_q.loadTotal, func(ctx context.Context, nodes []*RelaySite) error {
+						ids := make([]driver.Value, len(nodes))
+						for i := range nodes {
+							ids[i] = nodes[i].ID
+						}
+						var v []struct {
+							NodeID int `sql:"relay_site_id"`
+							Count  int `sql:"count"`
+						}
+						query.Where(func(s *sql.Selector) {
+							s.Where(sql.InValues(s.C(relaysite.GroupsColumn), ids...))
+						})
+						if err := query.GroupBy(relaysite.GroupsColumn).Aggregate(Count()).Scan(ctx, &v); err != nil {
+							return err
+						}
+						m := make(map[int]int, len(v))
+						for i := range v {
+							m[v[i].NodeID] = v[i].Count
+						}
+						for i := range nodes {
+							n := m[nodes[i].ID]
+							if nodes[i].Edges.totalCount[1] == nil {
+								nodes[i].Edges.totalCount[1] = make(map[string]int)
+							}
+							nodes[i].Edges.totalCount[1][alias] = n
+						}
+						return nil
+					})
+				} else {
+					_q.loadTotal = append(_q.loadTotal, func(_ context.Context, nodes []*RelaySite) error {
+						for i := range nodes {
+							n := len(nodes[i].Edges.Groups)
+							if nodes[i].Edges.totalCount[1] == nil {
+								nodes[i].Edges.totalCount[1] = make(map[string]int)
+							}
+							nodes[i].Edges.totalCount[1][alias] = n
+						}
+						return nil
+					})
+				}
+			}
+			if ignoredEdges || (args.first != nil && *args.first == 0) || (args.last != nil && *args.last == 0) {
+				continue
+			}
+			if query, err = pager.applyCursors(query, args.after, args.before); err != nil {
+				return err
+			}
+			path = append(path, edgesField, nodeField)
+			if field := collectedField(ctx, path...); field != nil {
+				if err := query.collectField(ctx, false, opCtx, *field, path, mayAddCondition(satisfies, relaysitegroupImplementors)...); err != nil {
+					return err
+				}
+			}
+			if limit := paginateLimit(args.first, args.last); limit > 0 {
+				if oneNode {
+					pager.applyOrder(query.Limit(limit))
+				} else {
+					modify := entgql.LimitPerRow(relaysite.GroupsColumn, limit, pager.orderExpr(query))
+					query.modifiers = append(query.modifiers, modify)
+				}
+			} else {
+				query = pager.applyOrder(query)
+			}
+			_q.WithNamedGroups(alias, func(wq *RelaySiteGroupQuery) {
+				*wq = *query
+			})
+
+		case "balanceSnapshots":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&RelaySiteBalanceSnapshotClient{config: _q.config}).Query()
+			)
+			args := newRelaySiteBalanceSnapshotPaginateArgs(fieldArgs(ctx, new(RelaySiteBalanceSnapshotWhereInput), path...))
+			if err := validateFirstLast(args.first, args.last); err != nil {
+				return fmt.Errorf("validate first and last in path %q: %w", path, err)
+			}
+			pager, err := newRelaySiteBalanceSnapshotPager(args.opts, args.last != nil)
+			if err != nil {
+				return fmt.Errorf("create new pager in path %q: %w", path, err)
+			}
+			if query, err = pager.applyFilter(query); err != nil {
+				return err
+			}
+			ignoredEdges := !hasCollectedField(ctx, append(path, edgesField)...)
+			if hasCollectedField(ctx, append(path, totalCountField)...) || hasCollectedField(ctx, append(path, pageInfoField)...) {
+				hasPagination := args.after != nil || args.first != nil || args.before != nil || args.last != nil
+				if hasPagination || ignoredEdges {
+					query := query.Clone()
+					_q.loadTotal = append(_q.loadTotal, func(ctx context.Context, nodes []*RelaySite) error {
+						ids := make([]driver.Value, len(nodes))
+						for i := range nodes {
+							ids[i] = nodes[i].ID
+						}
+						var v []struct {
+							NodeID int `sql:"relay_site_id"`
+							Count  int `sql:"count"`
+						}
+						query.Where(func(s *sql.Selector) {
+							s.Where(sql.InValues(s.C(relaysite.BalanceSnapshotsColumn), ids...))
+						})
+						if err := query.GroupBy(relaysite.BalanceSnapshotsColumn).Aggregate(Count()).Scan(ctx, &v); err != nil {
+							return err
+						}
+						m := make(map[int]int, len(v))
+						for i := range v {
+							m[v[i].NodeID] = v[i].Count
+						}
+						for i := range nodes {
+							n := m[nodes[i].ID]
+							if nodes[i].Edges.totalCount[2] == nil {
+								nodes[i].Edges.totalCount[2] = make(map[string]int)
+							}
+							nodes[i].Edges.totalCount[2][alias] = n
+						}
+						return nil
+					})
+				} else {
+					_q.loadTotal = append(_q.loadTotal, func(_ context.Context, nodes []*RelaySite) error {
+						for i := range nodes {
+							n := len(nodes[i].Edges.BalanceSnapshots)
+							if nodes[i].Edges.totalCount[2] == nil {
+								nodes[i].Edges.totalCount[2] = make(map[string]int)
+							}
+							nodes[i].Edges.totalCount[2][alias] = n
+						}
+						return nil
+					})
+				}
+			}
+			if ignoredEdges || (args.first != nil && *args.first == 0) || (args.last != nil && *args.last == 0) {
+				continue
+			}
+			if query, err = pager.applyCursors(query, args.after, args.before); err != nil {
+				return err
+			}
+			path = append(path, edgesField, nodeField)
+			if field := collectedField(ctx, path...); field != nil {
+				if err := query.collectField(ctx, false, opCtx, *field, path, mayAddCondition(satisfies, relaysitebalancesnapshotImplementors)...); err != nil {
+					return err
+				}
+			}
+			if limit := paginateLimit(args.first, args.last); limit > 0 {
+				if oneNode {
+					pager.applyOrder(query.Limit(limit))
+				} else {
+					modify := entgql.LimitPerRow(relaysite.BalanceSnapshotsColumn, limit, pager.orderExpr(query))
+					query.modifiers = append(query.modifiers, modify)
+				}
+			} else {
+				query = pager.applyOrder(query)
+			}
+			_q.WithNamedBalanceSnapshots(alias, func(wq *RelaySiteBalanceSnapshotQuery) {
+				*wq = *query
+			})
+
+		case "modelPrices":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&RelaySiteModelPriceClient{config: _q.config}).Query()
+			)
+			args := newRelaySiteModelPricePaginateArgs(fieldArgs(ctx, new(RelaySiteModelPriceWhereInput), path...))
+			if err := validateFirstLast(args.first, args.last); err != nil {
+				return fmt.Errorf("validate first and last in path %q: %w", path, err)
+			}
+			pager, err := newRelaySiteModelPricePager(args.opts, args.last != nil)
+			if err != nil {
+				return fmt.Errorf("create new pager in path %q: %w", path, err)
+			}
+			if query, err = pager.applyFilter(query); err != nil {
+				return err
+			}
+			ignoredEdges := !hasCollectedField(ctx, append(path, edgesField)...)
+			if hasCollectedField(ctx, append(path, totalCountField)...) || hasCollectedField(ctx, append(path, pageInfoField)...) {
+				hasPagination := args.after != nil || args.first != nil || args.before != nil || args.last != nil
+				if hasPagination || ignoredEdges {
+					query := query.Clone()
+					_q.loadTotal = append(_q.loadTotal, func(ctx context.Context, nodes []*RelaySite) error {
+						ids := make([]driver.Value, len(nodes))
+						for i := range nodes {
+							ids[i] = nodes[i].ID
+						}
+						var v []struct {
+							NodeID int `sql:"relay_site_id"`
+							Count  int `sql:"count"`
+						}
+						query.Where(func(s *sql.Selector) {
+							s.Where(sql.InValues(s.C(relaysite.ModelPricesColumn), ids...))
+						})
+						if err := query.GroupBy(relaysite.ModelPricesColumn).Aggregate(Count()).Scan(ctx, &v); err != nil {
+							return err
+						}
+						m := make(map[int]int, len(v))
+						for i := range v {
+							m[v[i].NodeID] = v[i].Count
+						}
+						for i := range nodes {
+							n := m[nodes[i].ID]
+							if nodes[i].Edges.totalCount[3] == nil {
+								nodes[i].Edges.totalCount[3] = make(map[string]int)
+							}
+							nodes[i].Edges.totalCount[3][alias] = n
+						}
+						return nil
+					})
+				} else {
+					_q.loadTotal = append(_q.loadTotal, func(_ context.Context, nodes []*RelaySite) error {
+						for i := range nodes {
+							n := len(nodes[i].Edges.ModelPrices)
+							if nodes[i].Edges.totalCount[3] == nil {
+								nodes[i].Edges.totalCount[3] = make(map[string]int)
+							}
+							nodes[i].Edges.totalCount[3][alias] = n
+						}
+						return nil
+					})
+				}
+			}
+			if ignoredEdges || (args.first != nil && *args.first == 0) || (args.last != nil && *args.last == 0) {
+				continue
+			}
+			if query, err = pager.applyCursors(query, args.after, args.before); err != nil {
+				return err
+			}
+			path = append(path, edgesField, nodeField)
+			if field := collectedField(ctx, path...); field != nil {
+				if err := query.collectField(ctx, false, opCtx, *field, path, mayAddCondition(satisfies, relaysitemodelpriceImplementors)...); err != nil {
+					return err
+				}
+			}
+			if limit := paginateLimit(args.first, args.last); limit > 0 {
+				if oneNode {
+					pager.applyOrder(query.Limit(limit))
+				} else {
+					modify := entgql.LimitPerRow(relaysite.ModelPricesColumn, limit, pager.orderExpr(query))
+					query.modifiers = append(query.modifiers, modify)
+				}
+			} else {
+				query = pager.applyOrder(query)
+			}
+			_q.WithNamedModelPrices(alias, func(wq *RelaySiteModelPriceQuery) {
+				*wq = *query
+			})
+
+		case "checkinLogs":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&RelaySiteCheckinLogClient{config: _q.config}).Query()
+			)
+			args := newRelaySiteCheckinLogPaginateArgs(fieldArgs(ctx, new(RelaySiteCheckinLogWhereInput), path...))
+			if err := validateFirstLast(args.first, args.last); err != nil {
+				return fmt.Errorf("validate first and last in path %q: %w", path, err)
+			}
+			pager, err := newRelaySiteCheckinLogPager(args.opts, args.last != nil)
+			if err != nil {
+				return fmt.Errorf("create new pager in path %q: %w", path, err)
+			}
+			if query, err = pager.applyFilter(query); err != nil {
+				return err
+			}
+			ignoredEdges := !hasCollectedField(ctx, append(path, edgesField)...)
+			if hasCollectedField(ctx, append(path, totalCountField)...) || hasCollectedField(ctx, append(path, pageInfoField)...) {
+				hasPagination := args.after != nil || args.first != nil || args.before != nil || args.last != nil
+				if hasPagination || ignoredEdges {
+					query := query.Clone()
+					_q.loadTotal = append(_q.loadTotal, func(ctx context.Context, nodes []*RelaySite) error {
+						ids := make([]driver.Value, len(nodes))
+						for i := range nodes {
+							ids[i] = nodes[i].ID
+						}
+						var v []struct {
+							NodeID int `sql:"relay_site_id"`
+							Count  int `sql:"count"`
+						}
+						query.Where(func(s *sql.Selector) {
+							s.Where(sql.InValues(s.C(relaysite.CheckinLogsColumn), ids...))
+						})
+						if err := query.GroupBy(relaysite.CheckinLogsColumn).Aggregate(Count()).Scan(ctx, &v); err != nil {
+							return err
+						}
+						m := make(map[int]int, len(v))
+						for i := range v {
+							m[v[i].NodeID] = v[i].Count
+						}
+						for i := range nodes {
+							n := m[nodes[i].ID]
+							if nodes[i].Edges.totalCount[4] == nil {
+								nodes[i].Edges.totalCount[4] = make(map[string]int)
+							}
+							nodes[i].Edges.totalCount[4][alias] = n
+						}
+						return nil
+					})
+				} else {
+					_q.loadTotal = append(_q.loadTotal, func(_ context.Context, nodes []*RelaySite) error {
+						for i := range nodes {
+							n := len(nodes[i].Edges.CheckinLogs)
+							if nodes[i].Edges.totalCount[4] == nil {
+								nodes[i].Edges.totalCount[4] = make(map[string]int)
+							}
+							nodes[i].Edges.totalCount[4][alias] = n
+						}
+						return nil
+					})
+				}
+			}
+			if ignoredEdges || (args.first != nil && *args.first == 0) || (args.last != nil && *args.last == 0) {
+				continue
+			}
+			if query, err = pager.applyCursors(query, args.after, args.before); err != nil {
+				return err
+			}
+			path = append(path, edgesField, nodeField)
+			if field := collectedField(ctx, path...); field != nil {
+				if err := query.collectField(ctx, false, opCtx, *field, path, mayAddCondition(satisfies, relaysitecheckinlogImplementors)...); err != nil {
+					return err
+				}
+			}
+			if limit := paginateLimit(args.first, args.last); limit > 0 {
+				if oneNode {
+					pager.applyOrder(query.Limit(limit))
+				} else {
+					modify := entgql.LimitPerRow(relaysite.CheckinLogsColumn, limit, pager.orderExpr(query))
+					query.modifiers = append(query.modifiers, modify)
+				}
+			} else {
+				query = pager.applyOrder(query)
+			}
+			_q.WithNamedCheckinLogs(alias, func(wq *RelaySiteCheckinLogQuery) {
+				*wq = *query
+			})
+
+		case "announcements":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&RelaySiteAnnouncementClient{config: _q.config}).Query()
+			)
+			args := newRelaySiteAnnouncementPaginateArgs(fieldArgs(ctx, new(RelaySiteAnnouncementWhereInput), path...))
+			if err := validateFirstLast(args.first, args.last); err != nil {
+				return fmt.Errorf("validate first and last in path %q: %w", path, err)
+			}
+			pager, err := newRelaySiteAnnouncementPager(args.opts, args.last != nil)
+			if err != nil {
+				return fmt.Errorf("create new pager in path %q: %w", path, err)
+			}
+			if query, err = pager.applyFilter(query); err != nil {
+				return err
+			}
+			ignoredEdges := !hasCollectedField(ctx, append(path, edgesField)...)
+			if hasCollectedField(ctx, append(path, totalCountField)...) || hasCollectedField(ctx, append(path, pageInfoField)...) {
+				hasPagination := args.after != nil || args.first != nil || args.before != nil || args.last != nil
+				if hasPagination || ignoredEdges {
+					query := query.Clone()
+					_q.loadTotal = append(_q.loadTotal, func(ctx context.Context, nodes []*RelaySite) error {
+						ids := make([]driver.Value, len(nodes))
+						for i := range nodes {
+							ids[i] = nodes[i].ID
+						}
+						var v []struct {
+							NodeID int `sql:"relay_site_id"`
+							Count  int `sql:"count"`
+						}
+						query.Where(func(s *sql.Selector) {
+							s.Where(sql.InValues(s.C(relaysite.AnnouncementsColumn), ids...))
+						})
+						if err := query.GroupBy(relaysite.AnnouncementsColumn).Aggregate(Count()).Scan(ctx, &v); err != nil {
+							return err
+						}
+						m := make(map[int]int, len(v))
+						for i := range v {
+							m[v[i].NodeID] = v[i].Count
+						}
+						for i := range nodes {
+							n := m[nodes[i].ID]
+							if nodes[i].Edges.totalCount[5] == nil {
+								nodes[i].Edges.totalCount[5] = make(map[string]int)
+							}
+							nodes[i].Edges.totalCount[5][alias] = n
+						}
+						return nil
+					})
+				} else {
+					_q.loadTotal = append(_q.loadTotal, func(_ context.Context, nodes []*RelaySite) error {
+						for i := range nodes {
+							n := len(nodes[i].Edges.Announcements)
+							if nodes[i].Edges.totalCount[5] == nil {
+								nodes[i].Edges.totalCount[5] = make(map[string]int)
+							}
+							nodes[i].Edges.totalCount[5][alias] = n
+						}
+						return nil
+					})
+				}
+			}
+			if ignoredEdges || (args.first != nil && *args.first == 0) || (args.last != nil && *args.last == 0) {
+				continue
+			}
+			if query, err = pager.applyCursors(query, args.after, args.before); err != nil {
+				return err
+			}
+			path = append(path, edgesField, nodeField)
+			if field := collectedField(ctx, path...); field != nil {
+				if err := query.collectField(ctx, false, opCtx, *field, path, mayAddCondition(satisfies, relaysiteannouncementImplementors)...); err != nil {
+					return err
+				}
+			}
+			if limit := paginateLimit(args.first, args.last); limit > 0 {
+				if oneNode {
+					pager.applyOrder(query.Limit(limit))
+				} else {
+					modify := entgql.LimitPerRow(relaysite.AnnouncementsColumn, limit, pager.orderExpr(query))
+					query.modifiers = append(query.modifiers, modify)
+				}
+			} else {
+				query = pager.applyOrder(query)
+			}
+			_q.WithNamedAnnouncements(alias, func(wq *RelaySiteAnnouncementQuery) {
+				*wq = *query
+			})
+		case "createdAt":
+			if _, ok := fieldSeen[relaysite.FieldCreatedAt]; !ok {
+				selectedFields = append(selectedFields, relaysite.FieldCreatedAt)
+				fieldSeen[relaysite.FieldCreatedAt] = struct{}{}
+			}
+		case "updatedAt":
+			if _, ok := fieldSeen[relaysite.FieldUpdatedAt]; !ok {
+				selectedFields = append(selectedFields, relaysite.FieldUpdatedAt)
+				fieldSeen[relaysite.FieldUpdatedAt] = struct{}{}
+			}
+		case "name":
+			if _, ok := fieldSeen[relaysite.FieldName]; !ok {
+				selectedFields = append(selectedFields, relaysite.FieldName)
+				fieldSeen[relaysite.FieldName] = struct{}{}
+			}
+		case "type":
+			if _, ok := fieldSeen[relaysite.FieldType]; !ok {
+				selectedFields = append(selectedFields, relaysite.FieldType)
+				fieldSeen[relaysite.FieldType] = struct{}{}
+			}
+		case "baseURL":
+			if _, ok := fieldSeen[relaysite.FieldBaseURL]; !ok {
+				selectedFields = append(selectedFields, relaysite.FieldBaseURL)
+				fieldSeen[relaysite.FieldBaseURL] = struct{}{}
+			}
+		case "status":
+			if _, ok := fieldSeen[relaysite.FieldStatus]; !ok {
+				selectedFields = append(selectedFields, relaysite.FieldStatus)
+				fieldSeen[relaysite.FieldStatus] = struct{}{}
+			}
+		case "autoCheckinEnabled":
+			if _, ok := fieldSeen[relaysite.FieldAutoCheckinEnabled]; !ok {
+				selectedFields = append(selectedFields, relaysite.FieldAutoCheckinEnabled)
+				fieldSeen[relaysite.FieldAutoCheckinEnabled] = struct{}{}
+			}
+		case "remark":
+			if _, ok := fieldSeen[relaysite.FieldRemark]; !ok {
+				selectedFields = append(selectedFields, relaysite.FieldRemark)
+				fieldSeen[relaysite.FieldRemark] = struct{}{}
+			}
+		case "lastSyncedAt":
+			if _, ok := fieldSeen[relaysite.FieldLastSyncedAt]; !ok {
+				selectedFields = append(selectedFields, relaysite.FieldLastSyncedAt)
+				fieldSeen[relaysite.FieldLastSyncedAt] = struct{}{}
+			}
+		case "lastSyncError":
+			if _, ok := fieldSeen[relaysite.FieldLastSyncError]; !ok {
+				selectedFields = append(selectedFields, relaysite.FieldLastSyncError)
+				fieldSeen[relaysite.FieldLastSyncError] = struct{}{}
+			}
+		case "lastCheckinAt":
+			if _, ok := fieldSeen[relaysite.FieldLastCheckinAt]; !ok {
+				selectedFields = append(selectedFields, relaysite.FieldLastCheckinAt)
+				fieldSeen[relaysite.FieldLastCheckinAt] = struct{}{}
+			}
+		case "lastCheckinResult":
+			if _, ok := fieldSeen[relaysite.FieldLastCheckinResult]; !ok {
+				selectedFields = append(selectedFields, relaysite.FieldLastCheckinResult)
+				fieldSeen[relaysite.FieldLastCheckinResult] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		_q.Select(selectedFields...)
+	}
+	return nil
+}
+
+type relaysitePaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []RelaySitePaginateOption
+}
+
+func newRelaySitePaginateArgs(rv map[string]any) *relaysitePaginateArgs {
+	args := &relaysitePaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &RelaySiteOrder{Field: &RelaySiteOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithRelaySiteOrder(order))
+			}
+		case *RelaySiteOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithRelaySiteOrder(v))
+			}
+		}
+	}
+	if v, ok := rv[whereField].(*RelaySiteWhereInput); ok {
+		args.opts = append(args.opts, WithRelaySiteFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (_q *RelaySiteAPIKeyQuery) CollectFields(ctx context.Context, satisfies ...string) (*RelaySiteAPIKeyQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return _q, nil
+	}
+	if err := _q.collectField(ctx, false, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return _q, nil
+}
+
+func (_q *RelaySiteAPIKeyQuery) collectField(ctx context.Context, oneNode bool, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(relaysiteapikey.Columns))
+		selectedFields = []string{relaysiteapikey.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+
+		case "relaySite":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&RelaySiteClient{config: _q.config}).Query()
+			)
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, relaysiteImplementors)...); err != nil {
+				return err
+			}
+			_q.withRelaySite = query
+			if _, ok := fieldSeen[relaysiteapikey.FieldRelaySiteID]; !ok {
+				selectedFields = append(selectedFields, relaysiteapikey.FieldRelaySiteID)
+				fieldSeen[relaysiteapikey.FieldRelaySiteID] = struct{}{}
+			}
+		case "createdAt":
+			if _, ok := fieldSeen[relaysiteapikey.FieldCreatedAt]; !ok {
+				selectedFields = append(selectedFields, relaysiteapikey.FieldCreatedAt)
+				fieldSeen[relaysiteapikey.FieldCreatedAt] = struct{}{}
+			}
+		case "updatedAt":
+			if _, ok := fieldSeen[relaysiteapikey.FieldUpdatedAt]; !ok {
+				selectedFields = append(selectedFields, relaysiteapikey.FieldUpdatedAt)
+				fieldSeen[relaysiteapikey.FieldUpdatedAt] = struct{}{}
+			}
+		case "relaySiteID":
+			if _, ok := fieldSeen[relaysiteapikey.FieldRelaySiteID]; !ok {
+				selectedFields = append(selectedFields, relaysiteapikey.FieldRelaySiteID)
+				fieldSeen[relaysiteapikey.FieldRelaySiteID] = struct{}{}
+			}
+		case "remoteID":
+			if _, ok := fieldSeen[relaysiteapikey.FieldRemoteID]; !ok {
+				selectedFields = append(selectedFields, relaysiteapikey.FieldRemoteID)
+				fieldSeen[relaysiteapikey.FieldRemoteID] = struct{}{}
+			}
+		case "name":
+			if _, ok := fieldSeen[relaysiteapikey.FieldName]; !ok {
+				selectedFields = append(selectedFields, relaysiteapikey.FieldName)
+				fieldSeen[relaysiteapikey.FieldName] = struct{}{}
+			}
+		case "status":
+			if _, ok := fieldSeen[relaysiteapikey.FieldStatus]; !ok {
+				selectedFields = append(selectedFields, relaysiteapikey.FieldStatus)
+				fieldSeen[relaysiteapikey.FieldStatus] = struct{}{}
+			}
+		case "groupName":
+			if _, ok := fieldSeen[relaysiteapikey.FieldGroupName]; !ok {
+				selectedFields = append(selectedFields, relaysiteapikey.FieldGroupName)
+				fieldSeen[relaysiteapikey.FieldGroupName] = struct{}{}
+			}
+		case "quota":
+			if _, ok := fieldSeen[relaysiteapikey.FieldQuota]; !ok {
+				selectedFields = append(selectedFields, relaysiteapikey.FieldQuota)
+				fieldSeen[relaysiteapikey.FieldQuota] = struct{}{}
+			}
+		case "usedQuota":
+			if _, ok := fieldSeen[relaysiteapikey.FieldUsedQuota]; !ok {
+				selectedFields = append(selectedFields, relaysiteapikey.FieldUsedQuota)
+				fieldSeen[relaysiteapikey.FieldUsedQuota] = struct{}{}
+			}
+		case "expiresAt":
+			if _, ok := fieldSeen[relaysiteapikey.FieldExpiresAt]; !ok {
+				selectedFields = append(selectedFields, relaysiteapikey.FieldExpiresAt)
+				fieldSeen[relaysiteapikey.FieldExpiresAt] = struct{}{}
+			}
+		case "syncedAt":
+			if _, ok := fieldSeen[relaysiteapikey.FieldSyncedAt]; !ok {
+				selectedFields = append(selectedFields, relaysiteapikey.FieldSyncedAt)
+				fieldSeen[relaysiteapikey.FieldSyncedAt] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		_q.Select(selectedFields...)
+	}
+	return nil
+}
+
+type relaysiteapikeyPaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []RelaySiteAPIKeyPaginateOption
+}
+
+func newRelaySiteAPIKeyPaginateArgs(rv map[string]any) *relaysiteapikeyPaginateArgs {
+	args := &relaysiteapikeyPaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &RelaySiteAPIKeyOrder{Field: &RelaySiteAPIKeyOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithRelaySiteAPIKeyOrder(order))
+			}
+		case *RelaySiteAPIKeyOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithRelaySiteAPIKeyOrder(v))
+			}
+		}
+	}
+	if v, ok := rv[whereField].(*RelaySiteAPIKeyWhereInput); ok {
+		args.opts = append(args.opts, WithRelaySiteAPIKeyFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (_q *RelaySiteAnnouncementQuery) CollectFields(ctx context.Context, satisfies ...string) (*RelaySiteAnnouncementQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return _q, nil
+	}
+	if err := _q.collectField(ctx, false, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return _q, nil
+}
+
+func (_q *RelaySiteAnnouncementQuery) collectField(ctx context.Context, oneNode bool, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(relaysiteannouncement.Columns))
+		selectedFields = []string{relaysiteannouncement.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+
+		case "relaySite":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&RelaySiteClient{config: _q.config}).Query()
+			)
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, relaysiteImplementors)...); err != nil {
+				return err
+			}
+			_q.withRelaySite = query
+			if _, ok := fieldSeen[relaysiteannouncement.FieldRelaySiteID]; !ok {
+				selectedFields = append(selectedFields, relaysiteannouncement.FieldRelaySiteID)
+				fieldSeen[relaysiteannouncement.FieldRelaySiteID] = struct{}{}
+			}
+		case "createdAt":
+			if _, ok := fieldSeen[relaysiteannouncement.FieldCreatedAt]; !ok {
+				selectedFields = append(selectedFields, relaysiteannouncement.FieldCreatedAt)
+				fieldSeen[relaysiteannouncement.FieldCreatedAt] = struct{}{}
+			}
+		case "updatedAt":
+			if _, ok := fieldSeen[relaysiteannouncement.FieldUpdatedAt]; !ok {
+				selectedFields = append(selectedFields, relaysiteannouncement.FieldUpdatedAt)
+				fieldSeen[relaysiteannouncement.FieldUpdatedAt] = struct{}{}
+			}
+		case "relaySiteID":
+			if _, ok := fieldSeen[relaysiteannouncement.FieldRelaySiteID]; !ok {
+				selectedFields = append(selectedFields, relaysiteannouncement.FieldRelaySiteID)
+				fieldSeen[relaysiteannouncement.FieldRelaySiteID] = struct{}{}
+			}
+		case "remoteID":
+			if _, ok := fieldSeen[relaysiteannouncement.FieldRemoteID]; !ok {
+				selectedFields = append(selectedFields, relaysiteannouncement.FieldRemoteID)
+				fieldSeen[relaysiteannouncement.FieldRemoteID] = struct{}{}
+			}
+		case "type":
+			if _, ok := fieldSeen[relaysiteannouncement.FieldType]; !ok {
+				selectedFields = append(selectedFields, relaysiteannouncement.FieldType)
+				fieldSeen[relaysiteannouncement.FieldType] = struct{}{}
+			}
+		case "content":
+			if _, ok := fieldSeen[relaysiteannouncement.FieldContent]; !ok {
+				selectedFields = append(selectedFields, relaysiteannouncement.FieldContent)
+				fieldSeen[relaysiteannouncement.FieldContent] = struct{}{}
+			}
+		case "extra":
+			if _, ok := fieldSeen[relaysiteannouncement.FieldExtra]; !ok {
+				selectedFields = append(selectedFields, relaysiteannouncement.FieldExtra)
+				fieldSeen[relaysiteannouncement.FieldExtra] = struct{}{}
+			}
+		case "contentHash":
+			if _, ok := fieldSeen[relaysiteannouncement.FieldContentHash]; !ok {
+				selectedFields = append(selectedFields, relaysiteannouncement.FieldContentHash)
+				fieldSeen[relaysiteannouncement.FieldContentHash] = struct{}{}
+			}
+		case "publishedAt":
+			if _, ok := fieldSeen[relaysiteannouncement.FieldPublishedAt]; !ok {
+				selectedFields = append(selectedFields, relaysiteannouncement.FieldPublishedAt)
+				fieldSeen[relaysiteannouncement.FieldPublishedAt] = struct{}{}
+			}
+		case "fetchedAt":
+			if _, ok := fieldSeen[relaysiteannouncement.FieldFetchedAt]; !ok {
+				selectedFields = append(selectedFields, relaysiteannouncement.FieldFetchedAt)
+				fieldSeen[relaysiteannouncement.FieldFetchedAt] = struct{}{}
+			}
+		case "readAt":
+			if _, ok := fieldSeen[relaysiteannouncement.FieldReadAt]; !ok {
+				selectedFields = append(selectedFields, relaysiteannouncement.FieldReadAt)
+				fieldSeen[relaysiteannouncement.FieldReadAt] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		_q.Select(selectedFields...)
+	}
+	return nil
+}
+
+type relaysiteannouncementPaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []RelaySiteAnnouncementPaginateOption
+}
+
+func newRelaySiteAnnouncementPaginateArgs(rv map[string]any) *relaysiteannouncementPaginateArgs {
+	args := &relaysiteannouncementPaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &RelaySiteAnnouncementOrder{Field: &RelaySiteAnnouncementOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithRelaySiteAnnouncementOrder(order))
+			}
+		case *RelaySiteAnnouncementOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithRelaySiteAnnouncementOrder(v))
+			}
+		}
+	}
+	if v, ok := rv[whereField].(*RelaySiteAnnouncementWhereInput); ok {
+		args.opts = append(args.opts, WithRelaySiteAnnouncementFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (_q *RelaySiteBalanceSnapshotQuery) CollectFields(ctx context.Context, satisfies ...string) (*RelaySiteBalanceSnapshotQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return _q, nil
+	}
+	if err := _q.collectField(ctx, false, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return _q, nil
+}
+
+func (_q *RelaySiteBalanceSnapshotQuery) collectField(ctx context.Context, oneNode bool, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(relaysitebalancesnapshot.Columns))
+		selectedFields = []string{relaysitebalancesnapshot.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+
+		case "relaySite":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&RelaySiteClient{config: _q.config}).Query()
+			)
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, relaysiteImplementors)...); err != nil {
+				return err
+			}
+			_q.withRelaySite = query
+			if _, ok := fieldSeen[relaysitebalancesnapshot.FieldRelaySiteID]; !ok {
+				selectedFields = append(selectedFields, relaysitebalancesnapshot.FieldRelaySiteID)
+				fieldSeen[relaysitebalancesnapshot.FieldRelaySiteID] = struct{}{}
+			}
+		case "createdAt":
+			if _, ok := fieldSeen[relaysitebalancesnapshot.FieldCreatedAt]; !ok {
+				selectedFields = append(selectedFields, relaysitebalancesnapshot.FieldCreatedAt)
+				fieldSeen[relaysitebalancesnapshot.FieldCreatedAt] = struct{}{}
+			}
+		case "updatedAt":
+			if _, ok := fieldSeen[relaysitebalancesnapshot.FieldUpdatedAt]; !ok {
+				selectedFields = append(selectedFields, relaysitebalancesnapshot.FieldUpdatedAt)
+				fieldSeen[relaysitebalancesnapshot.FieldUpdatedAt] = struct{}{}
+			}
+		case "relaySiteID":
+			if _, ok := fieldSeen[relaysitebalancesnapshot.FieldRelaySiteID]; !ok {
+				selectedFields = append(selectedFields, relaysitebalancesnapshot.FieldRelaySiteID)
+				fieldSeen[relaysitebalancesnapshot.FieldRelaySiteID] = struct{}{}
+			}
+		case "balance":
+			if _, ok := fieldSeen[relaysitebalancesnapshot.FieldBalance]; !ok {
+				selectedFields = append(selectedFields, relaysitebalancesnapshot.FieldBalance)
+				fieldSeen[relaysitebalancesnapshot.FieldBalance] = struct{}{}
+			}
+		case "unit":
+			if _, ok := fieldSeen[relaysitebalancesnapshot.FieldUnit]; !ok {
+				selectedFields = append(selectedFields, relaysitebalancesnapshot.FieldUnit)
+				fieldSeen[relaysitebalancesnapshot.FieldUnit] = struct{}{}
+			}
+		case "pulledAt":
+			if _, ok := fieldSeen[relaysitebalancesnapshot.FieldPulledAt]; !ok {
+				selectedFields = append(selectedFields, relaysitebalancesnapshot.FieldPulledAt)
+				fieldSeen[relaysitebalancesnapshot.FieldPulledAt] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		_q.Select(selectedFields...)
+	}
+	return nil
+}
+
+type relaysitebalancesnapshotPaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []RelaySiteBalanceSnapshotPaginateOption
+}
+
+func newRelaySiteBalanceSnapshotPaginateArgs(rv map[string]any) *relaysitebalancesnapshotPaginateArgs {
+	args := &relaysitebalancesnapshotPaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &RelaySiteBalanceSnapshotOrder{Field: &RelaySiteBalanceSnapshotOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithRelaySiteBalanceSnapshotOrder(order))
+			}
+		case *RelaySiteBalanceSnapshotOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithRelaySiteBalanceSnapshotOrder(v))
+			}
+		}
+	}
+	if v, ok := rv[whereField].(*RelaySiteBalanceSnapshotWhereInput); ok {
+		args.opts = append(args.opts, WithRelaySiteBalanceSnapshotFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (_q *RelaySiteCheckinLogQuery) CollectFields(ctx context.Context, satisfies ...string) (*RelaySiteCheckinLogQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return _q, nil
+	}
+	if err := _q.collectField(ctx, false, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return _q, nil
+}
+
+func (_q *RelaySiteCheckinLogQuery) collectField(ctx context.Context, oneNode bool, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(relaysitecheckinlog.Columns))
+		selectedFields = []string{relaysitecheckinlog.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+
+		case "relaySite":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&RelaySiteClient{config: _q.config}).Query()
+			)
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, relaysiteImplementors)...); err != nil {
+				return err
+			}
+			_q.withRelaySite = query
+			if _, ok := fieldSeen[relaysitecheckinlog.FieldRelaySiteID]; !ok {
+				selectedFields = append(selectedFields, relaysitecheckinlog.FieldRelaySiteID)
+				fieldSeen[relaysitecheckinlog.FieldRelaySiteID] = struct{}{}
+			}
+		case "createdAt":
+			if _, ok := fieldSeen[relaysitecheckinlog.FieldCreatedAt]; !ok {
+				selectedFields = append(selectedFields, relaysitecheckinlog.FieldCreatedAt)
+				fieldSeen[relaysitecheckinlog.FieldCreatedAt] = struct{}{}
+			}
+		case "updatedAt":
+			if _, ok := fieldSeen[relaysitecheckinlog.FieldUpdatedAt]; !ok {
+				selectedFields = append(selectedFields, relaysitecheckinlog.FieldUpdatedAt)
+				fieldSeen[relaysitecheckinlog.FieldUpdatedAt] = struct{}{}
+			}
+		case "relaySiteID":
+			if _, ok := fieldSeen[relaysitecheckinlog.FieldRelaySiteID]; !ok {
+				selectedFields = append(selectedFields, relaysitecheckinlog.FieldRelaySiteID)
+				fieldSeen[relaysitecheckinlog.FieldRelaySiteID] = struct{}{}
+			}
+		case "executedAt":
+			if _, ok := fieldSeen[relaysitecheckinlog.FieldExecutedAt]; !ok {
+				selectedFields = append(selectedFields, relaysitecheckinlog.FieldExecutedAt)
+				fieldSeen[relaysitecheckinlog.FieldExecutedAt] = struct{}{}
+			}
+		case "status":
+			if _, ok := fieldSeen[relaysitecheckinlog.FieldStatus]; !ok {
+				selectedFields = append(selectedFields, relaysitecheckinlog.FieldStatus)
+				fieldSeen[relaysitecheckinlog.FieldStatus] = struct{}{}
+			}
+		case "message":
+			if _, ok := fieldSeen[relaysitecheckinlog.FieldMessage]; !ok {
+				selectedFields = append(selectedFields, relaysitecheckinlog.FieldMessage)
+				fieldSeen[relaysitecheckinlog.FieldMessage] = struct{}{}
+			}
+		case "errorMessage":
+			if _, ok := fieldSeen[relaysitecheckinlog.FieldErrorMessage]; !ok {
+				selectedFields = append(selectedFields, relaysitecheckinlog.FieldErrorMessage)
+				fieldSeen[relaysitecheckinlog.FieldErrorMessage] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		_q.Select(selectedFields...)
+	}
+	return nil
+}
+
+type relaysitecheckinlogPaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []RelaySiteCheckinLogPaginateOption
+}
+
+func newRelaySiteCheckinLogPaginateArgs(rv map[string]any) *relaysitecheckinlogPaginateArgs {
+	args := &relaysitecheckinlogPaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &RelaySiteCheckinLogOrder{Field: &RelaySiteCheckinLogOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithRelaySiteCheckinLogOrder(order))
+			}
+		case *RelaySiteCheckinLogOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithRelaySiteCheckinLogOrder(v))
+			}
+		}
+	}
+	if v, ok := rv[whereField].(*RelaySiteCheckinLogWhereInput); ok {
+		args.opts = append(args.opts, WithRelaySiteCheckinLogFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (_q *RelaySiteGroupQuery) CollectFields(ctx context.Context, satisfies ...string) (*RelaySiteGroupQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return _q, nil
+	}
+	if err := _q.collectField(ctx, false, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return _q, nil
+}
+
+func (_q *RelaySiteGroupQuery) collectField(ctx context.Context, oneNode bool, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(relaysitegroup.Columns))
+		selectedFields = []string{relaysitegroup.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+
+		case "relaySite":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&RelaySiteClient{config: _q.config}).Query()
+			)
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, relaysiteImplementors)...); err != nil {
+				return err
+			}
+			_q.withRelaySite = query
+			if _, ok := fieldSeen[relaysitegroup.FieldRelaySiteID]; !ok {
+				selectedFields = append(selectedFields, relaysitegroup.FieldRelaySiteID)
+				fieldSeen[relaysitegroup.FieldRelaySiteID] = struct{}{}
+			}
+		case "createdAt":
+			if _, ok := fieldSeen[relaysitegroup.FieldCreatedAt]; !ok {
+				selectedFields = append(selectedFields, relaysitegroup.FieldCreatedAt)
+				fieldSeen[relaysitegroup.FieldCreatedAt] = struct{}{}
+			}
+		case "updatedAt":
+			if _, ok := fieldSeen[relaysitegroup.FieldUpdatedAt]; !ok {
+				selectedFields = append(selectedFields, relaysitegroup.FieldUpdatedAt)
+				fieldSeen[relaysitegroup.FieldUpdatedAt] = struct{}{}
+			}
+		case "relaySiteID":
+			if _, ok := fieldSeen[relaysitegroup.FieldRelaySiteID]; !ok {
+				selectedFields = append(selectedFields, relaysitegroup.FieldRelaySiteID)
+				fieldSeen[relaysitegroup.FieldRelaySiteID] = struct{}{}
+			}
+		case "name":
+			if _, ok := fieldSeen[relaysitegroup.FieldName]; !ok {
+				selectedFields = append(selectedFields, relaysitegroup.FieldName)
+				fieldSeen[relaysitegroup.FieldName] = struct{}{}
+			}
+		case "ratio":
+			if _, ok := fieldSeen[relaysitegroup.FieldRatio]; !ok {
+				selectedFields = append(selectedFields, relaysitegroup.FieldRatio)
+				fieldSeen[relaysitegroup.FieldRatio] = struct{}{}
+			}
+		case "syncedAt":
+			if _, ok := fieldSeen[relaysitegroup.FieldSyncedAt]; !ok {
+				selectedFields = append(selectedFields, relaysitegroup.FieldSyncedAt)
+				fieldSeen[relaysitegroup.FieldSyncedAt] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		_q.Select(selectedFields...)
+	}
+	return nil
+}
+
+type relaysitegroupPaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []RelaySiteGroupPaginateOption
+}
+
+func newRelaySiteGroupPaginateArgs(rv map[string]any) *relaysitegroupPaginateArgs {
+	args := &relaysitegroupPaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &RelaySiteGroupOrder{Field: &RelaySiteGroupOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithRelaySiteGroupOrder(order))
+			}
+		case *RelaySiteGroupOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithRelaySiteGroupOrder(v))
+			}
+		}
+	}
+	if v, ok := rv[whereField].(*RelaySiteGroupWhereInput); ok {
+		args.opts = append(args.opts, WithRelaySiteGroupFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (_q *RelaySiteModelPriceQuery) CollectFields(ctx context.Context, satisfies ...string) (*RelaySiteModelPriceQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return _q, nil
+	}
+	if err := _q.collectField(ctx, false, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return _q, nil
+}
+
+func (_q *RelaySiteModelPriceQuery) collectField(ctx context.Context, oneNode bool, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(relaysitemodelprice.Columns))
+		selectedFields = []string{relaysitemodelprice.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+
+		case "relaySite":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&RelaySiteClient{config: _q.config}).Query()
+			)
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, relaysiteImplementors)...); err != nil {
+				return err
+			}
+			_q.withRelaySite = query
+			if _, ok := fieldSeen[relaysitemodelprice.FieldRelaySiteID]; !ok {
+				selectedFields = append(selectedFields, relaysitemodelprice.FieldRelaySiteID)
+				fieldSeen[relaysitemodelprice.FieldRelaySiteID] = struct{}{}
+			}
+		case "createdAt":
+			if _, ok := fieldSeen[relaysitemodelprice.FieldCreatedAt]; !ok {
+				selectedFields = append(selectedFields, relaysitemodelprice.FieldCreatedAt)
+				fieldSeen[relaysitemodelprice.FieldCreatedAt] = struct{}{}
+			}
+		case "updatedAt":
+			if _, ok := fieldSeen[relaysitemodelprice.FieldUpdatedAt]; !ok {
+				selectedFields = append(selectedFields, relaysitemodelprice.FieldUpdatedAt)
+				fieldSeen[relaysitemodelprice.FieldUpdatedAt] = struct{}{}
+			}
+		case "relaySiteID":
+			if _, ok := fieldSeen[relaysitemodelprice.FieldRelaySiteID]; !ok {
+				selectedFields = append(selectedFields, relaysitemodelprice.FieldRelaySiteID)
+				fieldSeen[relaysitemodelprice.FieldRelaySiteID] = struct{}{}
+			}
+		case "modelID":
+			if _, ok := fieldSeen[relaysitemodelprice.FieldModelID]; !ok {
+				selectedFields = append(selectedFields, relaysitemodelprice.FieldModelID)
+				fieldSeen[relaysitemodelprice.FieldModelID] = struct{}{}
+			}
+		case "syncedAt":
+			if _, ok := fieldSeen[relaysitemodelprice.FieldSyncedAt]; !ok {
+				selectedFields = append(selectedFields, relaysitemodelprice.FieldSyncedAt)
+				fieldSeen[relaysitemodelprice.FieldSyncedAt] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		_q.Select(selectedFields...)
+	}
+	return nil
+}
+
+type relaysitemodelpricePaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []RelaySiteModelPricePaginateOption
+}
+
+func newRelaySiteModelPricePaginateArgs(rv map[string]any) *relaysitemodelpricePaginateArgs {
+	args := &relaysitemodelpricePaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &RelaySiteModelPriceOrder{Field: &RelaySiteModelPriceOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithRelaySiteModelPriceOrder(order))
+			}
+		case *RelaySiteModelPriceOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithRelaySiteModelPriceOrder(v))
+			}
+		}
+	}
+	if v, ok := rv[whereField].(*RelaySiteModelPriceWhereInput); ok {
+		args.opts = append(args.opts, WithRelaySiteModelPriceFilter(v.Filter))
 	}
 	return args
 }

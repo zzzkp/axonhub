@@ -27,6 +27,14 @@ import (
 	"github.com/looplj/axonhub/internal/ent/prompt"
 	"github.com/looplj/axonhub/internal/ent/promptprotectionrule"
 	"github.com/looplj/axonhub/internal/ent/providerquotastatus"
+	"github.com/looplj/axonhub/internal/ent/relaysite"
+	"github.com/looplj/axonhub/internal/ent/relaysiteannouncement"
+	"github.com/looplj/axonhub/internal/ent/relaysiteapikey"
+	"github.com/looplj/axonhub/internal/ent/relaysitebalancesnapshot"
+	"github.com/looplj/axonhub/internal/ent/relaysitecheckinlog"
+	"github.com/looplj/axonhub/internal/ent/relaysitecredential"
+	"github.com/looplj/axonhub/internal/ent/relaysitegroup"
+	"github.com/looplj/axonhub/internal/ent/relaysitemodelprice"
 	"github.com/looplj/axonhub/internal/ent/request"
 	"github.com/looplj/axonhub/internal/ent/requestexecution"
 	"github.com/looplj/axonhub/internal/ent/role"
@@ -112,6 +120,14 @@ func checkColumn(t, c string) error {
 			prompt.Table:                   prompt.ValidColumn,
 			promptprotectionrule.Table:     promptprotectionrule.ValidColumn,
 			providerquotastatus.Table:      providerquotastatus.ValidColumn,
+			relaysite.Table:                relaysite.ValidColumn,
+			relaysiteapikey.Table:          relaysiteapikey.ValidColumn,
+			relaysiteannouncement.Table:    relaysiteannouncement.ValidColumn,
+			relaysitebalancesnapshot.Table: relaysitebalancesnapshot.ValidColumn,
+			relaysitecheckinlog.Table:      relaysitecheckinlog.ValidColumn,
+			relaysitecredential.Table:      relaysitecredential.ValidColumn,
+			relaysitegroup.Table:           relaysitegroup.ValidColumn,
+			relaysitemodelprice.Table:      relaysitemodelprice.ValidColumn,
 			request.Table:                  request.ValidColumn,
 			requestexecution.Table:         requestexecution.ValidColumn,
 			role.Table:                     role.ValidColumn,

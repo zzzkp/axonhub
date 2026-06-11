@@ -1,0 +1,95 @@
+enum RelaySiteCredentialAuthType {
+  token
+  password
+}
+
+input RelaySiteCredentialInput {
+  authType: RelaySiteCredentialAuthType!
+  token: String
+  userId: Int
+  username: String
+  password: String
+}
+
+type RelaySiteDisplayCredential {
+  authType: RelaySiteCredentialAuthType!
+  token: String
+  userId: Int
+  username: String
+  password: String
+}
+
+input CreateRelaySiteConfigInput {
+  name: String!
+  baseURL: String!
+  status: RelaySiteStatus
+  autoCheckinEnabled: Boolean
+  remark: String
+  credential: RelaySiteCredentialInput!
+}
+
+input UpdateRelaySiteConfigInput {
+  name: String
+  baseURL: String
+  status: RelaySiteStatus
+  autoCheckinEnabled: Boolean
+  remark: String
+  credential: RelaySiteCredentialInput
+}
+
+input ImportRelaySiteAPIKeyToChannelInput {
+  name: String!
+  type: ChannelType!
+  baseURL: String!
+  supportedModels: [String!]!
+  defaultTestModel: String!
+  tags: [String!]
+  remark: String
+}
+
+input RelaySiteAPIKeyConfigInput {
+  name: String!
+  status: Int
+  expiredTime: Int
+  remainQuota: Int
+  unlimitedQuota: Boolean
+  modelLimitsEnabled: Boolean
+  modelLimits: String
+  allowIps: String
+  group: String
+  crossGroupRetry: Boolean
+}
+
+extend type RelaySiteModelPrice {
+  promptPrice: Decimal
+  completionPrice: Decimal
+  billingUnit: String
+  enableGroups: [String!]!
+  quotaType: Int
+  modelPrice: Decimal
+  modelRatio: Decimal
+  completionRatio: Decimal
+  supportedEndpointTypes: [String!]!
+}
+
+extend type RelaySite {
+  displayCredential: RelaySiteDisplayCredential
+  hasUnreadAnnouncements: Boolean!
+}
+
+extend type Mutation {
+  createRelaySiteConfig(input: CreateRelaySiteConfigInput!): RelaySite!
+  updateRelaySiteConfig(id: ID!, input: UpdateRelaySiteConfigInput!): RelaySite!
+  deleteRelaySiteConfig(id: ID!): RelaySite!
+  syncRelaySite(id: ID!): RelaySite!
+  syncAllRelaySites: Boolean!
+  checkinRelaySite(id: ID!): RelaySiteCheckinLog!
+  checkinAllRelaySites: Boolean!
+  refreshRelaySiteAnnouncements(id: ID!): RelaySite!
+  markRelaySiteAnnouncementsRead(id: ID!): RelaySite!
+  createRelaySiteAPIKey(relaySiteID: ID!, input: RelaySiteAPIKeyConfigInput!): RelaySite!
+  updateRelaySiteAPIKey(relaySiteAPIKeyID: ID!, input: RelaySiteAPIKeyConfigInput!): RelaySite!
+  deleteRelaySiteAPIKey(relaySiteAPIKeyID: ID!): RelaySite!
+  createRelaySiteAPIKeysForAllGroups(relaySiteID: ID!, input: RelaySiteAPIKeyConfigInput!): RelaySite!
+  importRelaySiteAPIKeyToChannel(relaySiteAPIKeyID: ID!, input: ImportRelaySiteAPIKeyToChannelInput!): Channel!
+}
