@@ -6,6 +6,7 @@ import { useErrorHandler } from '@/hooks/use-error-handler';
 import {
   createRelaySiteInputSchema,
   importRelaySiteAPIKeyToChannelInputSchema,
+  importRelaySitesBackupInputSchema,
   importedRelaySiteChannelSchema,
   relaySiteAnnouncementResultSchema,
   relaySiteAPIKeyConfigInputSchema,
@@ -17,6 +18,7 @@ import {
   type CreateRelaySiteInput,
   type ImportedRelaySiteChannel,
   type ImportRelaySiteAPIKeyToChannelInput,
+  type ImportRelaySitesBackupInput,
   type RelaySite,
   type RelaySiteAnnouncement,
   type RelaySiteAnnouncementResult,
@@ -32,7 +34,7 @@ import {
 export { useUpdateChannelStatus } from '@/features/channels/data/channels';
 
 export type { CreateRelaySiteInput, RelaySite, RelaySiteAnnouncement, RelaySiteAnnouncementResult, RelaySiteAPIKey, RelaySiteCheckinLog, RelaySiteModelPrice, RelaySitesConnection, UpdateRelaySiteInput };
-export type { ImportedRelaySiteChannel, ImportRelaySiteAPIKeyToChannelInput, RelaySiteAPIKeyConfigInput };
+export type { ImportedRelaySiteChannel, ImportRelaySiteAPIKeyToChannelInput, ImportRelaySitesBackupInput, RelaySiteAPIKeyConfigInput };
 
 const RELAY_SITE_FIELDS = `
   id
@@ -142,6 +144,18 @@ const UPDATE_RELAY_SITE_MUTATION = `
 const DELETE_RELAY_SITE_MUTATION = `
   mutation DeleteRelaySiteConfig($id: ID!) {
     deleteRelaySiteConfig(id: $id) { id name status }
+  }
+`;
+
+const EXPORT_RELAY_SITES_BACKUP_MUTATION = `
+  mutation ExportRelaySitesBackup {
+    exportRelaySitesBackup
+  }
+`;
+
+const IMPORT_RELAY_SITES_BACKUP_MUTATION = `
+  mutation ImportRelaySitesBackup($payload: String!) {
+    importRelaySitesBackup(payload: $payload)
   }
 `;
 
@@ -332,6 +346,49 @@ export function useDeleteRelaySite() {
       queryClient.invalidateQueries({ queryKey: ['relaySites'] });
       queryClient.invalidateQueries({ queryKey: ['channels'] });
       toast.success(t('relaySites.messages.deleteSuccess'));
+    },
+  });
+}
+
+export function useExportRelaySitesBackup() {
+  const { t } = useTranslation();
+  const { handleError } = useErrorHandler();
+
+  return useMutation({
+    mutationFn: async () => {
+      try {
+        const data = await graphqlRequest<{ exportRelaySitesBackup: string }>(EXPORT_RELAY_SITES_BACKUP_MUTATION);
+        return data.exportRelaySitesBackup;
+      } catch (error) {
+        handleError(error, { context: t('relaySites.buttons.exportBackup') });
+        throw error;
+      }
+    },
+    onSuccess: () => {
+      toast.success(t('relaySites.messages.exportBackupSuccess'));
+    },
+  });
+}
+
+export function useImportRelaySitesBackup() {
+  const { t } = useTranslation();
+  const queryClient = useQueryClient();
+  const { handleError } = useErrorHandler();
+
+  return useMutation({
+    mutationFn: async (input: ImportRelaySitesBackupInput) => {
+      try {
+        const validatedInput = importRelaySitesBackupInputSchema.parse(input);
+        const data = await graphqlRequest<{ importRelaySitesBackup: boolean }>(IMPORT_RELAY_SITES_BACKUP_MUTATION, validatedInput);
+        return data.importRelaySitesBackup;
+      } catch (error) {
+        handleError(error, { context: t('relaySites.buttons.importBackup') });
+        throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['relaySites'] });
+      toast.success(t('relaySites.messages.importBackupSuccess'));
     },
   });
 }
