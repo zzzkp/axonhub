@@ -35,6 +35,8 @@ function RelaySitesContent() {
     orderBy: { field: 'CREATED_AT', direction: 'DESC' },
   });
 
+  const sites = data?.edges?.map((edge) => edge.node) || [];
+
   const handleNextPage = () => {
     if (data?.pageInfo?.hasNextPage && data?.pageInfo?.endCursor) {
       setCursors(data.pageInfo.startCursor ?? undefined, data.pageInfo.endCursor ?? undefined, 'after');
@@ -60,7 +62,7 @@ function RelaySitesContent() {
   return (
     <div className='flex flex-1 flex-col overflow-hidden'>
       <RelaySitesTable
-        data={data?.edges?.map((edge) => edge.node) || []}
+        data={sites}
         loading={isLoading}
         pageInfo={data?.pageInfo}
         pageSize={pageSize}
@@ -81,6 +83,51 @@ function RelaySitesContent() {
 export default function RelaySitesManagement() {
   const { t } = useTranslation();
   const { channelPermissions } = usePermissions();
+  const { pageSize, setCursors, setPageSize, resetCursor, paginationArgs } = usePaginationSearch({
+    defaultPageSize: 20,
+    pageSizeStorageKey: 'relay-sites-table-page-size',
+  });
+  const [nameFilter, setNameFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('active');
+  const debouncedNameFilter = useDebounce(nameFilter, 300);
+
+  const whereClause = (() => {
+    const where: Record<string, string | string[]> = {};
+    if (debouncedNameFilter) where.nameContainsFold = debouncedNameFilter;
+    if (statusFilter === 'active') where.statusIn = ['enabled', 'disabled'];
+    else if (statusFilter !== 'all') where.status = statusFilter;
+    return Object.keys(where).length > 0 ? where : undefined;
+  })();
+
+  const { data, isLoading } = useRelaySites({
+    ...paginationArgs,
+    where: whereClause,
+    orderBy: { field: 'CREATED_AT', direction: 'DESC' },
+  });
+
+  const sites = data?.edges?.map((edge) => edge.node) || [];
+
+  const handleNextPage = () => {
+    if (data?.pageInfo?.hasNextPage && data?.pageInfo?.endCursor) {
+      setCursors(data.pageInfo.startCursor ?? undefined, data.pageInfo.endCursor ?? undefined, 'after');
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (data?.pageInfo?.hasPreviousPage) {
+      setCursors(data.pageInfo.startCursor ?? undefined, data.pageInfo.endCursor ?? undefined, 'before');
+    }
+  };
+
+  const handleNameFilterChange = (filter: string) => {
+    setNameFilter(filter);
+    resetCursor();
+  };
+
+  const handleStatusFilterChange = (status: string) => {
+    setStatusFilter(status);
+    resetCursor();
+  };
 
   return (
     <RelaySitesProvider>
@@ -90,11 +137,27 @@ export default function RelaySitesManagement() {
             <h2 className='text-xl font-bold tracking-tight'>{t('relaySites.title')}</h2>
             <p className='text-sm text-muted-foreground'>{t('relaySites.description')}</p>
           </div>
-          <RelaySitesPrimaryButtons canWrite={channelPermissions.canWrite} />
+          <RelaySitesPrimaryButtons canWrite={channelPermissions.canWrite} sites={sites} />
         </div>
       </Header>
       <Main fixed>
-        <RelaySitesContent />
+        <div className='flex flex-1 flex-col overflow-hidden'>
+          <RelaySitesTable
+            data={sites}
+            loading={isLoading}
+            pageInfo={data?.pageInfo}
+            pageSize={pageSize}
+            totalCount={data?.totalCount}
+            nameFilter={nameFilter}
+            statusFilter={statusFilter}
+            canWrite={channelPermissions.canWrite}
+            onNextPage={handleNextPage}
+            onPreviousPage={handlePreviousPage}
+            onPageSizeChange={setPageSize}
+            onNameFilterChange={handleNameFilterChange}
+            onStatusFilterChange={handleStatusFilterChange}
+          />
+        </div>
       </Main>
       <RelaySitesDialogs />
     </RelaySitesProvider>

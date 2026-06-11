@@ -1547,7 +1547,7 @@ func (_m *RelaySite) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     _m.ID,
 		Type:   "RelaySite",
-		Fields: make([]*Field, 12),
+		Fields: make([]*Field, 14),
 		Edges:  make([]*Edge, 6),
 	}
 	var buf []byte
@@ -1645,6 +1645,22 @@ func (_m *RelaySite) Node(ctx context.Context) (node *Node, err error) {
 	node.Fields[11] = &Field{
 		Type:  "string",
 		Name:  "last_checkin_result",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(_m.CheckinPageURL); err != nil {
+		return nil, err
+	}
+	node.Fields[12] = &Field{
+		Type:  "string",
+		Name:  "checkin_page_url",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(_m.ExternalCheckinPageURL); err != nil {
+		return nil, err
+	}
+	node.Fields[13] = &Field{
+		Type:  "string",
+		Name:  "external_checkin_page_url",
 		Value: string(buf),
 	}
 	node.Edges[0] = &Edge{

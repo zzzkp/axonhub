@@ -2,7 +2,7 @@
 
 import { Fragment, useMemo, useState } from 'react';
 import { format } from 'date-fns';
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { Boxes, ChevronDown, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { PageInfo } from '@/gql/pagination';
 import { Badge } from '@/components/ui/badge';
@@ -14,7 +14,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { TableSkeleton } from '@/components/ui/table-skeleton';
 import { ServerSidePagination } from '@/components/server-side-pagination';
 import { RelaySiteActions } from './relay-site-actions';
-import { useUpdateRelaySite, type RelaySite } from '../data/relay-sites';
+import { useRelaySitesContext } from '../context/relay-sites-context';
+import { useUpdateRelaySite, useRelaySiteChannels, type RelaySite } from '../data/relay-sites';
 
 interface RelaySitesTableProps {
   data: RelaySite[];
@@ -55,6 +56,27 @@ function StatusSwitch({ relaySite, canWrite }: { relaySite: RelaySite; canWrite:
         input: { status: checked ? 'enabled' : 'disabled' },
       })}
     />
+  );
+}
+
+function BalanceCell({ relaySite }: { relaySite: RelaySite }) {
+  const latestBalance = nodes(relaySite.balanceSnapshots)[0];
+  if (!latestBalance) return <span className='text-sm text-muted-foreground'>-</span>;
+  const balance = Number(latestBalance.balance).toFixed(2);
+  return (
+    <span className='whitespace-nowrap text-sm font-medium'>
+      {balance} {latestBalance.unit}
+    </span>
+  );
+}
+
+function ChannelCountCell({ relaySite, onOpen }: { relaySite: RelaySite; onOpen: () => void }) {
+  const { data: channels = [] } = useRelaySiteChannels(relaySite.id);
+  return (
+    <Button variant='ghost' size='sm' className='h-7 gap-1 px-2' onClick={onOpen}>
+      <Boxes className='h-3.5 w-3.5' />
+      <span className='text-sm'>{channels.length}</span>
+    </Button>
   );
 }
 
@@ -116,9 +138,10 @@ export function RelaySitesTable({
   onStatusFilterChange,
 }: RelaySitesTableProps) {
   const { t } = useTranslation();
+  const { setManagingRelaySite, setIsModelsAndTokensDialogOpen } = useRelaySitesContext();
   const [expandedIDs, setExpandedIDs] = useState<Set<string>>(new Set());
 
-  const columnsCount = 8;
+  const columnsCount = 10;
   const expandedMap = useMemo(() => expandedIDs, [expandedIDs]);
   const toggleExpanded = (id: string) => {
     setExpandedIDs((prev) => {
@@ -127,6 +150,11 @@ export function RelaySitesTable({
       else next.add(id);
       return next;
     });
+  };
+
+  const handleOpenModelsAndTokens = (relaySite: RelaySite) => {
+    setManagingRelaySite(relaySite);
+    setIsModelsAndTokensDialogOpen(true);
   };
 
   return (
@@ -156,6 +184,8 @@ export function RelaySitesTable({
               <TableHead className='border-0'>{t('relaySites.columns.lastSyncedAt')}</TableHead>
               <TableHead className='border-0'>{t('relaySites.columns.lastCheckinAt')}</TableHead>
               <TableHead className='border-0'>{t('relaySites.columns.lastResult')}</TableHead>
+              <TableHead className='border-0'>{t('relaySites.columns.balance')}</TableHead>
+              <TableHead className='border-0'>{t('relaySites.columns.channelCount')}</TableHead>
               <TableHead className='w-12 border-0'>{t('common.columns.actions')}</TableHead>
             </TableRow>
           </TableHeader>
@@ -184,7 +214,13 @@ export function RelaySitesTable({
                     <TableCell className='border-0'><StatusSwitch relaySite={relaySite} canWrite={canWrite} /></TableCell>
                     <TableCell className='border-0 text-sm text-muted-foreground'>{formatDate(relaySite.lastSyncedAt)}</TableCell>
                     <TableCell className='border-0 text-sm text-muted-foreground'>{formatDate(relaySite.lastCheckinAt)}</TableCell>
-                    <TableCell className='max-w-[220px] border-0 text-sm text-muted-foreground'><span className='line-clamp-2'>{relaySite.lastSyncError || relaySite.lastCheckinResult || '-'}</span></TableCell>
+                    <TableCell className='border-0'>
+                      <div className='max-w-[280px] overflow-hidden text-ellipsis whitespace-nowrap text-sm text-muted-foreground'>
+                        {relaySite.lastSyncError || relaySite.lastCheckinResult || '-'}
+                      </div>
+                    </TableCell>
+                    <TableCell className='border-0'><BalanceCell relaySite={relaySite} /></TableCell>
+                    <TableCell className='border-0'><ChannelCountCell relaySite={relaySite} onOpen={() => handleOpenModelsAndTokens(relaySite)} /></TableCell>
                     <TableCell className='border-0'><RelaySiteActions relaySite={relaySite} canWrite={canWrite} /></TableCell>
                   </TableRow>
                   {expanded && (

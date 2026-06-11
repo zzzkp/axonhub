@@ -29,6 +29,8 @@ import {
   type UpdateRelaySiteInput,
 } from './schema';
 
+export { useUpdateChannelStatus } from '@/features/channels/data/channels';
+
 export type { CreateRelaySiteInput, RelaySite, RelaySiteAnnouncement, RelaySiteAnnouncementResult, RelaySiteAPIKey, RelaySiteCheckinLog, RelaySiteModelPrice, RelaySitesConnection, UpdateRelaySiteInput };
 export type { ImportedRelaySiteChannel, ImportRelaySiteAPIKeyToChannelInput, RelaySiteAPIKeyConfigInput };
 
@@ -46,6 +48,8 @@ const RELAY_SITE_FIELDS = `
   lastSyncError
   lastCheckinAt
   lastCheckinResult
+  checkinPageURL
+  externalCheckinPageURL
   hasUnreadAnnouncements
   displayCredential { authType token userId username password }
   apiKeys(first: 100, orderBy: { field: UPDATED_AT, direction: DESC }) {
@@ -88,6 +92,8 @@ const RELAY_SITE_FORM_FIELDS = `
   lastSyncError
   lastCheckinAt
   lastCheckinResult
+  checkinPageURL
+  externalCheckinPageURL
   hasUnreadAnnouncements
 `;
 
@@ -185,6 +191,26 @@ const IMPORT_RELAY_SITE_API_KEY_TO_CHANNEL_MUTATION = `
       status
       supportedModels
       defaultTestModel
+    }
+  }
+`;
+
+const RELAY_SITE_CHANNELS_QUERY = `
+  query RelaySiteChannels($input: QueryChannelInput!) {
+    queryChannels(input: $input) {
+      edges {
+        node {
+          id
+          status
+          tags
+          endpoints {
+            apiFormat
+            path
+            baseURL
+            transport
+          }
+        }
+      }
     }
   }
 `;
@@ -471,8 +497,27 @@ export function useImportRelaySiteAPIKeyToChannel() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['relaySites'] });
       queryClient.invalidateQueries({ queryKey: ['channels'] });
+      queryClient.invalidateQueries({ queryKey: ['relaySiteChannels'] });
       toast.success(t('relaySites.messages.importChannelSuccess'));
     },
+  });
+}
+
+export function useRelaySiteChannels(relaySiteID?: string) {
+  return useQuery({
+    queryKey: ['relaySiteChannels', relaySiteID],
+    queryFn: async () => {
+      if (!relaySiteID) return [];
+      // Extract raw integer ID from GraphQL node ID (gid://axonhub/RelaySite/123 → 123)
+      const rawID = relaySiteID.split('/').pop() || '';
+      const data = await graphqlRequest<{
+        queryChannels: { edges: Array<{ node: { id: string; status: string; tags: string[] | null; endpoints?: Array<{ apiFormat: string; path?: string; baseURL?: string; transport?: string }> | null } }> };
+      }>(RELAY_SITE_CHANNELS_QUERY, {
+        input: { hasTag: `relay-site:${rawID}`, first: 1000 },
+      });
+      return data.queryChannels.edges.map((edge) => edge.node);
+    },
+    enabled: !!relaySiteID,
   });
 }
 

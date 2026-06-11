@@ -20,9 +20,7 @@ export function RelaySiteActions({ relaySite, canWrite }: RelaySiteActionsProps)
     setDeletingRelaySite,
     setIsDeleteDialogOpen,
     setManagingRelaySite,
-    setIsAPIKeysDialogOpen,
-    setViewingModelsRelaySite,
-    setIsModelsDialogOpen,
+    setIsModelsAndTokensDialogOpen,
     setViewingCheckinLogsRelaySite,
     setIsCheckinLogsDialogOpen,
     setViewingAnnouncementsRelaySite,
@@ -50,25 +48,16 @@ export function RelaySiteActions({ relaySite, canWrite }: RelaySiteActionsProps)
               <CalendarCheck className='mr-2 h-4 w-4' />
               {t('relaySites.actions.checkin')}
             </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => {
-                setManagingRelaySite(relaySite);
-                setIsAPIKeysDialogOpen(true);
-              }}
-            >
-              <KeyRound className='mr-2 h-4 w-4' />
-              {t('relaySites.actions.apiKeys')}
-            </DropdownMenuItem>
           </>
         )}
         <DropdownMenuItem
           onClick={() => {
-            setViewingModelsRelaySite(relaySite);
-            setIsModelsDialogOpen(true);
+            setManagingRelaySite(relaySite);
+            setIsModelsAndTokensDialogOpen(true);
           }}
         >
           <Boxes className='mr-2 h-4 w-4' />
-          {t('relaySites.actions.models')}
+          {t('relaySites.actions.modelsAndTokens')}
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => {

@@ -16,6 +16,8 @@ interface RelaySitesContextType {
   setIsAPIKeysDialogOpen: (open: boolean) => void;
   isModelsDialogOpen: boolean;
   setIsModelsDialogOpen: (open: boolean) => void;
+  isModelsAndTokensDialogOpen: boolean;
+  setIsModelsAndTokensDialogOpen: (open: boolean) => void;
   isCheckinLogsDialogOpen: boolean;
   setIsCheckinLogsDialogOpen: (open: boolean) => void;
   isAnnouncementsDialogOpen: boolean;
@@ -55,6 +57,7 @@ export default function RelaySitesProvider({ children }: { children: ReactNode }
   const [isImportChannelDialogOpen, setIsImportChannelDialogOpen] = useState(false);
   const [isAPIKeysDialogOpen, setIsAPIKeysDialogOpen] = useState(false);
   const [isModelsDialogOpen, setIsModelsDialogOpen] = useState(false);
+  const [isModelsAndTokensDialogOpen, setIsModelsAndTokensDialogOpen] = useState(false);
   const [isCheckinLogsDialogOpen, setIsCheckinLogsDialogOpen] = useState(false);
   const [isAnnouncementsDialogOpen, setIsAnnouncementsDialogOpen] = useState(false);
   const [editingRelaySite, setEditingRelaySite] = useState<RelaySite | null>(null);
@@ -81,6 +84,8 @@ export default function RelaySitesProvider({ children }: { children: ReactNode }
         setIsAPIKeysDialogOpen,
         isModelsDialogOpen,
         setIsModelsDialogOpen,
+        isModelsAndTokensDialogOpen,
+        setIsModelsAndTokensDialogOpen,
         isCheckinLogsDialogOpen,
         setIsCheckinLogsDialogOpen,
         isAnnouncementsDialogOpen,

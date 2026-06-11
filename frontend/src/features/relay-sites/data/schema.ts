@@ -103,6 +103,8 @@ export const relaySiteSchema = z.object({
   lastSyncError: z.string().nullable().optional(),
   lastCheckinAt: z.string().nullable().optional(),
   lastCheckinResult: z.string().nullable().optional(),
+  checkinPageURL: z.string().nullable().optional(),
+  externalCheckinPageURL: z.string().nullable().optional(),
   hasUnreadAnnouncements: z.boolean(),
   displayCredential: relaySiteDisplayCredentialSchema,
   apiKeys: nestedConnectionOf(relaySiteAPIKeySchema),
@@ -128,6 +130,8 @@ export const relaySiteFormResultSchema = relaySiteSchema.pick({
   lastSyncError: true,
   lastCheckinAt: true,
   lastCheckinResult: true,
+  checkinPageURL: true,
+  externalCheckinPageURL: true,
   hasUnreadAnnouncements: true,
 });
 export type RelaySiteFormResult = z.infer<typeof relaySiteFormResultSchema>;
@@ -173,6 +177,8 @@ export const createRelaySiteInputSchema = z.object({
   status: relaySiteStatusSchema.optional(),
   autoCheckinEnabled: z.boolean().optional(),
   remark: z.string().optional(),
+  checkinPageURL: z.string().optional(),
+  externalCheckinPageURL: z.string().optional(),
   credential: relaySiteCredentialInputSchema,
 });
 export type CreateRelaySiteInput = z.infer<typeof createRelaySiteInputSchema>;
@@ -183,6 +189,8 @@ export const updateRelaySiteInputSchema = z.object({
   status: relaySiteStatusSchema.optional(),
   autoCheckinEnabled: z.boolean().optional(),
   remark: z.string().optional(),
+  checkinPageURL: z.string().optional(),
+  externalCheckinPageURL: z.string().optional(),
   credential: relaySiteCredentialInputSchema.optional(),
 });
 export type UpdateRelaySiteInput = z.infer<typeof updateRelaySiteInputSchema>;

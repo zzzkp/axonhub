@@ -1330,8 +1330,10 @@ type ComplexityRoot struct {
 		BalanceSnapshots       func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.RelaySiteBalanceSnapshotOrder, where *ent.RelaySiteBalanceSnapshotWhereInput) int
 		BaseURL                func(childComplexity int) int
 		CheckinLogs            func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.RelaySiteCheckinLogOrder, where *ent.RelaySiteCheckinLogWhereInput) int
+		CheckinPageURL         func(childComplexity int) int
 		CreatedAt              func(childComplexity int) int
 		DisplayCredential      func(childComplexity int) int
+		ExternalCheckinPageURL func(childComplexity int) int
 		Groups                 func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.RelaySiteGroupOrder, where *ent.RelaySiteGroupWhereInput) int
 		HasUnreadAnnouncements func(childComplexity int) int
 		ID                     func(childComplexity int) int
@@ -2597,9 +2599,13 @@ type UserRoleResolver interface {
 
 type CreateRelaySiteConfigInputResolver interface {
 	Credential(ctx context.Context, obj *biz.CreateRelaySiteConfigInput, data *RelaySiteCredentialInput) error
+	CheckinPageURL(ctx context.Context, obj *biz.CreateRelaySiteConfigInput, data *string) error
+	ExternalCheckinPageURL(ctx context.Context, obj *biz.CreateRelaySiteConfigInput, data *string) error
 }
 type UpdateRelaySiteConfigInputResolver interface {
 	Credential(ctx context.Context, obj *biz.UpdateRelaySiteConfigInput, data *RelaySiteCredentialInput) error
+	CheckinPageURL(ctx context.Context, obj *biz.UpdateRelaySiteConfigInput, data *string) error
+	ExternalCheckinPageURL(ctx context.Context, obj *biz.UpdateRelaySiteConfigInput, data *string) error
 }
 
 type executableSchema struct {
@@ -8430,6 +8436,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.RelaySite.CheckinLogs(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.RelaySiteCheckinLogOrder), args["where"].(*ent.RelaySiteCheckinLogWhereInput)), true
+	case "RelaySite.checkinPageURL":
+		if e.complexity.RelaySite.CheckinPageURL == nil {
+			break
+		}
+
+		return e.complexity.RelaySite.CheckinPageURL(childComplexity), true
 	case "RelaySite.createdAt":
 		if e.complexity.RelaySite.CreatedAt == nil {
 			break
@@ -8442,6 +8454,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.RelaySite.DisplayCredential(childComplexity), true
+	case "RelaySite.externalCheckinPageURL":
+		if e.complexity.RelaySite.ExternalCheckinPageURL == nil {
+			break
+		}
+
+		return e.complexity.RelaySite.ExternalCheckinPageURL(childComplexity), true
 	case "RelaySite.groups":
 		if e.complexity.RelaySite.Groups == nil {
 			break
@@ -36315,6 +36333,10 @@ func (ec *executionContext) fieldContext_Mutation_createRelaySiteConfig(ctx cont
 				return ec.fieldContext_RelaySite_lastCheckinAt(ctx, field)
 			case "lastCheckinResult":
 				return ec.fieldContext_RelaySite_lastCheckinResult(ctx, field)
+			case "checkinPageURL":
+				return ec.fieldContext_RelaySite_checkinPageURL(ctx, field)
+			case "externalCheckinPageURL":
+				return ec.fieldContext_RelaySite_externalCheckinPageURL(ctx, field)
 			case "apiKeys":
 				return ec.fieldContext_RelaySite_apiKeys(ctx, field)
 			case "groups":
@@ -36400,6 +36422,10 @@ func (ec *executionContext) fieldContext_Mutation_updateRelaySiteConfig(ctx cont
 				return ec.fieldContext_RelaySite_lastCheckinAt(ctx, field)
 			case "lastCheckinResult":
 				return ec.fieldContext_RelaySite_lastCheckinResult(ctx, field)
+			case "checkinPageURL":
+				return ec.fieldContext_RelaySite_checkinPageURL(ctx, field)
+			case "externalCheckinPageURL":
+				return ec.fieldContext_RelaySite_externalCheckinPageURL(ctx, field)
 			case "apiKeys":
 				return ec.fieldContext_RelaySite_apiKeys(ctx, field)
 			case "groups":
@@ -36485,6 +36511,10 @@ func (ec *executionContext) fieldContext_Mutation_deleteRelaySiteConfig(ctx cont
 				return ec.fieldContext_RelaySite_lastCheckinAt(ctx, field)
 			case "lastCheckinResult":
 				return ec.fieldContext_RelaySite_lastCheckinResult(ctx, field)
+			case "checkinPageURL":
+				return ec.fieldContext_RelaySite_checkinPageURL(ctx, field)
+			case "externalCheckinPageURL":
+				return ec.fieldContext_RelaySite_externalCheckinPageURL(ctx, field)
 			case "apiKeys":
 				return ec.fieldContext_RelaySite_apiKeys(ctx, field)
 			case "groups":
@@ -36570,6 +36600,10 @@ func (ec *executionContext) fieldContext_Mutation_syncRelaySite(ctx context.Cont
 				return ec.fieldContext_RelaySite_lastCheckinAt(ctx, field)
 			case "lastCheckinResult":
 				return ec.fieldContext_RelaySite_lastCheckinResult(ctx, field)
+			case "checkinPageURL":
+				return ec.fieldContext_RelaySite_checkinPageURL(ctx, field)
+			case "externalCheckinPageURL":
+				return ec.fieldContext_RelaySite_externalCheckinPageURL(ctx, field)
 			case "apiKeys":
 				return ec.fieldContext_RelaySite_apiKeys(ctx, field)
 			case "groups":
@@ -36774,6 +36808,10 @@ func (ec *executionContext) fieldContext_Mutation_refreshRelaySiteAnnouncements(
 				return ec.fieldContext_RelaySite_lastCheckinAt(ctx, field)
 			case "lastCheckinResult":
 				return ec.fieldContext_RelaySite_lastCheckinResult(ctx, field)
+			case "checkinPageURL":
+				return ec.fieldContext_RelaySite_checkinPageURL(ctx, field)
+			case "externalCheckinPageURL":
+				return ec.fieldContext_RelaySite_externalCheckinPageURL(ctx, field)
 			case "apiKeys":
 				return ec.fieldContext_RelaySite_apiKeys(ctx, field)
 			case "groups":
@@ -36859,6 +36897,10 @@ func (ec *executionContext) fieldContext_Mutation_markRelaySiteAnnouncementsRead
 				return ec.fieldContext_RelaySite_lastCheckinAt(ctx, field)
 			case "lastCheckinResult":
 				return ec.fieldContext_RelaySite_lastCheckinResult(ctx, field)
+			case "checkinPageURL":
+				return ec.fieldContext_RelaySite_checkinPageURL(ctx, field)
+			case "externalCheckinPageURL":
+				return ec.fieldContext_RelaySite_externalCheckinPageURL(ctx, field)
 			case "apiKeys":
 				return ec.fieldContext_RelaySite_apiKeys(ctx, field)
 			case "groups":
@@ -36944,6 +36986,10 @@ func (ec *executionContext) fieldContext_Mutation_createRelaySiteAPIKey(ctx cont
 				return ec.fieldContext_RelaySite_lastCheckinAt(ctx, field)
 			case "lastCheckinResult":
 				return ec.fieldContext_RelaySite_lastCheckinResult(ctx, field)
+			case "checkinPageURL":
+				return ec.fieldContext_RelaySite_checkinPageURL(ctx, field)
+			case "externalCheckinPageURL":
+				return ec.fieldContext_RelaySite_externalCheckinPageURL(ctx, field)
 			case "apiKeys":
 				return ec.fieldContext_RelaySite_apiKeys(ctx, field)
 			case "groups":
@@ -37029,6 +37075,10 @@ func (ec *executionContext) fieldContext_Mutation_updateRelaySiteAPIKey(ctx cont
 				return ec.fieldContext_RelaySite_lastCheckinAt(ctx, field)
 			case "lastCheckinResult":
 				return ec.fieldContext_RelaySite_lastCheckinResult(ctx, field)
+			case "checkinPageURL":
+				return ec.fieldContext_RelaySite_checkinPageURL(ctx, field)
+			case "externalCheckinPageURL":
+				return ec.fieldContext_RelaySite_externalCheckinPageURL(ctx, field)
 			case "apiKeys":
 				return ec.fieldContext_RelaySite_apiKeys(ctx, field)
 			case "groups":
@@ -37114,6 +37164,10 @@ func (ec *executionContext) fieldContext_Mutation_deleteRelaySiteAPIKey(ctx cont
 				return ec.fieldContext_RelaySite_lastCheckinAt(ctx, field)
 			case "lastCheckinResult":
 				return ec.fieldContext_RelaySite_lastCheckinResult(ctx, field)
+			case "checkinPageURL":
+				return ec.fieldContext_RelaySite_checkinPageURL(ctx, field)
+			case "externalCheckinPageURL":
+				return ec.fieldContext_RelaySite_externalCheckinPageURL(ctx, field)
 			case "apiKeys":
 				return ec.fieldContext_RelaySite_apiKeys(ctx, field)
 			case "groups":
@@ -37199,6 +37253,10 @@ func (ec *executionContext) fieldContext_Mutation_createRelaySiteAPIKeysForAllGr
 				return ec.fieldContext_RelaySite_lastCheckinAt(ctx, field)
 			case "lastCheckinResult":
 				return ec.fieldContext_RelaySite_lastCheckinResult(ctx, field)
+			case "checkinPageURL":
+				return ec.fieldContext_RelaySite_checkinPageURL(ctx, field)
+			case "externalCheckinPageURL":
+				return ec.fieldContext_RelaySite_externalCheckinPageURL(ctx, field)
 			case "apiKeys":
 				return ec.fieldContext_RelaySite_apiKeys(ctx, field)
 			case "groups":
@@ -46040,6 +46098,64 @@ func (ec *executionContext) fieldContext_RelaySite_lastCheckinResult(_ context.C
 	return fc, nil
 }
 
+func (ec *executionContext) _RelaySite_checkinPageURL(ctx context.Context, field graphql.CollectedField, obj *ent.RelaySite) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_RelaySite_checkinPageURL,
+		func(ctx context.Context) (any, error) {
+			return obj.CheckinPageURL, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_RelaySite_checkinPageURL(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "RelaySite",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _RelaySite_externalCheckinPageURL(ctx context.Context, field graphql.CollectedField, obj *ent.RelaySite) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_RelaySite_externalCheckinPageURL,
+		func(ctx context.Context) (any, error) {
+			return obj.ExternalCheckinPageURL, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_RelaySite_externalCheckinPageURL(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "RelaySite",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _RelaySite_apiKeys(ctx context.Context, field graphql.CollectedField, obj *ent.RelaySite) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -46802,6 +46918,10 @@ func (ec *executionContext) fieldContext_RelaySiteAPIKey_relaySite(_ context.Con
 				return ec.fieldContext_RelaySite_lastCheckinAt(ctx, field)
 			case "lastCheckinResult":
 				return ec.fieldContext_RelaySite_lastCheckinResult(ctx, field)
+			case "checkinPageURL":
+				return ec.fieldContext_RelaySite_checkinPageURL(ctx, field)
+			case "externalCheckinPageURL":
+				return ec.fieldContext_RelaySite_externalCheckinPageURL(ctx, field)
 			case "apiKeys":
 				return ec.fieldContext_RelaySite_apiKeys(ctx, field)
 			case "groups":
@@ -47412,6 +47532,10 @@ func (ec *executionContext) fieldContext_RelaySiteAnnouncement_relaySite(_ conte
 				return ec.fieldContext_RelaySite_lastCheckinAt(ctx, field)
 			case "lastCheckinResult":
 				return ec.fieldContext_RelaySite_lastCheckinResult(ctx, field)
+			case "checkinPageURL":
+				return ec.fieldContext_RelaySite_checkinPageURL(ctx, field)
+			case "externalCheckinPageURL":
+				return ec.fieldContext_RelaySite_externalCheckinPageURL(ctx, field)
 			case "apiKeys":
 				return ec.fieldContext_RelaySite_apiKeys(ctx, field)
 			case "groups":
@@ -47877,6 +48001,10 @@ func (ec *executionContext) fieldContext_RelaySiteBalanceSnapshot_relaySite(_ co
 				return ec.fieldContext_RelaySite_lastCheckinAt(ctx, field)
 			case "lastCheckinResult":
 				return ec.fieldContext_RelaySite_lastCheckinResult(ctx, field)
+			case "checkinPageURL":
+				return ec.fieldContext_RelaySite_checkinPageURL(ctx, field)
+			case "externalCheckinPageURL":
+				return ec.fieldContext_RelaySite_externalCheckinPageURL(ctx, field)
 			case "apiKeys":
 				return ec.fieldContext_RelaySite_apiKeys(ctx, field)
 			case "groups":
@@ -48361,6 +48489,10 @@ func (ec *executionContext) fieldContext_RelaySiteCheckinLog_relaySite(_ context
 				return ec.fieldContext_RelaySite_lastCheckinAt(ctx, field)
 			case "lastCheckinResult":
 				return ec.fieldContext_RelaySite_lastCheckinResult(ctx, field)
+			case "checkinPageURL":
+				return ec.fieldContext_RelaySite_checkinPageURL(ctx, field)
+			case "externalCheckinPageURL":
+				return ec.fieldContext_RelaySite_externalCheckinPageURL(ctx, field)
 			case "apiKeys":
 				return ec.fieldContext_RelaySite_apiKeys(ctx, field)
 			case "groups":
@@ -48863,6 +48995,10 @@ func (ec *executionContext) fieldContext_RelaySiteEdge_node(_ context.Context, f
 				return ec.fieldContext_RelaySite_lastCheckinAt(ctx, field)
 			case "lastCheckinResult":
 				return ec.fieldContext_RelaySite_lastCheckinResult(ctx, field)
+			case "checkinPageURL":
+				return ec.fieldContext_RelaySite_checkinPageURL(ctx, field)
+			case "externalCheckinPageURL":
+				return ec.fieldContext_RelaySite_externalCheckinPageURL(ctx, field)
 			case "apiKeys":
 				return ec.fieldContext_RelaySite_apiKeys(ctx, field)
 			case "groups":
@@ -49168,6 +49304,10 @@ func (ec *executionContext) fieldContext_RelaySiteGroup_relaySite(_ context.Cont
 				return ec.fieldContext_RelaySite_lastCheckinAt(ctx, field)
 			case "lastCheckinResult":
 				return ec.fieldContext_RelaySite_lastCheckinResult(ctx, field)
+			case "checkinPageURL":
+				return ec.fieldContext_RelaySite_checkinPageURL(ctx, field)
+			case "externalCheckinPageURL":
+				return ec.fieldContext_RelaySite_externalCheckinPageURL(ctx, field)
 			case "apiKeys":
 				return ec.fieldContext_RelaySite_apiKeys(ctx, field)
 			case "groups":
@@ -49594,6 +49734,10 @@ func (ec *executionContext) fieldContext_RelaySiteModelPrice_relaySite(_ context
 				return ec.fieldContext_RelaySite_lastCheckinAt(ctx, field)
 			case "lastCheckinResult":
 				return ec.fieldContext_RelaySite_lastCheckinResult(ctx, field)
+			case "checkinPageURL":
+				return ec.fieldContext_RelaySite_checkinPageURL(ctx, field)
+			case "externalCheckinPageURL":
+				return ec.fieldContext_RelaySite_externalCheckinPageURL(ctx, field)
 			case "apiKeys":
 				return ec.fieldContext_RelaySite_apiKeys(ctx, field)
 			case "groups":
@@ -71986,7 +72130,7 @@ func (ec *executionContext) unmarshalInputCreateRelaySiteConfigInput(ctx context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "baseURL", "status", "autoCheckinEnabled", "remark", "credential"}
+	fieldsInOrder := [...]string{"name", "baseURL", "status", "autoCheckinEnabled", "remark", "credential", "checkinPageURL", "externalCheckinPageURL"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -72037,6 +72181,24 @@ func (ec *executionContext) unmarshalInputCreateRelaySiteConfigInput(ctx context
 			if err = ec.resolvers.CreateRelaySiteConfigInput().Credential(ctx, &it, data); err != nil {
 				return it, err
 			}
+		case "checkinPageURL":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("checkinPageURL"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			if err = ec.resolvers.CreateRelaySiteConfigInput().CheckinPageURL(ctx, &it, data); err != nil {
+				return it, err
+			}
+		case "externalCheckinPageURL":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("externalCheckinPageURL"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			if err = ec.resolvers.CreateRelaySiteConfigInput().ExternalCheckinPageURL(ctx, &it, data); err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -72050,7 +72212,7 @@ func (ec *executionContext) unmarshalInputCreateRelaySiteInput(ctx context.Conte
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "type", "baseURL", "status", "autoCheckinEnabled", "remark"}
+	fieldsInOrder := [...]string{"name", "type", "baseURL", "status", "autoCheckinEnabled", "remark", "checkinPageURL", "externalCheckinPageURL"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -72099,6 +72261,20 @@ func (ec *executionContext) unmarshalInputCreateRelaySiteInput(ctx context.Conte
 				return it, err
 			}
 			it.Remark = data
+		case "checkinPageURL":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("checkinPageURL"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CheckinPageURL = data
+		case "externalCheckinPageURL":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("externalCheckinPageURL"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ExternalCheckinPageURL = data
 		}
 	}
 
@@ -83794,7 +83970,7 @@ func (ec *executionContext) unmarshalInputRelaySiteWhereInput(ctx context.Contex
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "type", "typeNEQ", "typeIn", "typeNotIn", "baseURL", "baseURLNEQ", "baseURLIn", "baseURLNotIn", "baseURLGT", "baseURLGTE", "baseURLLT", "baseURLLTE", "baseURLContains", "baseURLHasPrefix", "baseURLHasSuffix", "baseURLEqualFold", "baseURLContainsFold", "status", "statusNEQ", "statusIn", "statusNotIn", "autoCheckinEnabled", "autoCheckinEnabledNEQ", "remark", "remarkNEQ", "remarkIn", "remarkNotIn", "remarkGT", "remarkGTE", "remarkLT", "remarkLTE", "remarkContains", "remarkHasPrefix", "remarkHasSuffix", "remarkIsNil", "remarkNotNil", "remarkEqualFold", "remarkContainsFold", "lastSyncedAt", "lastSyncedAtNEQ", "lastSyncedAtIn", "lastSyncedAtNotIn", "lastSyncedAtGT", "lastSyncedAtGTE", "lastSyncedAtLT", "lastSyncedAtLTE", "lastSyncedAtIsNil", "lastSyncedAtNotNil", "lastSyncError", "lastSyncErrorNEQ", "lastSyncErrorIn", "lastSyncErrorNotIn", "lastSyncErrorGT", "lastSyncErrorGTE", "lastSyncErrorLT", "lastSyncErrorLTE", "lastSyncErrorContains", "lastSyncErrorHasPrefix", "lastSyncErrorHasSuffix", "lastSyncErrorIsNil", "lastSyncErrorNotNil", "lastSyncErrorEqualFold", "lastSyncErrorContainsFold", "lastCheckinAt", "lastCheckinAtNEQ", "lastCheckinAtIn", "lastCheckinAtNotIn", "lastCheckinAtGT", "lastCheckinAtGTE", "lastCheckinAtLT", "lastCheckinAtLTE", "lastCheckinAtIsNil", "lastCheckinAtNotNil", "lastCheckinResult", "lastCheckinResultNEQ", "lastCheckinResultIn", "lastCheckinResultNotIn", "lastCheckinResultGT", "lastCheckinResultGTE", "lastCheckinResultLT", "lastCheckinResultLTE", "lastCheckinResultContains", "lastCheckinResultHasPrefix", "lastCheckinResultHasSuffix", "lastCheckinResultIsNil", "lastCheckinResultNotNil", "lastCheckinResultEqualFold", "lastCheckinResultContainsFold", "hasAPIKeys", "hasAPIKeysWith", "hasGroups", "hasGroupsWith", "hasBalanceSnapshots", "hasBalanceSnapshotsWith", "hasModelPrices", "hasModelPricesWith", "hasCheckinLogs", "hasCheckinLogsWith", "hasAnnouncements", "hasAnnouncementsWith"}
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "type", "typeNEQ", "typeIn", "typeNotIn", "baseURL", "baseURLNEQ", "baseURLIn", "baseURLNotIn", "baseURLGT", "baseURLGTE", "baseURLLT", "baseURLLTE", "baseURLContains", "baseURLHasPrefix", "baseURLHasSuffix", "baseURLEqualFold", "baseURLContainsFold", "status", "statusNEQ", "statusIn", "statusNotIn", "autoCheckinEnabled", "autoCheckinEnabledNEQ", "remark", "remarkNEQ", "remarkIn", "remarkNotIn", "remarkGT", "remarkGTE", "remarkLT", "remarkLTE", "remarkContains", "remarkHasPrefix", "remarkHasSuffix", "remarkIsNil", "remarkNotNil", "remarkEqualFold", "remarkContainsFold", "lastSyncedAt", "lastSyncedAtNEQ", "lastSyncedAtIn", "lastSyncedAtNotIn", "lastSyncedAtGT", "lastSyncedAtGTE", "lastSyncedAtLT", "lastSyncedAtLTE", "lastSyncedAtIsNil", "lastSyncedAtNotNil", "lastSyncError", "lastSyncErrorNEQ", "lastSyncErrorIn", "lastSyncErrorNotIn", "lastSyncErrorGT", "lastSyncErrorGTE", "lastSyncErrorLT", "lastSyncErrorLTE", "lastSyncErrorContains", "lastSyncErrorHasPrefix", "lastSyncErrorHasSuffix", "lastSyncErrorIsNil", "lastSyncErrorNotNil", "lastSyncErrorEqualFold", "lastSyncErrorContainsFold", "lastCheckinAt", "lastCheckinAtNEQ", "lastCheckinAtIn", "lastCheckinAtNotIn", "lastCheckinAtGT", "lastCheckinAtGTE", "lastCheckinAtLT", "lastCheckinAtLTE", "lastCheckinAtIsNil", "lastCheckinAtNotNil", "lastCheckinResult", "lastCheckinResultNEQ", "lastCheckinResultIn", "lastCheckinResultNotIn", "lastCheckinResultGT", "lastCheckinResultGTE", "lastCheckinResultLT", "lastCheckinResultLTE", "lastCheckinResultContains", "lastCheckinResultHasPrefix", "lastCheckinResultHasSuffix", "lastCheckinResultIsNil", "lastCheckinResultNotNil", "lastCheckinResultEqualFold", "lastCheckinResultContainsFold", "checkinPageURL", "checkinPageURLNEQ", "checkinPageURLIn", "checkinPageURLNotIn", "checkinPageURLGT", "checkinPageURLGTE", "checkinPageURLLT", "checkinPageURLLTE", "checkinPageURLContains", "checkinPageURLHasPrefix", "checkinPageURLHasSuffix", "checkinPageURLIsNil", "checkinPageURLNotNil", "checkinPageURLEqualFold", "checkinPageURLContainsFold", "externalCheckinPageURL", "externalCheckinPageURLNEQ", "externalCheckinPageURLIn", "externalCheckinPageURLNotIn", "externalCheckinPageURLGT", "externalCheckinPageURLGTE", "externalCheckinPageURLLT", "externalCheckinPageURLLTE", "externalCheckinPageURLContains", "externalCheckinPageURLHasPrefix", "externalCheckinPageURLHasSuffix", "externalCheckinPageURLIsNil", "externalCheckinPageURLNotNil", "externalCheckinPageURLEqualFold", "externalCheckinPageURLContainsFold", "hasAPIKeys", "hasAPIKeysWith", "hasGroups", "hasGroupsWith", "hasBalanceSnapshots", "hasBalanceSnapshotsWith", "hasModelPrices", "hasModelPricesWith", "hasCheckinLogs", "hasCheckinLogsWith", "hasAnnouncements", "hasAnnouncementsWith"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -84729,6 +84905,216 @@ func (ec *executionContext) unmarshalInputRelaySiteWhereInput(ctx context.Contex
 				return it, err
 			}
 			it.LastCheckinResultContainsFold = data
+		case "checkinPageURL":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("checkinPageURL"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CheckinPageURL = data
+		case "checkinPageURLNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("checkinPageURLNEQ"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CheckinPageURLNEQ = data
+		case "checkinPageURLIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("checkinPageURLIn"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CheckinPageURLIn = data
+		case "checkinPageURLNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("checkinPageURLNotIn"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CheckinPageURLNotIn = data
+		case "checkinPageURLGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("checkinPageURLGT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CheckinPageURLGT = data
+		case "checkinPageURLGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("checkinPageURLGTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CheckinPageURLGTE = data
+		case "checkinPageURLLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("checkinPageURLLT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CheckinPageURLLT = data
+		case "checkinPageURLLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("checkinPageURLLTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CheckinPageURLLTE = data
+		case "checkinPageURLContains":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("checkinPageURLContains"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CheckinPageURLContains = data
+		case "checkinPageURLHasPrefix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("checkinPageURLHasPrefix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CheckinPageURLHasPrefix = data
+		case "checkinPageURLHasSuffix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("checkinPageURLHasSuffix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CheckinPageURLHasSuffix = data
+		case "checkinPageURLIsNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("checkinPageURLIsNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CheckinPageURLIsNil = data
+		case "checkinPageURLNotNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("checkinPageURLNotNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CheckinPageURLNotNil = data
+		case "checkinPageURLEqualFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("checkinPageURLEqualFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CheckinPageURLEqualFold = data
+		case "checkinPageURLContainsFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("checkinPageURLContainsFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CheckinPageURLContainsFold = data
+		case "externalCheckinPageURL":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("externalCheckinPageURL"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ExternalCheckinPageURL = data
+		case "externalCheckinPageURLNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("externalCheckinPageURLNEQ"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ExternalCheckinPageURLNEQ = data
+		case "externalCheckinPageURLIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("externalCheckinPageURLIn"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ExternalCheckinPageURLIn = data
+		case "externalCheckinPageURLNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("externalCheckinPageURLNotIn"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ExternalCheckinPageURLNotIn = data
+		case "externalCheckinPageURLGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("externalCheckinPageURLGT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ExternalCheckinPageURLGT = data
+		case "externalCheckinPageURLGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("externalCheckinPageURLGTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ExternalCheckinPageURLGTE = data
+		case "externalCheckinPageURLLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("externalCheckinPageURLLT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ExternalCheckinPageURLLT = data
+		case "externalCheckinPageURLLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("externalCheckinPageURLLTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ExternalCheckinPageURLLTE = data
+		case "externalCheckinPageURLContains":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("externalCheckinPageURLContains"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ExternalCheckinPageURLContains = data
+		case "externalCheckinPageURLHasPrefix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("externalCheckinPageURLHasPrefix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ExternalCheckinPageURLHasPrefix = data
+		case "externalCheckinPageURLHasSuffix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("externalCheckinPageURLHasSuffix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ExternalCheckinPageURLHasSuffix = data
+		case "externalCheckinPageURLIsNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("externalCheckinPageURLIsNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ExternalCheckinPageURLIsNil = data
+		case "externalCheckinPageURLNotNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("externalCheckinPageURLNotNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ExternalCheckinPageURLNotNil = data
+		case "externalCheckinPageURLEqualFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("externalCheckinPageURLEqualFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ExternalCheckinPageURLEqualFold = data
+		case "externalCheckinPageURLContainsFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("externalCheckinPageURLContainsFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ExternalCheckinPageURLContainsFold = data
 		case "hasAPIKeys":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasAPIKeys"))
 			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
@@ -91555,7 +91941,7 @@ func (ec *executionContext) unmarshalInputUpdateRelaySiteConfigInput(ctx context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "baseURL", "status", "autoCheckinEnabled", "remark", "credential"}
+	fieldsInOrder := [...]string{"name", "baseURL", "status", "autoCheckinEnabled", "remark", "credential", "checkinPageURL", "externalCheckinPageURL"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -91606,6 +91992,24 @@ func (ec *executionContext) unmarshalInputUpdateRelaySiteConfigInput(ctx context
 			if err = ec.resolvers.UpdateRelaySiteConfigInput().Credential(ctx, &it, data); err != nil {
 				return it, err
 			}
+		case "checkinPageURL":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("checkinPageURL"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			if err = ec.resolvers.UpdateRelaySiteConfigInput().CheckinPageURL(ctx, &it, data); err != nil {
+				return it, err
+			}
+		case "externalCheckinPageURL":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("externalCheckinPageURL"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			if err = ec.resolvers.UpdateRelaySiteConfigInput().ExternalCheckinPageURL(ctx, &it, data); err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -91619,7 +92023,7 @@ func (ec *executionContext) unmarshalInputUpdateRelaySiteInput(ctx context.Conte
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "type", "baseURL", "status", "autoCheckinEnabled", "remark", "clearRemark"}
+	fieldsInOrder := [...]string{"name", "type", "baseURL", "status", "autoCheckinEnabled", "remark", "clearRemark", "checkinPageURL", "clearCheckinPageURL", "externalCheckinPageURL", "clearExternalCheckinPageURL"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -91675,6 +92079,34 @@ func (ec *executionContext) unmarshalInputUpdateRelaySiteInput(ctx context.Conte
 				return it, err
 			}
 			it.ClearRemark = data
+		case "checkinPageURL":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("checkinPageURL"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CheckinPageURL = data
+		case "clearCheckinPageURL":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearCheckinPageURL"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClearCheckinPageURL = data
+		case "externalCheckinPageURL":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("externalCheckinPageURL"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ExternalCheckinPageURL = data
+		case "clearExternalCheckinPageURL":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearExternalCheckinPageURL"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClearExternalCheckinPageURL = data
 		}
 	}
 
@@ -108258,6 +108690,10 @@ func (ec *executionContext) _RelaySite(ctx context.Context, sel ast.SelectionSet
 			out.Values[i] = ec._RelaySite_lastCheckinAt(ctx, field, obj)
 		case "lastCheckinResult":
 			out.Values[i] = ec._RelaySite_lastCheckinResult(ctx, field, obj)
+		case "checkinPageURL":
+			out.Values[i] = ec._RelaySite_checkinPageURL(ctx, field, obj)
+		case "externalCheckinPageURL":
+			out.Values[i] = ec._RelaySite_externalCheckinPageURL(ctx, field, obj)
 		case "apiKeys":
 			field := field
 

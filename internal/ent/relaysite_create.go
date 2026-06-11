@@ -195,6 +195,34 @@ func (_c *RelaySiteCreate) SetNillableLastCheckinResult(v *string) *RelaySiteCre
 	return _c
 }
 
+// SetCheckinPageURL sets the "checkin_page_url" field.
+func (_c *RelaySiteCreate) SetCheckinPageURL(v string) *RelaySiteCreate {
+	_c.mutation.SetCheckinPageURL(v)
+	return _c
+}
+
+// SetNillableCheckinPageURL sets the "checkin_page_url" field if the given value is not nil.
+func (_c *RelaySiteCreate) SetNillableCheckinPageURL(v *string) *RelaySiteCreate {
+	if v != nil {
+		_c.SetCheckinPageURL(*v)
+	}
+	return _c
+}
+
+// SetExternalCheckinPageURL sets the "external_checkin_page_url" field.
+func (_c *RelaySiteCreate) SetExternalCheckinPageURL(v string) *RelaySiteCreate {
+	_c.mutation.SetExternalCheckinPageURL(v)
+	return _c
+}
+
+// SetNillableExternalCheckinPageURL sets the "external_checkin_page_url" field if the given value is not nil.
+func (_c *RelaySiteCreate) SetNillableExternalCheckinPageURL(v *string) *RelaySiteCreate {
+	if v != nil {
+		_c.SetExternalCheckinPageURL(*v)
+	}
+	return _c
+}
+
 // SetCredentialID sets the "credential" edge to the RelaySiteCredential entity by ID.
 func (_c *RelaySiteCreate) SetCredentialID(id int) *RelaySiteCreate {
 	_c.mutation.SetCredentialID(id)
@@ -482,6 +510,14 @@ func (_c *RelaySiteCreate) createSpec() (*RelaySite, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.LastCheckinResult(); ok {
 		_spec.SetField(relaysite.FieldLastCheckinResult, field.TypeString, value)
 		_node.LastCheckinResult = &value
+	}
+	if value, ok := _c.mutation.CheckinPageURL(); ok {
+		_spec.SetField(relaysite.FieldCheckinPageURL, field.TypeString, value)
+		_node.CheckinPageURL = &value
+	}
+	if value, ok := _c.mutation.ExternalCheckinPageURL(); ok {
+		_spec.SetField(relaysite.FieldExternalCheckinPageURL, field.TypeString, value)
+		_node.ExternalCheckinPageURL = &value
 	}
 	if nodes := _c.mutation.CredentialIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -827,6 +863,42 @@ func (u *RelaySiteUpsert) ClearLastCheckinResult() *RelaySiteUpsert {
 	return u
 }
 
+// SetCheckinPageURL sets the "checkin_page_url" field.
+func (u *RelaySiteUpsert) SetCheckinPageURL(v string) *RelaySiteUpsert {
+	u.Set(relaysite.FieldCheckinPageURL, v)
+	return u
+}
+
+// UpdateCheckinPageURL sets the "checkin_page_url" field to the value that was provided on create.
+func (u *RelaySiteUpsert) UpdateCheckinPageURL() *RelaySiteUpsert {
+	u.SetExcluded(relaysite.FieldCheckinPageURL)
+	return u
+}
+
+// ClearCheckinPageURL clears the value of the "checkin_page_url" field.
+func (u *RelaySiteUpsert) ClearCheckinPageURL() *RelaySiteUpsert {
+	u.SetNull(relaysite.FieldCheckinPageURL)
+	return u
+}
+
+// SetExternalCheckinPageURL sets the "external_checkin_page_url" field.
+func (u *RelaySiteUpsert) SetExternalCheckinPageURL(v string) *RelaySiteUpsert {
+	u.Set(relaysite.FieldExternalCheckinPageURL, v)
+	return u
+}
+
+// UpdateExternalCheckinPageURL sets the "external_checkin_page_url" field to the value that was provided on create.
+func (u *RelaySiteUpsert) UpdateExternalCheckinPageURL() *RelaySiteUpsert {
+	u.SetExcluded(relaysite.FieldExternalCheckinPageURL)
+	return u
+}
+
+// ClearExternalCheckinPageURL clears the value of the "external_checkin_page_url" field.
+func (u *RelaySiteUpsert) ClearExternalCheckinPageURL() *RelaySiteUpsert {
+	u.SetNull(relaysite.FieldExternalCheckinPageURL)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create.
 // Using this option is equivalent to using:
 //
@@ -1079,6 +1151,48 @@ func (u *RelaySiteUpsertOne) UpdateLastCheckinResult() *RelaySiteUpsertOne {
 func (u *RelaySiteUpsertOne) ClearLastCheckinResult() *RelaySiteUpsertOne {
 	return u.Update(func(s *RelaySiteUpsert) {
 		s.ClearLastCheckinResult()
+	})
+}
+
+// SetCheckinPageURL sets the "checkin_page_url" field.
+func (u *RelaySiteUpsertOne) SetCheckinPageURL(v string) *RelaySiteUpsertOne {
+	return u.Update(func(s *RelaySiteUpsert) {
+		s.SetCheckinPageURL(v)
+	})
+}
+
+// UpdateCheckinPageURL sets the "checkin_page_url" field to the value that was provided on create.
+func (u *RelaySiteUpsertOne) UpdateCheckinPageURL() *RelaySiteUpsertOne {
+	return u.Update(func(s *RelaySiteUpsert) {
+		s.UpdateCheckinPageURL()
+	})
+}
+
+// ClearCheckinPageURL clears the value of the "checkin_page_url" field.
+func (u *RelaySiteUpsertOne) ClearCheckinPageURL() *RelaySiteUpsertOne {
+	return u.Update(func(s *RelaySiteUpsert) {
+		s.ClearCheckinPageURL()
+	})
+}
+
+// SetExternalCheckinPageURL sets the "external_checkin_page_url" field.
+func (u *RelaySiteUpsertOne) SetExternalCheckinPageURL(v string) *RelaySiteUpsertOne {
+	return u.Update(func(s *RelaySiteUpsert) {
+		s.SetExternalCheckinPageURL(v)
+	})
+}
+
+// UpdateExternalCheckinPageURL sets the "external_checkin_page_url" field to the value that was provided on create.
+func (u *RelaySiteUpsertOne) UpdateExternalCheckinPageURL() *RelaySiteUpsertOne {
+	return u.Update(func(s *RelaySiteUpsert) {
+		s.UpdateExternalCheckinPageURL()
+	})
+}
+
+// ClearExternalCheckinPageURL clears the value of the "external_checkin_page_url" field.
+func (u *RelaySiteUpsertOne) ClearExternalCheckinPageURL() *RelaySiteUpsertOne {
+	return u.Update(func(s *RelaySiteUpsert) {
+		s.ClearExternalCheckinPageURL()
 	})
 }
 
@@ -1500,6 +1614,48 @@ func (u *RelaySiteUpsertBulk) UpdateLastCheckinResult() *RelaySiteUpsertBulk {
 func (u *RelaySiteUpsertBulk) ClearLastCheckinResult() *RelaySiteUpsertBulk {
 	return u.Update(func(s *RelaySiteUpsert) {
 		s.ClearLastCheckinResult()
+	})
+}
+
+// SetCheckinPageURL sets the "checkin_page_url" field.
+func (u *RelaySiteUpsertBulk) SetCheckinPageURL(v string) *RelaySiteUpsertBulk {
+	return u.Update(func(s *RelaySiteUpsert) {
+		s.SetCheckinPageURL(v)
+	})
+}
+
+// UpdateCheckinPageURL sets the "checkin_page_url" field to the value that was provided on create.
+func (u *RelaySiteUpsertBulk) UpdateCheckinPageURL() *RelaySiteUpsertBulk {
+	return u.Update(func(s *RelaySiteUpsert) {
+		s.UpdateCheckinPageURL()
+	})
+}
+
+// ClearCheckinPageURL clears the value of the "checkin_page_url" field.
+func (u *RelaySiteUpsertBulk) ClearCheckinPageURL() *RelaySiteUpsertBulk {
+	return u.Update(func(s *RelaySiteUpsert) {
+		s.ClearCheckinPageURL()
+	})
+}
+
+// SetExternalCheckinPageURL sets the "external_checkin_page_url" field.
+func (u *RelaySiteUpsertBulk) SetExternalCheckinPageURL(v string) *RelaySiteUpsertBulk {
+	return u.Update(func(s *RelaySiteUpsert) {
+		s.SetExternalCheckinPageURL(v)
+	})
+}
+
+// UpdateExternalCheckinPageURL sets the "external_checkin_page_url" field to the value that was provided on create.
+func (u *RelaySiteUpsertBulk) UpdateExternalCheckinPageURL() *RelaySiteUpsertBulk {
+	return u.Update(func(s *RelaySiteUpsert) {
+		s.UpdateExternalCheckinPageURL()
+	})
+}
+
+// ClearExternalCheckinPageURL clears the value of the "external_checkin_page_url" field.
+func (u *RelaySiteUpsertBulk) ClearExternalCheckinPageURL() *RelaySiteUpsertBulk {
+	return u.Update(func(s *RelaySiteUpsert) {
+		s.ClearExternalCheckinPageURL()
 	})
 }
 

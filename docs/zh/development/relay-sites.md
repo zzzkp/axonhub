@@ -122,7 +122,9 @@ GraphQL schema 和 resolver 位于：
 - `frontend/src/locales/zh-CN/relaySites.json`
 - `frontend/src/locales/en/relaySites.json`
 
-前端功能包括站点分页列表、搜索和状态筛选、新增和编辑站点、手动同步、手动签到、资源快照展示、API Key 管理弹窗、签到记录弹窗、公告弹窗，以及导入 Channel 弹窗。
+前端功能包括站点分页列表、搜索和状态筛选、新增和编辑站点、手动同步、手动签到、资源快照展示、API Key 管理弹窗、模型与令牌弹窗、签到记录弹窗、公告弹窗，以及导入 Channel 弹窗。
+
+模型与令牌弹窗会按分组展示远端 API Key 和可用模型。令牌列表中的“渠道状态”开关复用显式导入流程：未关联 Channel 时创建普通 Channel，已关联但禁用时重新启用，已启用时禁用对应 Channel。令牌列表中的“端点配置”开关复用现有 `saveChannelEndpoints` mutation，为该令牌关联的 Channel 快速补充或移除消息协议端点。
 
 公告入口位于中转站列表操作菜单。打开公告弹窗时会调用 `refreshRelaySiteAnnouncements` 拉取远端 `/api/status` 并刷新本地快照；弹窗内展示公告内容、类型、发布时间、获取时间和已读状态，并可通过 `markRelaySiteAnnouncementsRead` 将当前站点公告标记为已读。列表的站点列通过 `hasUnreadAnnouncements` 显示未读提示。
 
@@ -141,7 +143,15 @@ GraphQL schema 和 resolver 位于：
 3. 用户填写 Channel 类型、Base URL、支持模型、默认测试模型等字段。
 4. service 调用现有 `ChannelService.CreateChannel` 创建普通渠道。
 
-导入后，中转站和 Channel 没有强绑定关系；后续请求转发仍由现有 Channel、模型关联和负载均衡逻辑处理。
+导入后，中转站和 Channel 没有强绑定关系；后续请求转发仍由现有 Channel、模型关联和负载均衡逻辑处理。前端会通过导入时写入的 tags 查找中转站 API Key 与 Channel 的关联，用于模型与令牌弹窗中的渠道状态和端点配置快捷操作。
+
+端点配置开关只管理消息协议端点，不修改 Channel 默认端点，也不修改请求转发协议选择逻辑。当前自动管理的端点为：
+
+- `openai/responses`
+- `anthropic/messages`
+- `gemini/contents`
+
+开启端点配置时，前端会保留现有自定义 endpoints，并补齐缺失的上述消息协议 endpoints。关闭端点配置时，只删除 apiFormat 属于上述集合且 `path`、`baseURL`、`transport` 均为空的 endpoint；如果用户在渠道端点配置中为这些协议设置了自定义 path、baseURL 或 transport，则关闭开关不会删除该 endpoint。
 
 ## 扩展新站点类型
 
