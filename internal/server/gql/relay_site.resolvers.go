@@ -8,9 +8,12 @@ package gql
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/looplj/axonhub/internal/ent"
+	"github.com/looplj/axonhub/internal/ent/relaysite"
 	"github.com/looplj/axonhub/internal/ent/relaysiteannouncement"
+	"github.com/looplj/axonhub/internal/ent/relaysitecheckinlog"
 	"github.com/looplj/axonhub/internal/ent/relaysitecredential"
 	"github.com/looplj/axonhub/internal/objects"
 	"github.com/looplj/axonhub/internal/scopes"
@@ -104,6 +107,49 @@ func (r *mutationResolver) CreateRelaySiteAPIKeysForAllGroups(ctx context.Contex
 // ImportRelaySiteAPIKeyToChannel is the resolver for the importRelaySiteAPIKeyToChannel field.
 func (r *mutationResolver) ImportRelaySiteAPIKeyToChannel(ctx context.Context, relaySiteAPIKeyID objects.GUID, input biz.ImportRelaySiteAPIKeyToChannelInput) (*ent.Channel, error) {
 	return r.relaySiteService.ImportAPIKeyToChannel(ctx, relaySiteAPIKeyID.ID, input)
+}
+
+// FailedRelaySiteCheckinPages is the resolver for the failedRelaySiteCheckinPages field.
+func (r *queryResolver) FailedRelaySiteCheckinPages(ctx context.Context) ([]*RelaySiteCheckinPage, error) {
+	sites, err := r.client.RelaySite.Query().
+		Where(relaysite.TypeEQ(relaysite.TypeNewAPI)).
+		All(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to list relay sites: %w", err)
+	}
+
+	pages := make([]*RelaySiteCheckinPage, 0, len(sites))
+	for _, site := range sites {
+		latestLog, err := site.QueryCheckinLogs().
+			Order(ent.Desc(relaysitecheckinlog.FieldExecutedAt)).
+			First(ctx)
+		if ent.IsNotFound(err) {
+			continue
+		}
+		if err != nil {
+			return nil, fmt.Errorf("failed to get latest relay site checkin log for %q: %w", site.Name, err)
+		}
+		if latestLog.Status != relaysitecheckinlog.StatusFailed {
+			continue
+		}
+
+		// 确定签到页 URL：优先使用 checkinPageURL，为空则使用 baseURL + /console/personal
+		checkinURL := ""
+		if site.CheckinPageURL != nil && *site.CheckinPageURL != "" {
+			checkinURL = *site.CheckinPageURL
+		} else {
+			// new-api 默认签到页路径
+			checkinURL = strings.TrimRight(site.BaseURL, "/") + "/console/personal"
+		}
+
+		pages = append(pages, &RelaySiteCheckinPage{
+			RelaySiteID:   objects.GUID{Type: ent.TypeRelaySite, ID: site.ID},
+			RelaySiteName: site.Name,
+			URL:           checkinURL,
+		})
+	}
+
+	return pages, nil
 }
 
 // DisplayCredential is the resolver for the displayCredential field.

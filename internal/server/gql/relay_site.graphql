@@ -100,6 +100,16 @@ type RelaySiteBatchOperationResult {
   failures: [RelaySiteBatchOperationFailure!]!
 }
 
+type RelaySiteCheckinPage {
+  relaySiteID: ID!
+  relaySiteName: String!
+  url: String!
+}
+
+extend type Query {
+  failedRelaySiteCheckinPages: [RelaySiteCheckinPage!]!
+}
+
 extend type Mutation {
   createRelaySiteConfig(input: CreateRelaySiteConfigInput!): RelaySite!
   updateRelaySiteConfig(id: ID!, input: UpdateRelaySiteConfigInput!): RelaySite!

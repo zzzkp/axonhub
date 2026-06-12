@@ -250,6 +250,9 @@ func (a *RelaySiteNewAPIAdapter) Checkin(ctx context.Context) (*RelaySiteCheckin
 	if err != nil {
 		return nil, err
 	}
+	if !resp.Success {
+		return nil, newRelaySiteCheckinFailure(responseMessage(resp.Message))
+	}
 
 	message := resp.Message
 	if message == "" {
@@ -385,7 +388,7 @@ func (a *RelaySiteNewAPIAdapter) doRaw(ctx context.Context, method string, path 
 
 	resp, err := a.httpClient.Do(ctx, request.Build())
 	if err != nil {
-		return nil, fmt.Errorf("new-api %s %s failed: %w", method, path, err)
+		return nil, relaySiteUpstreamRequestError("new_api", method, path, err)
 	}
 
 	return resp, nil

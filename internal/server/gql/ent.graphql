@@ -5365,6 +5365,7 @@ RelaySiteCheckinLogStatus is enum for the field status
 enum RelaySiteCheckinLogStatus @goModel(model: "github.com/looplj/axonhub/internal/ent/relaysitecheckinlog.Status") {
   success
   failed
+  skipped
 }
 """
 RelaySiteCheckinLogWhereInput is used for filtering RelaySiteCheckinLog objects.

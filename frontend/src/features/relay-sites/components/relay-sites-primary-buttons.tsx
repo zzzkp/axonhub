@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { useRelaySitesContext } from '../context/relay-sites-context';
-import { useCheckinAllRelaySites, useExportRelaySitesBackup, useImportRelaySitesBackup, useSyncAllRelaySites, type RelaySite } from '../data/relay-sites';
+import { useCheckinAllRelaySites, useExportRelaySitesBackup, useFailedRelaySiteCheckinPages, useImportRelaySitesBackup, useSyncAllRelaySites, type RelaySite, type RelaySiteCheckinPage } from '../data/relay-sites';
 
 export function RelaySitesPrimaryButtons({ canWrite, sites }: { canWrite: boolean; sites: RelaySite[] }) {
   const { t } = useTranslation();
@@ -14,28 +14,26 @@ export function RelaySitesPrimaryButtons({ canWrite, sites }: { canWrite: boolea
   const importFileInputRef = useRef<HTMLInputElement>(null);
   const syncAllMutation = useSyncAllRelaySites();
   const checkinAllMutation = useCheckinAllRelaySites();
+  const failedCheckinPagesQuery = useFailedRelaySiteCheckinPages(canWrite);
   const exportBackupMutation = useExportRelaySitesBackup();
   const importBackupMutation = useImportRelaySitesBackup();
 
   const handleOpenAllExternalPages = () => {
-    const urls = sites.map(s => s.externalCheckinPageURL).filter(Boolean);
+    const urls = sites.filter(s => s.type === 'new_api').map(s => s.externalCheckinPageURL).filter(Boolean);
     urls.forEach(url => window.open(url!, '_blank'));
   };
 
   const handleOpenFailedPages = () => {
-    const failedSites = sites.filter(s => {
-      const latestLog = s.checkinLogs.edges?.[0]?.node;
-      return latestLog?.status === 'failed';
-    });
-    const urls = failedSites.map(s => s.checkinPageURL).filter(Boolean);
-    urls.forEach(url => window.open(url!, '_blank'));
+    const pages: RelaySiteCheckinPage[] = failedCheckinPagesQuery.data ?? [];
+    if (pages.length === 0) {
+      toast.info(t('relaySites.messages.noFailedCheckinPages'));
+      return;
+    }
+    pages.forEach(page => window.open(page.url, '_blank'));
+    toast.success(t('relaySites.messages.openedFailedCheckinPages', { count: pages.length }));
   };
 
-  const externalPagesCount = sites.filter(s => s.externalCheckinPageURL).length;
-  const failedPagesCount = sites.filter(s => {
-    const latestLog = s.checkinLogs.edges?.[0]?.node;
-    return latestLog?.status === 'failed' && s.checkinPageURL;
-  }).length;
+  const externalPagesCount = sites.filter(s => s.type === 'new_api' && s.externalCheckinPageURL).length;
 
   const handleExportBackup = async () => {
     let payload = '';
@@ -120,8 +118,8 @@ export function RelaySitesPrimaryButtons({ canWrite, sites }: { canWrite: boolea
         <ExternalLink className='mr-2 h-4 w-4' />
         {t('relaySites.buttons.openAllExternalCheckinPages')}
       </Button>
-      <Button variant='outline' onClick={handleOpenFailedPages} disabled={failedPagesCount === 0}>
-        <ExternalLink className='mr-2 h-4 w-4' />
+      <Button variant='outline' onClick={handleOpenFailedPages} disabled={failedCheckinPagesQuery.isLoading || failedCheckinPagesQuery.isFetching}>
+        <ExternalLink className={`mr-2 h-4 w-4 ${failedCheckinPagesQuery.isLoading || failedCheckinPagesQuery.isFetching ? 'animate-spin' : ''}`} />
         {t('relaySites.buttons.openFailedCheckinPages')}
       </Button>
       <Button onClick={() => setIsCreateDialogOpen(true)}>

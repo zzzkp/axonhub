@@ -31,6 +31,9 @@ const (
 
 	// ErrCodeInternalServerError indicates an unexpected server error.
 	ErrCodeInternalServerError ErrorCode = "INTERNAL_SERVER_ERROR"
+
+	// ErrCodeRelaySiteUpstreamError indicates a remote relay site request failed.
+	ErrCodeRelaySiteUpstreamError ErrorCode = "RELAY_SITE_UPSTREAM_ERROR"
 )
 
 // CodedError is an error with a machine-readable code.
