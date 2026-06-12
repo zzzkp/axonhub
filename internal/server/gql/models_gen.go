@@ -339,6 +339,12 @@ type QueryModelsInput struct {
 	IncludeAllChannelModels *bool            `json:"includeAllChannelModels,omitempty"`
 }
 
+type RelaySiteCheckinPage struct {
+	RelaySiteID   objects.GUID `json:"relaySiteID"`
+	RelaySiteName string       `json:"relaySiteName"`
+	URL           string       `json:"url"`
+}
+
 type RelaySiteCredentialInput struct {
 	AuthType       RelaySiteCredentialAuthType `json:"authType"`
 	Token          *string                     `json:"token,omitempty"`

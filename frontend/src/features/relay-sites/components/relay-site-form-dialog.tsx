@@ -120,9 +120,11 @@ export function RelaySiteFormDialog({ mode }: { mode: 'create' | 'edit' }) {
   const tokenExpiresAt = watch('tokenExpiresAt');
 
   useEffect(() => {
-    if (siteType === 'sub2api' && authType !== 'jwt') {
-      setValue('authType', 'jwt');
+    if (siteType === 'sub2api') {
+      if (authType !== 'jwt') setValue('authType', 'jwt');
       setValue('autoCheckinEnabled', false);
+      setValue('checkinPageURL', '');
+      setValue('externalCheckinPageURL', '');
     }
     if (siteType === 'new_api' && authType === 'jwt') {
       setValue('authType', 'token');
@@ -176,10 +178,10 @@ export function RelaySiteFormDialog({ mode }: { mode: 'create' | 'edit' }) {
         type: data.type,
         baseURL: normalizeBaseURL(data.baseURL),
         status: data.status,
-        autoCheckinEnabled: data.autoCheckinEnabled,
+        autoCheckinEnabled: data.type === 'new_api' && data.autoCheckinEnabled,
         remark: data.remark.trim(),
-        checkinPageURL: data.checkinPageURL.trim(),
-        externalCheckinPageURL: data.externalCheckinPageURL.trim(),
+        checkinPageURL: data.type === 'new_api' ? data.checkinPageURL.trim() : '',
+        externalCheckinPageURL: data.type === 'new_api' ? data.externalCheckinPageURL.trim() : '',
         credential: credential!,
       };
       await createMutation.mutateAsync(input);
@@ -192,10 +194,10 @@ export function RelaySiteFormDialog({ mode }: { mode: 'create' | 'edit' }) {
       name: data.name.trim(),
       baseURL: normalizeBaseURL(data.baseURL),
       status: data.status,
-      autoCheckinEnabled: data.autoCheckinEnabled,
+      autoCheckinEnabled: data.type === 'new_api' && data.autoCheckinEnabled,
       remark: data.remark.trim(),
-      checkinPageURL: data.checkinPageURL.trim(),
-      externalCheckinPageURL: data.externalCheckinPageURL.trim(),
+      checkinPageURL: data.type === 'new_api' ? data.checkinPageURL.trim() : '',
+      externalCheckinPageURL: data.type === 'new_api' ? data.externalCheckinPageURL.trim() : '',
       ...(credential ? { credential } : {}),
     };
     await updateMutation.mutateAsync({ id: editingRelaySite.id, input });
@@ -249,6 +251,7 @@ export function RelaySiteFormDialog({ mode }: { mode: 'create' | 'edit' }) {
               <Switch
                 id={`${mode}-relay-site-auto-checkin`}
                 checked={watch('autoCheckinEnabled')}
+                disabled={siteType !== 'new_api'}
                 onCheckedChange={(checked) => setValue('autoCheckinEnabled', checked)}
               />
             </div>
@@ -258,11 +261,11 @@ export function RelaySiteFormDialog({ mode }: { mode: 'create' | 'edit' }) {
             </div>
             <div className='grid gap-2'>
               <Label htmlFor={`${mode}-relay-site-checkin-page-url`}>{t('relaySites.fields.checkinPageURL')}</Label>
-              <Input id={`${mode}-relay-site-checkin-page-url`} placeholder='https://...' {...register('checkinPageURL')} />
+              <Input id={`${mode}-relay-site-checkin-page-url`} placeholder='https://...' disabled={siteType !== 'new_api'} {...register('checkinPageURL')} />
             </div>
             <div className='grid gap-2'>
               <Label htmlFor={`${mode}-relay-site-external-checkin-page-url`}>{t('relaySites.fields.externalCheckinPageURL')}</Label>
-              <Input id={`${mode}-relay-site-external-checkin-page-url`} placeholder='https://...' {...register('externalCheckinPageURL')} />
+              <Input id={`${mode}-relay-site-external-checkin-page-url`} placeholder='https://...' disabled={siteType !== 'new_api'} {...register('externalCheckinPageURL')} />
             </div>
             <div className='grid gap-2'>
               <Label htmlFor={`${mode}-relay-site-auth-type`}>{t('relaySites.fields.authType')}</Label>

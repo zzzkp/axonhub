@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -23,6 +24,7 @@ import (
 	"github.com/looplj/axonhub/internal/ent/relaysitemodelprice"
 	"github.com/looplj/axonhub/internal/log"
 	"github.com/looplj/axonhub/internal/objects"
+	"github.com/looplj/axonhub/internal/pkg/xerrors"
 	"github.com/looplj/axonhub/internal/pkg/xtime"
 	"github.com/looplj/axonhub/internal/server/scheduler"
 )
@@ -234,7 +236,7 @@ func (s *RelaySiteService) runAutoCheckinScheduled(ctx context.Context) {
 	ctx = authz.WithSystemBypass(ctx, relaySiteAutoCheckinTaskName)
 
 	sites, err := s.entFromContext(ctx).RelaySite.Query().
-		Where(relaysite.StatusEQ(relaysite.StatusEnabled), relaysite.AutoCheckinEnabledEQ(true)).
+		Where(relaysite.TypeEQ(relaysite.TypeNewAPI), relaysite.StatusEQ(relaysite.StatusEnabled), relaysite.AutoCheckinEnabledEQ(true)).
 		All(ctx)
 	if err != nil {
 		log.Warn(ctx, "failed to load relay sites for auto check-in", log.Cause(err))
@@ -242,11 +244,20 @@ func (s *RelaySiteService) runAutoCheckinScheduled(ctx context.Context) {
 	}
 
 	for _, site := range sites {
-		if _, err := s.CheckinSite(ctx, site.ID); err != nil {
+		logEntry, err := s.CheckinSite(ctx, site.ID)
+		if err != nil {
 			log.Warn(ctx, "failed to auto check in relay site",
 				log.Int("relay_site_id", site.ID),
 				log.String("relay_site_name", site.Name),
 				log.Cause(err),
+			)
+			continue
+		}
+		if logEntry != nil && logEntry.Status == relaysitecheckinlog.StatusFailed {
+			log.Warn(ctx, "failed to auto check in relay site",
+				log.Int("relay_site_id", site.ID),
+				log.String("relay_site_name", site.Name),
+				log.Cause(errors.New(relaySiteCheckinLogMessage(logEntry))),
 			)
 		}
 	}
@@ -313,15 +324,22 @@ func (s *RelaySiteService) SyncAllSites(ctx context.Context) (*RelaySiteBatchOpe
 }
 
 func (s *RelaySiteService) CheckinAllSites(ctx context.Context) (*RelaySiteBatchOperationResult, error) {
-	sites, err := s.listAllSites(ctx)
+	sites, err := s.entFromContext(ctx).RelaySite.Query().
+		Where(relaysite.TypeEQ(relaysite.TypeNewAPI)).
+		All(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to list new-api relay sites: %w", err)
 	}
 
 	result := newRelaySiteBatchOperationResult(len(sites))
 	for _, site := range sites {
-		if _, err := s.CheckinSite(ctx, site.ID); err != nil {
+		logEntry, err := s.CheckinSite(ctx, site.ID)
+		if err != nil {
 			result.addFailure(site, err)
+			continue
+		}
+		if logEntry != nil && logEntry.Status == relaysitecheckinlog.StatusFailed {
+			result.addFailureMessage(site, relaySiteCheckinLogMessage(logEntry))
 			continue
 		}
 		result.SuccessCount++
@@ -338,11 +356,15 @@ func newRelaySiteBatchOperationResult(totalCount int) *RelaySiteBatchOperationRe
 }
 
 func (r *RelaySiteBatchOperationResult) addFailure(site *ent.RelaySite, err error) {
+	r.addFailureMessage(site, err.Error())
+}
+
+func (r *RelaySiteBatchOperationResult) addFailureMessage(site *ent.RelaySite, message string) {
 	r.FailedCount++
 	r.Failures = append(r.Failures, &RelaySiteBatchOperationFailure{
 		RelaySiteID:   site.ID,
 		RelaySiteName: site.Name,
-		ErrorMessage:  err.Error(),
+		ErrorMessage:  message,
 	})
 }
 
@@ -735,6 +757,14 @@ func normalizeRelaySiteAPIKeyStatus(status string) relaysiteapikey.Status {
 }
 
 func (s *RelaySiteService) CheckinSite(ctx context.Context, id int) (*ent.RelaySiteCheckinLog, error) {
+	site, err := s.entFromContext(ctx).RelaySite.Get(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get relay site: %w", err)
+	}
+	if site.Type != relaysite.TypeNewAPI {
+		return nil, fmt.Errorf("relay site type %s does not support checkin", site.Type)
+	}
+
 	adapter, err := s.adapterForSite(ctx, id)
 	if err != nil {
 		return nil, err
@@ -744,35 +774,8 @@ func (s *RelaySiteService) CheckinSite(ctx context.Context, id int) (*ent.RelayS
 	now := xtime.UTCNow()
 
 	if err != nil {
-		var logEntry *ent.RelaySiteCheckinLog
-		saveErr := s.RunInTransaction(ctx, func(ctx context.Context) error {
-			client := s.entFromContext(ctx)
-			var createErr error
-			logEntry, createErr = client.RelaySiteCheckinLog.Create().
-				SetRelaySiteID(id).
-				SetExecutedAt(now).
-				SetStatus(relaysitecheckinlog.StatusFailed).
-				SetErrorMessage(err.Error()).
-				Save(ctx)
-			if createErr != nil {
-				return fmt.Errorf("failed to record relay site checkin failure: %w", createErr)
-			}
-
-			_, createErr = client.RelaySite.UpdateOneID(id).
-				SetLastCheckinAt(now).
-				SetLastCheckinResult(err.Error()).
-				Save(ctx)
-			if createErr != nil {
-				return fmt.Errorf("failed to update relay site checkin status: %w", createErr)
-			}
-
-			return nil
-		})
-		if saveErr != nil {
-			return nil, saveErr
-		}
-
-		return logEntry, err
+		status, message := relaySiteCheckinFailureStatusAndMessage(err)
+		return s.recordRelaySiteCheckinResult(ctx, id, now, status, message)
 	}
 
 	message := "success"
@@ -780,22 +783,36 @@ func (s *RelaySiteService) CheckinSite(ctx context.Context, id int) (*ent.RelayS
 		message = result.Message
 	}
 
+	return s.recordRelaySiteCheckinResult(ctx, id, now, relaysitecheckinlog.StatusSuccess, message)
+}
+
+func (s *RelaySiteService) recordRelaySiteCheckinResult(ctx context.Context, id int, executedAt time.Time, status relaysitecheckinlog.Status, message string) (*ent.RelaySiteCheckinLog, error) {
+	message = strings.TrimSpace(message)
+	if message == "" {
+		message = "checkin failed"
+	}
+
 	var logEntry *ent.RelaySiteCheckinLog
-	err = s.RunInTransaction(ctx, func(ctx context.Context) error {
+	err := s.RunInTransaction(ctx, func(ctx context.Context) error {
 		client := s.entFromContext(ctx)
-		var saveErr error
-		logEntry, saveErr = client.RelaySiteCheckinLog.Create().
+		create := client.RelaySiteCheckinLog.Create().
 			SetRelaySiteID(id).
-			SetExecutedAt(now).
-			SetStatus(relaysitecheckinlog.StatusSuccess).
-			SetMessage(message).
-			Save(ctx)
+			SetExecutedAt(executedAt).
+			SetStatus(status)
+		if status == relaysitecheckinlog.StatusFailed {
+			create.SetErrorMessage(message)
+		} else {
+			create.SetMessage(message)
+		}
+
+		var saveErr error
+		logEntry, saveErr = create.Save(ctx)
 		if saveErr != nil {
-			return fmt.Errorf("failed to record relay site checkin success: %w", saveErr)
+			return fmt.Errorf("failed to record relay site checkin result: %w", saveErr)
 		}
 
 		_, saveErr = client.RelaySite.UpdateOneID(id).
-			SetLastCheckinAt(now).
+			SetLastCheckinAt(executedAt).
 			SetLastCheckinResult(message).
 			Save(ctx)
 		if saveErr != nil {
@@ -809,6 +826,89 @@ func (s *RelaySiteService) CheckinSite(ctx context.Context, id int) (*ent.RelayS
 	}
 
 	return logEntry, nil
+}
+
+func relaySiteCheckinFailureStatusAndMessage(err error) (relaysitecheckinlog.Status, string) {
+	var checkinFailure *relaySiteCheckinFailure
+	if errors.As(err, &checkinFailure) {
+		if checkinFailure.skipped {
+			return relaysitecheckinlog.StatusSkipped, checkinFailure.message
+		}
+		return relaysitecheckinlog.StatusFailed, checkinFailure.message
+	}
+
+	if codedErr, ok := xerrors.IsCodedError(err); ok {
+		if status, ok := codedErr.Extensions["status"].(string); ok && strings.TrimSpace(status) != "" {
+			return relaysitecheckinlog.StatusFailed, "status " + strings.TrimSpace(status)
+		}
+		if detail, ok := codedErr.Extensions["detail"].(string); ok && strings.TrimSpace(detail) != "" {
+			return relaysitecheckinlog.StatusFailed, normalizeRelaySiteCheckinMessage(detail)
+		}
+	}
+
+	return relaysitecheckinlog.StatusFailed, normalizeRelaySiteCheckinMessage(err.Error())
+}
+
+func normalizeRelaySiteCheckinMessage(message string) string {
+	message = strings.TrimSpace(message)
+	prefixes := []string{
+		"relay site upstream request failed:",
+		"new-api checkin failed:",
+		"new-api POST /api/user/checkin failed:",
+	}
+	for {
+		previous := message
+		for _, prefix := range prefixes {
+			if strings.HasPrefix(message, prefix) {
+				message = strings.TrimSpace(strings.TrimPrefix(message, prefix))
+			}
+		}
+		if message == previous {
+			break
+		}
+	}
+	if status := relaySiteHTTPStatusMessage(message); status != "" {
+		return status
+	}
+	if message == "" {
+		return "checkin failed"
+	}
+	return message
+}
+
+func relaySiteHTTPStatusMessage(message string) string {
+	const marker = " with status "
+	idx := strings.LastIndex(message, marker)
+	if idx < 0 {
+		return ""
+	}
+	status := strings.TrimSpace(message[idx+len(marker):])
+	if status == "" {
+		return ""
+	}
+	return "status " + status
+}
+
+func isRelaySiteCheckinSkippedMessage(message string) bool {
+	switch strings.TrimSpace(message) {
+	case "今日已签到", "签到功能未启用":
+		return true
+	default:
+		return false
+	}
+}
+
+func relaySiteCheckinLogMessage(logEntry *ent.RelaySiteCheckinLog) string {
+	if logEntry == nil {
+		return "checkin failed"
+	}
+	if logEntry.ErrorMessage != nil && strings.TrimSpace(*logEntry.ErrorMessage) != "" {
+		return strings.TrimSpace(*logEntry.ErrorMessage)
+	}
+	if logEntry.Message != nil && strings.TrimSpace(*logEntry.Message) != "" {
+		return strings.TrimSpace(*logEntry.Message)
+	}
+	return "checkin failed"
 }
 
 func (s *RelaySiteService) RefreshAnnouncements(ctx context.Context, id int) (*ent.RelaySite, error) {

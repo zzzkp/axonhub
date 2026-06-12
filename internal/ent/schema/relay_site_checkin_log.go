@@ -30,7 +30,7 @@ func (RelaySiteCheckinLog) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("relay_site_id").Immutable(),
 		field.Time("executed_at"),
-		field.Enum("status").Values("success", "failed"),
+		field.Enum("status").Values("success", "failed", "skipped"),
 		field.String("message").Optional().Nillable(),
 		field.String("error_message").Optional().Nillable(),
 	}

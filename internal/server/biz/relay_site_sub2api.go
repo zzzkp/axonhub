@@ -380,7 +380,7 @@ func (a *RelaySiteSub2APIAdapter) doRaw(ctx context.Context, method string, path
 
 	resp, err := a.httpClient.Do(ctx, request.Build())
 	if err != nil {
-		return nil, fmt.Errorf("sub2api %s %s failed: %w", method, path, err)
+		return nil, relaySiteUpstreamRequestError("sub2api", method, path, err)
 	}
 
 	return resp, nil

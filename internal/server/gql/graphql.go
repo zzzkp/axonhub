@@ -173,14 +173,18 @@ func NewGraphqlHandlers(deps Dependencies) *GraphqlHandler {
 		// Check if it's a CodedError
 		var codedErr *xerrors.CodedError
 		if errors.As(err, &codedErr) {
+			extensions := map[string]any{
+				"code": codedErr.Code,
+			}
+			for key, value := range codedErr.Extensions {
+				if value != nil {
+					extensions[key] = value
+				}
+			}
+
 			return &gqlerror.Error{
-				Message: codedErr.Message,
-				Extensions: map[string]any{
-					"code":     codedErr.Code,
-					"resource": codedErr.Extensions["resource"],
-					"field":    codedErr.Extensions["field"],
-					"value":    codedErr.Extensions["value"],
-				},
+				Message:    codedErr.Message,
+				Extensions: extensions,
 			}
 		}
 		// Convert ent privacy deny errors to FORBIDDEN

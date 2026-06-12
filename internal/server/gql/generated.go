@@ -1262,6 +1262,7 @@ type ComplexityRoot struct {
 		DashboardOverview            func(childComplexity int) int
 		DataStorages                 func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.DataStorageOrder, where *ent.DataStorageWhereInput) int
 		DefaultDataStorageID         func(childComplexity int) int
+		FailedRelaySiteCheckinPages  func(childComplexity int) int
 		FastestChannels              func(childComplexity int, input FastestChannelsInput) int
 		FastestModels                func(childComplexity int, input FastestChannelsInput) int
 		FetchModels                  func(childComplexity int, input biz.FetchModelsInput) int
@@ -1461,6 +1462,12 @@ type ComplexityRoot struct {
 	RelaySiteCheckinLogEdge struct {
 		Cursor func(childComplexity int) int
 		Node   func(childComplexity int) int
+	}
+
+	RelaySiteCheckinPage struct {
+		RelaySiteID   func(childComplexity int) int
+		RelaySiteName func(childComplexity int) int
+		URL           func(childComplexity int) int
 	}
 
 	RelaySiteConnection struct {
@@ -2473,6 +2480,7 @@ type QueryResolver interface {
 	QueryUnassociatedChannels(ctx context.Context) ([]*biz.UnassociatedChannel, error)
 	AutoBackupSettings(ctx context.Context) (*biz.AutoBackupSettings, error)
 	ChannelProbeData(ctx context.Context, input biz.GetChannelProbeDataInput) ([]*biz.ChannelProbeData, error)
+	FailedRelaySiteCheckinPages(ctx context.Context) ([]*RelaySiteCheckinPage, error)
 }
 type RelaySiteResolver interface {
 	ID(ctx context.Context, obj *ent.RelaySite) (*objects.GUID, error)
@@ -7929,6 +7937,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Query.DefaultDataStorageID(childComplexity), true
+	case "Query.failedRelaySiteCheckinPages":
+		if e.complexity.Query.FailedRelaySiteCheckinPages == nil {
+			break
+		}
+
+		return e.complexity.Query.FailedRelaySiteCheckinPages(childComplexity), true
 	case "Query.fastestChannels":
 		if e.complexity.Query.FastestChannels == nil {
 			break
@@ -9009,6 +9023,25 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.RelaySiteCheckinLogEdge.Node(childComplexity), true
+
+	case "RelaySiteCheckinPage.relaySiteID":
+		if e.complexity.RelaySiteCheckinPage.RelaySiteID == nil {
+			break
+		}
+
+		return e.complexity.RelaySiteCheckinPage.RelaySiteID(childComplexity), true
+	case "RelaySiteCheckinPage.relaySiteName":
+		if e.complexity.RelaySiteCheckinPage.RelaySiteName == nil {
+			break
+		}
+
+		return e.complexity.RelaySiteCheckinPage.RelaySiteName(childComplexity), true
+	case "RelaySiteCheckinPage.url":
+		if e.complexity.RelaySiteCheckinPage.URL == nil {
+			break
+		}
+
+		return e.complexity.RelaySiteCheckinPage.URL(childComplexity), true
 
 	case "RelaySiteConnection.edges":
 		if e.complexity.RelaySiteConnection.Edges == nil {
@@ -45626,6 +45659,43 @@ func (ec *executionContext) fieldContext_Query_channelProbeData(ctx context.Cont
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_failedRelaySiteCheckinPages(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_failedRelaySiteCheckinPages,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Query().FailedRelaySiteCheckinPages(ctx)
+		},
+		nil,
+		ec.marshalNRelaySiteCheckinPage2ᚕᚖgithubᚗcomᚋloopljᚋaxonhubᚋinternalᚋserverᚋgqlᚐRelaySiteCheckinPageᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_failedRelaySiteCheckinPages(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "relaySiteID":
+				return ec.fieldContext_RelaySiteCheckinPage_relaySiteID(ctx, field)
+			case "relaySiteName":
+				return ec.fieldContext_RelaySiteCheckinPage_relaySiteName(ctx, field)
+			case "url":
+				return ec.fieldContext_RelaySiteCheckinPage_url(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type RelaySiteCheckinPage", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -49044,6 +49114,93 @@ func (ec *executionContext) fieldContext_RelaySiteCheckinLogEdge_cursor(_ contex
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Cursor does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _RelaySiteCheckinPage_relaySiteID(ctx context.Context, field graphql.CollectedField, obj *RelaySiteCheckinPage) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_RelaySiteCheckinPage_relaySiteID,
+		func(ctx context.Context) (any, error) {
+			return obj.RelaySiteID, nil
+		},
+		nil,
+		ec.marshalNID2githubᚗcomᚋloopljᚋaxonhubᚋinternalᚋobjectsᚐGUID,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_RelaySiteCheckinPage_relaySiteID(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "RelaySiteCheckinPage",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _RelaySiteCheckinPage_relaySiteName(ctx context.Context, field graphql.CollectedField, obj *RelaySiteCheckinPage) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_RelaySiteCheckinPage_relaySiteName,
+		func(ctx context.Context) (any, error) {
+			return obj.RelaySiteName, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_RelaySiteCheckinPage_relaySiteName(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "RelaySiteCheckinPage",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _RelaySiteCheckinPage_url(ctx context.Context, field graphql.CollectedField, obj *RelaySiteCheckinPage) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_RelaySiteCheckinPage_url,
+		func(ctx context.Context) (any, error) {
+			return obj.URL, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_RelaySiteCheckinPage_url(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "RelaySiteCheckinPage",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -108838,6 +108995,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "failedRelaySiteCheckinPages":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_failedRelaySiteCheckinPages(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "__type":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___type(ctx, field)
@@ -110504,6 +110683,55 @@ func (ec *executionContext) _RelaySiteCheckinLogEdge(ctx context.Context, sel as
 			out.Values[i] = ec._RelaySiteCheckinLogEdge_node(ctx, field, obj)
 		case "cursor":
 			out.Values[i] = ec._RelaySiteCheckinLogEdge_cursor(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var relaySiteCheckinPageImplementors = []string{"RelaySiteCheckinPage"}
+
+func (ec *executionContext) _RelaySiteCheckinPage(ctx context.Context, sel ast.SelectionSet, obj *RelaySiteCheckinPage) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, relaySiteCheckinPageImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("RelaySiteCheckinPage")
+		case "relaySiteID":
+			out.Values[i] = ec._RelaySiteCheckinPage_relaySiteID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "relaySiteName":
+			out.Values[i] = ec._RelaySiteCheckinPage_relaySiteName(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "url":
+			out.Values[i] = ec._RelaySiteCheckinPage_url(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -122938,6 +123166,60 @@ func (ec *executionContext) marshalNRelaySiteCheckinLogStatus2githubᚗcomᚋloo
 func (ec *executionContext) unmarshalNRelaySiteCheckinLogWhereInput2ᚖgithubᚗcomᚋloopljᚋaxonhubᚋinternalᚋentᚐRelaySiteCheckinLogWhereInput(ctx context.Context, v any) (*ent.RelaySiteCheckinLogWhereInput, error) {
 	res, err := ec.unmarshalInputRelaySiteCheckinLogWhereInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNRelaySiteCheckinPage2ᚕᚖgithubᚗcomᚋloopljᚋaxonhubᚋinternalᚋserverᚋgqlᚐRelaySiteCheckinPageᚄ(ctx context.Context, sel ast.SelectionSet, v []*RelaySiteCheckinPage) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNRelaySiteCheckinPage2ᚖgithubᚗcomᚋloopljᚋaxonhubᚋinternalᚋserverᚋgqlᚐRelaySiteCheckinPage(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNRelaySiteCheckinPage2ᚖgithubᚗcomᚋloopljᚋaxonhubᚋinternalᚋserverᚋgqlᚐRelaySiteCheckinPage(ctx context.Context, sel ast.SelectionSet, v *RelaySiteCheckinPage) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._RelaySiteCheckinPage(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNRelaySiteConnection2githubᚗcomᚋloopljᚋaxonhubᚋinternalᚋentᚐRelaySiteConnection(ctx context.Context, sel ast.SelectionSet, v ent.RelaySiteConnection) graphql.Marshaler {

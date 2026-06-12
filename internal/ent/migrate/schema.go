@@ -652,7 +652,7 @@ var (
 		{Name: "created_at", Type: field.TypeTime, Default: schema.Expr("CURRENT_TIMESTAMP")},
 		{Name: "updated_at", Type: field.TypeTime, Default: schema.Expr("CURRENT_TIMESTAMP")},
 		{Name: "executed_at", Type: field.TypeTime},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"success", "failed"}},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"success", "failed", "skipped"}},
 		{Name: "message", Type: field.TypeString, Nullable: true},
 		{Name: "error_message", Type: field.TypeString, Nullable: true},
 		{Name: "relay_site_id", Type: field.TypeInt},
