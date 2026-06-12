@@ -10,7 +10,7 @@ import { useCheckinAllRelaySites, useExportRelaySitesBackup, useFailedRelaySiteC
 
 export function RelaySitesPrimaryButtons({ canWrite, sites }: { canWrite: boolean; sites: RelaySite[] }) {
   const { t } = useTranslation();
-  const { setIsCreateDialogOpen } = useRelaySitesContext();
+  const { setIsCreateDialogOpen, setBatchOperationResult, setIsBatchResultDialogOpen } = useRelaySitesContext();
   const importFileInputRef = useRef<HTMLInputElement>(null);
   const syncAllMutation = useSyncAllRelaySites();
   const checkinAllMutation = useCheckinAllRelaySites();
@@ -106,11 +106,21 @@ export function RelaySitesPrimaryButtons({ canWrite, sites }: { canWrite: boolea
         <Upload className='mr-2 h-4 w-4' />
         {t('relaySites.buttons.importBackup')}
       </Button>
-      <Button variant='outline' onClick={() => syncAllMutation.mutate()} disabled={syncAllMutation.isPending}>
+      <Button variant='outline' onClick={() => syncAllMutation.mutate(undefined, {
+        onSuccess: (result) => {
+          setBatchOperationResult(result);
+          setIsBatchResultDialogOpen(true);
+        },
+      })} disabled={syncAllMutation.isPending}>
         <RefreshCw className={`mr-2 h-4 w-4 ${syncAllMutation.isPending ? 'animate-spin' : ''}`} />
         {t('relaySites.buttons.syncAll')}
       </Button>
-      <Button variant='outline' onClick={() => checkinAllMutation.mutate()} disabled={checkinAllMutation.isPending}>
+      <Button variant='outline' onClick={() => checkinAllMutation.mutate(undefined, {
+        onSuccess: (result) => {
+          setBatchOperationResult(result);
+          setIsBatchResultDialogOpen(true);
+        },
+      })} disabled={checkinAllMutation.isPending}>
         <CalendarCheck className={`mr-2 h-4 w-4 ${checkinAllMutation.isPending ? 'animate-spin' : ''}`} />
         {t('relaySites.buttons.checkinAll')}
       </Button>

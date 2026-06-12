@@ -441,19 +441,8 @@ export function useSyncAllRelaySites() {
         throw error;
       }
     },
-    onSuccess: result => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['relaySites'] });
-      toastBatchOperationResult(
-        result,
-        t('relaySites.messages.syncAllSuccess'),
-        t('relaySites.messages.syncAllPartialFailure'),
-        t('relaySites.messages.batchOperationSummary', { success: result.successCount, total: result.totalCount }),
-        t('relaySites.messages.batchOperationFailureSummary', {
-          success: result.successCount,
-          total: result.totalCount,
-          failedSites: result.failures.map(failure => failure.relaySiteName).join(', '),
-        })
-      );
     },
   });
 }
@@ -509,20 +498,9 @@ export function useCheckinAllRelaySites() {
         throw error;
       }
     },
-    onSuccess: result => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['relaySites'] });
       queryClient.invalidateQueries({ queryKey: ['failedRelaySiteCheckinPages'] });
-      toastBatchOperationResult(
-        result,
-        t('relaySites.messages.checkinAllSuccess'),
-        t('relaySites.messages.checkinAllPartialFailure'),
-        t('relaySites.messages.batchOperationSummary', { success: result.successCount, total: result.totalCount }),
-        t('relaySites.messages.batchOperationFailureSummary', {
-          success: result.successCount,
-          total: result.totalCount,
-          failedSites: result.failures.map(failure => failure.relaySiteName).join(', '),
-        })
-      );
     },
   });
 }

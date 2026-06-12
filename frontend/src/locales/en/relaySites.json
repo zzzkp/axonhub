@@ -33,6 +33,7 @@
   "relaySites.authTypes.password": "Username + Password",
   "relaySites.authTypes.jwt": "JWT",
   "relaySites.columns.site": "Site",
+  "relaySites.columns.autoCheckin": "Auto Check-in",
   "relaySites.columns.lastSyncedAt": "Last Sync",
   "relaySites.columns.lastCheckinAt": "Last Check-in",
   "relaySites.columns.lastResult": "Last Result",
@@ -170,5 +171,12 @@
   "relaySites.messages.apiKeyDeleted": "API key deleted",
   "relaySites.messages.announcementsRead": "Announcements marked as read",
   "relaySites.messages.apiKeysCreatedForAllGroups": "API keys created for all groups",
-  "relaySites.messages.noModelsAvailable": "No models available for this group, cannot import channel"
+  "relaySites.messages.noModelsAvailable": "No models available for this group, cannot import channel",
+  "relaySites.batchResult.title": "Batch Operation Result",
+  "relaySites.batchResult.summary": "Success {{success}} / Failed {{failed}} / Total {{total}}",
+  "relaySites.batchResult.allSuccess": "All succeeded",
+  "relaySites.batchResult.columns.site": "Site",
+  "relaySites.batchResult.columns.error": "Error Message",
+  "relaySites.batchResult.status.success": "Success",
+  "relaySites.batchResult.status.failed": "Failed"
 }
