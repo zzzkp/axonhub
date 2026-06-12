@@ -170,3 +170,15 @@ func GetErrors(ctx context.Context) []error {
 
 	return slices.Clone(container.Errors)
 }
+
+// CopyContextWithoutTransaction creates a new context that inherits values from the parent
+// but without any Ent transaction state, suitable for concurrent operations.
+func CopyContextWithoutTransaction(parent context.Context) context.Context {
+	container := getContainer(parent)
+
+	// Create a new background context
+	ctx := context.Background()
+
+	// Copy the container to the new context
+	return withContainer(ctx, container)
+}

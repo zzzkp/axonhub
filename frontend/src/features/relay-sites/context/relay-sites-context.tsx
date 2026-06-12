@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, type ReactNode } from 'react';
-import type { RelaySite, RelaySiteAPIKey } from '../data/relay-sites';
+import type { RelaySite, RelaySiteAPIKey, RelaySiteBatchOperationResult } from '../data/relay-sites';
 
 interface RelaySitesContextType {
   isCreateDialogOpen: boolean;
@@ -22,6 +22,8 @@ interface RelaySitesContextType {
   setIsCheckinLogsDialogOpen: (open: boolean) => void;
   isAnnouncementsDialogOpen: boolean;
   setIsAnnouncementsDialogOpen: (open: boolean) => void;
+  isBatchResultDialogOpen: boolean;
+  setIsBatchResultDialogOpen: (open: boolean) => void;
   editingRelaySite: RelaySite | null;
   setEditingRelaySite: (relaySite: RelaySite | null) => void;
   deletingRelaySite: RelaySite | null;
@@ -38,6 +40,8 @@ interface RelaySitesContextType {
   setViewingCheckinLogsRelaySite: (relaySite: RelaySite | null) => void;
   viewingAnnouncementsRelaySite: RelaySite | null;
   setViewingAnnouncementsRelaySite: (relaySite: RelaySite | null) => void;
+  batchOperationResult: RelaySiteBatchOperationResult | null;
+  setBatchOperationResult: (result: RelaySiteBatchOperationResult | null) => void;
 }
 
 const RelaySitesContext = createContext<RelaySitesContextType | undefined>(undefined);
@@ -60,6 +64,7 @@ export default function RelaySitesProvider({ children }: { children: ReactNode }
   const [isModelsAndTokensDialogOpen, setIsModelsAndTokensDialogOpen] = useState(false);
   const [isCheckinLogsDialogOpen, setIsCheckinLogsDialogOpen] = useState(false);
   const [isAnnouncementsDialogOpen, setIsAnnouncementsDialogOpen] = useState(false);
+  const [isBatchResultDialogOpen, setIsBatchResultDialogOpen] = useState(false);
   const [editingRelaySite, setEditingRelaySite] = useState<RelaySite | null>(null);
   const [deletingRelaySite, setDeletingRelaySite] = useState<RelaySite | null>(null);
   const [importingRelaySite, setImportingRelaySite] = useState<RelaySite | null>(null);
@@ -68,6 +73,7 @@ export default function RelaySitesProvider({ children }: { children: ReactNode }
   const [viewingModelsRelaySite, setViewingModelsRelaySite] = useState<RelaySite | null>(null);
   const [viewingCheckinLogsRelaySite, setViewingCheckinLogsRelaySite] = useState<RelaySite | null>(null);
   const [viewingAnnouncementsRelaySite, setViewingAnnouncementsRelaySite] = useState<RelaySite | null>(null);
+  const [batchOperationResult, setBatchOperationResult] = useState<RelaySiteBatchOperationResult | null>(null);
 
   return (
     <RelaySitesContext.Provider
@@ -90,6 +96,8 @@ export default function RelaySitesProvider({ children }: { children: ReactNode }
         setIsCheckinLogsDialogOpen,
         isAnnouncementsDialogOpen,
         setIsAnnouncementsDialogOpen,
+        isBatchResultDialogOpen,
+        setIsBatchResultDialogOpen,
         editingRelaySite,
         setEditingRelaySite,
         deletingRelaySite,
@@ -106,6 +114,8 @@ export default function RelaySitesProvider({ children }: { children: ReactNode }
         setViewingCheckinLogsRelaySite,
         viewingAnnouncementsRelaySite,
         setViewingAnnouncementsRelaySite,
+        batchOperationResult,
+        setBatchOperationResult,
       }}
     >
       {children}

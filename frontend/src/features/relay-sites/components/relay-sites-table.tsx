@@ -59,6 +59,22 @@ function StatusSwitch({ relaySite, canWrite }: { relaySite: RelaySite; canWrite:
   );
 }
 
+function AutoCheckinSwitch({ relaySite, canWrite }: { relaySite: RelaySite; canWrite: boolean }) {
+  const updateMutation = useUpdateRelaySite();
+  const isArchived = relaySite.status === 'archived';
+
+  return (
+    <Switch
+      checked={relaySite.autoCheckinEnabled}
+      disabled={!canWrite || isArchived || updateMutation.isPending}
+      onCheckedChange={(checked) => updateMutation.mutate({
+        id: relaySite.id,
+        input: { autoCheckinEnabled: checked },
+      })}
+    />
+  );
+}
+
 function BalanceCell({ relaySite }: { relaySite: RelaySite }) {
   const latestBalance = nodes(relaySite.balanceSnapshots)[0];
   if (!latestBalance) return <span className='text-sm text-muted-foreground'>-</span>;
@@ -138,7 +154,7 @@ export function RelaySitesTable({
   onStatusFilterChange,
 }: RelaySitesTableProps) {
   const { t } = useTranslation();
-  const { setManagingRelaySite, setIsModelsAndTokensDialogOpen } = useRelaySitesContext();
+  const { setManagingRelaySite, setIsModelsAndTokensDialogOpen, setViewingAnnouncementsRelaySite, setIsAnnouncementsDialogOpen } = useRelaySitesContext();
   const [expandedIDs, setExpandedIDs] = useState<Set<string>>(new Set());
 
   const columnsCount = 10;
@@ -155,6 +171,11 @@ export function RelaySitesTable({
   const handleOpenModelsAndTokens = (relaySite: RelaySite) => {
     setManagingRelaySite(relaySite);
     setIsModelsAndTokensDialogOpen(true);
+  };
+
+  const handleOpenAnnouncements = (relaySite: RelaySite) => {
+    setViewingAnnouncementsRelaySite(relaySite);
+    setIsAnnouncementsDialogOpen(true);
   };
 
   return (
@@ -181,7 +202,7 @@ export function RelaySitesTable({
               <TableHead className='border-0'>{t('relaySites.columns.site')}</TableHead>
               <TableHead className='border-0'>{t('relaySites.fields.type')}</TableHead>
               <TableHead className='border-0'>{t('common.columns.status')}</TableHead>
-              <TableHead className='border-0'>{t('relaySites.columns.lastSyncedAt')}</TableHead>
+              <TableHead className='border-0'>{t('relaySites.columns.autoCheckin')}</TableHead>
               <TableHead className='border-0'>{t('relaySites.columns.lastCheckinAt')}</TableHead>
               <TableHead className='border-0'>{t('relaySites.columns.lastResult')}</TableHead>
               <TableHead className='border-0'>{t('relaySites.columns.balance')}</TableHead>
@@ -206,7 +227,15 @@ export function RelaySitesTable({
                     <TableCell className='min-w-[260px] border-0'>
                       <div className='flex flex-wrap items-center gap-2 font-medium'>
                         <span>{relaySite.name}</span>
-                        {relaySite.hasUnreadAnnouncements && <Badge variant='destructive'>{t('relaySites.announcements.unread')}</Badge>}
+                        {relaySite.hasUnreadAnnouncements && (
+                          <Badge
+                            variant='destructive'
+                            className='cursor-pointer hover:bg-destructive/80'
+                            onClick={() => handleOpenAnnouncements(relaySite)}
+                          >
+                            {t('relaySites.announcements.unread')}
+                          </Badge>
+                        )}
                       </div>
                       <a
                         href={relaySite.baseURL}
@@ -219,7 +248,7 @@ export function RelaySitesTable({
                     </TableCell>
                     <TableCell className='border-0'><Badge variant='outline'>{t(`relaySites.types.${relaySite.type}`)}</Badge></TableCell>
                     <TableCell className='border-0'><StatusSwitch relaySite={relaySite} canWrite={canWrite} /></TableCell>
-                    <TableCell className='border-0 text-sm text-muted-foreground'>{formatDate(relaySite.lastSyncedAt)}</TableCell>
+                    <TableCell className='border-0'><AutoCheckinSwitch relaySite={relaySite} canWrite={canWrite} /></TableCell>
                     <TableCell className='border-0 text-sm text-muted-foreground'>{formatDate(relaySite.lastCheckinAt)}</TableCell>
                     <TableCell className='border-0'>
                       <div className='max-w-[280px] overflow-hidden text-ellipsis whitespace-nowrap text-sm text-muted-foreground'>

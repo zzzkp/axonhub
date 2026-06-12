@@ -13,6 +13,7 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/looplj/axonhub/internal/authz"
+	"github.com/looplj/axonhub/internal/contexts"
 	"github.com/looplj/axonhub/internal/ent"
 	"github.com/looplj/axonhub/internal/ent/channel"
 	"github.com/looplj/axonhub/internal/ent/relaysite"
@@ -311,16 +312,9 @@ func (s *RelaySiteService) SyncAllSites(ctx context.Context) (*RelaySiteBatchOpe
 		return nil, err
 	}
 
-	result := newRelaySiteBatchOperationResult(len(sites))
-	for _, site := range sites {
-		if err := s.SyncSite(ctx, site.ID); err != nil {
-			result.addFailure(site, err)
-			continue
-		}
-		result.SuccessCount++
-	}
-
-	return result, nil
+	return s.executeBatchOperation(ctx, sites, func(ctx context.Context, site *ent.RelaySite) error {
+		return s.SyncSite(ctx, site.ID)
+	}), nil
 }
 
 func (s *RelaySiteService) CheckinAllSites(ctx context.Context) (*RelaySiteBatchOperationResult, error) {
@@ -331,21 +325,16 @@ func (s *RelaySiteService) CheckinAllSites(ctx context.Context) (*RelaySiteBatch
 		return nil, fmt.Errorf("failed to list new-api relay sites: %w", err)
 	}
 
-	result := newRelaySiteBatchOperationResult(len(sites))
-	for _, site := range sites {
+	return s.executeBatchOperation(ctx, sites, func(ctx context.Context, site *ent.RelaySite) error {
 		logEntry, err := s.CheckinSite(ctx, site.ID)
 		if err != nil {
-			result.addFailure(site, err)
-			continue
+			return err
 		}
 		if logEntry != nil && logEntry.Status == relaysitecheckinlog.StatusFailed {
-			result.addFailureMessage(site, relaySiteCheckinLogMessage(logEntry))
-			continue
+			return errors.New(relaySiteCheckinLogMessage(logEntry))
 		}
-		result.SuccessCount++
-	}
-
-	return result, nil
+		return nil
+	}), nil
 }
 
 func newRelaySiteBatchOperationResult(totalCount int) *RelaySiteBatchOperationResult {
@@ -366,6 +355,54 @@ func (r *RelaySiteBatchOperationResult) addFailureMessage(site *ent.RelaySite, m
 		RelaySiteName: site.Name,
 		ErrorMessage:  message,
 	})
+}
+
+func (s *RelaySiteService) executeBatchOperation(ctx context.Context, sites []*ent.RelaySite, operation func(context.Context, *ent.RelaySite) error) *RelaySiteBatchOperationResult {
+	result := newRelaySiteBatchOperationResult(len(sites))
+	if len(sites) == 0 {
+		return result
+	}
+
+	// Use a buffered channel to control concurrency
+	const maxConcurrency = 10
+	semaphore := make(chan struct{}, maxConcurrency)
+	resultChan := make(chan batchOperationItemResult, len(sites))
+
+	// Launch goroutines for each site
+	for _, site := range sites {
+		site := site // capture loop variable
+		go func() {
+			semaphore <- struct{}{}        // acquire semaphore
+			defer func() { <-semaphore }() // release semaphore
+
+			// Create a new context for each operation to avoid sharing transaction state
+			opCtx := contexts.CopyContextWithoutTransaction(ctx)
+			err := operation(opCtx, site)
+
+			resultChan <- batchOperationItemResult{
+				site: site,
+				err:  err,
+			}
+		}()
+	}
+
+	// Collect results
+	for i := 0; i < len(sites); i++ {
+		item := <-resultChan
+		if item.err != nil {
+			result.addFailure(item.site, item.err)
+		} else {
+			result.SuccessCount++
+		}
+	}
+
+	close(resultChan)
+	return result
+}
+
+type batchOperationItemResult struct {
+	site *ent.RelaySite
+	err  error
 }
 
 func (s *RelaySiteService) listAllSites(ctx context.Context) ([]*ent.RelaySite, error) {

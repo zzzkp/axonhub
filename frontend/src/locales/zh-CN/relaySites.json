@@ -33,6 +33,7 @@
   "relaySites.authTypes.password": "用户名 + 密码",
   "relaySites.authTypes.jwt": "JWT",
   "relaySites.columns.site": "站点",
+  "relaySites.columns.autoCheckin": "自动签到",
   "relaySites.columns.lastSyncedAt": "最近同步",
   "relaySites.columns.lastCheckinAt": "最近签到",
   "relaySites.columns.lastResult": "最近结果",
@@ -170,5 +171,12 @@
   "relaySites.messages.apiKeyDeleted": "API Key 已删除",
   "relaySites.messages.announcementsRead": "公告已标记为已读",
   "relaySites.messages.apiKeysCreatedForAllGroups": "已为所有分组创建 Key",
-  "relaySites.messages.noModelsAvailable": "该分组无可用模型，无法导入渠道"
+  "relaySites.messages.noModelsAvailable": "该分组无可用模型，无法导入渠道",
+  "relaySites.batchResult.title": "批量操作结果",
+  "relaySites.batchResult.summary": "成功 {{success}} / 失败 {{failed}} / 总数 {{total}}",
+  "relaySites.batchResult.allSuccess": "全部成功",
+  "relaySites.batchResult.columns.site": "站点",
+  "relaySites.batchResult.columns.error": "错误信息",
+  "relaySites.batchResult.status.success": "成功",
+  "relaySites.batchResult.status.failed": "失败"
 }

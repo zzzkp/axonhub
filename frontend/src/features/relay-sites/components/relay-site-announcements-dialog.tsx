@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { format } from 'date-fns';
 import { Megaphone, RefreshCw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -62,14 +62,6 @@ export function RelaySiteAnnouncementsDialog() {
   );
   const hasUnread = announcements.some((announcement) => !announcement.readAt);
   const isBusy = refreshMutation.isPending || markReadMutation.isPending;
-
-  useEffect(() => {
-    if (!isAnnouncementsDialogOpen || !viewingAnnouncementsRelaySite) return;
-
-    refreshMutation.mutate(viewingAnnouncementsRelaySite.id, {
-      onSuccess: (result) => setViewingAnnouncementsRelaySite(mergeAnnouncementResult(viewingAnnouncementsRelaySite, result)),
-    });
-  }, [isAnnouncementsDialogOpen, viewingAnnouncementsRelaySite?.id]);
 
   const setOpen = (open: boolean) => {
     setIsAnnouncementsDialogOpen(open);
