@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
+import { z } from 'zod';
 import { graphqlRequest } from '@/gql/graphql';
 import { useErrorHandler } from '@/hooks/use-error-handler';
 import {
@@ -11,6 +12,7 @@ import {
   relaySiteAnnouncementResultSchema,
   relaySiteAPIKeyConfigInputSchema,
   relaySiteBatchOperationResultSchema,
+  relaySiteCheckinPageSchema,
   relaySiteCheckinLogSchema,
   relaySiteFormResultSchema,
   relaySiteSchema,
@@ -26,6 +28,7 @@ import {
   type RelaySiteAPIKey,
   type RelaySiteBatchOperationResult,
   type RelaySiteAPIKeyConfigInput,
+  type RelaySiteCheckinPage,
   type RelaySiteCheckinLog,
   type RelaySiteFormResult,
   type RelaySiteModelPrice,
@@ -36,7 +39,7 @@ import {
 export { useUpdateChannelStatus } from '@/features/channels/data/channels';
 
 export type { CreateRelaySiteInput, RelaySite, RelaySiteAnnouncement, RelaySiteAnnouncementResult, RelaySiteAPIKey, RelaySiteCheckinLog, RelaySiteModelPrice, RelaySitesConnection, UpdateRelaySiteInput };
-export type { ImportedRelaySiteChannel, ImportRelaySiteAPIKeyToChannelInput, ImportRelaySitesBackupInput, RelaySiteAPIKeyConfigInput, RelaySiteBatchOperationResult };
+export type { ImportedRelaySiteChannel, ImportRelaySiteAPIKeyToChannelInput, ImportRelaySitesBackupInput, RelaySiteAPIKeyConfigInput, RelaySiteBatchOperationResult, RelaySiteCheckinPage };
 
 const RELAY_SITE_FIELDS = `
   id
@@ -182,6 +185,12 @@ const CHECKIN_RELAY_SITE_MUTATION = `
 const CHECKIN_ALL_RELAY_SITES_MUTATION = `
   mutation CheckinAllRelaySites {
     checkinAllRelaySites { totalCount successCount failedCount failures { relaySiteID relaySiteName errorMessage } }
+  }
+`;
+
+const FAILED_RELAY_SITE_CHECKIN_PAGES_QUERY = `
+  query FailedRelaySiteCheckinPages {
+    failedRelaySiteCheckinPages { relaySiteID relaySiteName url }
   }
 `;
 
@@ -464,8 +473,22 @@ export function useCheckinRelaySite() {
         throw error;
       }
     },
-    onSuccess: () => {
+    onSuccess: log => {
       queryClient.invalidateQueries({ queryKey: ['relaySites'] });
+      queryClient.invalidateQueries({ queryKey: ['failedRelaySiteCheckinPages'] });
+      const message = relaySiteCheckinLogMessage(log);
+      if (log.status === 'failed') {
+        toast.error(message || t('common.errors.operationFailed', { operation: t('relaySites.actions.checkin') }));
+        return;
+      }
+      if (log.status === 'skipped') {
+        toast.info(message || t('relaySites.checkinStatus.skipped'));
+        return;
+      }
+      if (message) {
+        toast.success(t('relaySites.messages.checkinSuccess'), { description: message });
+        return;
+      }
       toast.success(t('relaySites.messages.checkinSuccess'));
     },
   });
@@ -488,6 +511,7 @@ export function useCheckinAllRelaySites() {
     },
     onSuccess: result => {
       queryClient.invalidateQueries({ queryKey: ['relaySites'] });
+      queryClient.invalidateQueries({ queryKey: ['failedRelaySiteCheckinPages'] });
       toastBatchOperationResult(
         result,
         t('relaySites.messages.checkinAllSuccess'),
@@ -503,6 +527,26 @@ export function useCheckinAllRelaySites() {
   });
 }
 
+export function useFailedRelaySiteCheckinPages(enabled = true) {
+  const { t } = useTranslation();
+  const { handleError } = useErrorHandler();
+
+  return useQuery({
+    queryKey: ['failedRelaySiteCheckinPages'],
+    queryFn: async () => {
+      try {
+        const data = await graphqlRequest<{ failedRelaySiteCheckinPages: RelaySiteCheckinPage[] }>(FAILED_RELAY_SITE_CHECKIN_PAGES_QUERY);
+        return z.array(relaySiteCheckinPageSchema).parse(data.failedRelaySiteCheckinPages);
+      } catch (error) {
+        handleError(error, { context: t('relaySites.buttons.openFailedCheckinPages') });
+        throw error;
+      }
+    },
+    enabled,
+    staleTime: 30_000,
+  });
+}
+
 function toastBatchOperationResult(result: RelaySiteBatchOperationResult, successMessage: string, partialFailureMessage: string, summary: string, failureSummary: string) {
   if (result.failedCount > 0) {
     toast.warning(partialFailureMessage, { description: failureSummary });
@@ -510,6 +554,10 @@ function toastBatchOperationResult(result: RelaySiteBatchOperationResult, succes
   }
 
   toast.success(successMessage, { description: summary });
+}
+
+function relaySiteCheckinLogMessage(log: RelaySiteCheckinLog) {
+  return (log.errorMessage || log.message || '').trim();
 }
 
 async function fetchRelaySiteAnnouncements(id: string) {

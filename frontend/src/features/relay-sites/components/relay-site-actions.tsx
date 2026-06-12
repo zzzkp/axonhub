@@ -28,6 +28,7 @@ export function RelaySiteActions({ relaySite, canWrite }: RelaySiteActionsProps)
   } = useRelaySitesContext();
   const syncMutation = useSyncRelaySite();
   const checkinMutation = useCheckinRelaySite();
+  const supportsCheckin = relaySite.type === 'new_api';
 
   return (
     <DropdownMenu>
@@ -44,10 +45,12 @@ export function RelaySiteActions({ relaySite, canWrite }: RelaySiteActionsProps)
               <RefreshCw className='mr-2 h-4 w-4' />
               {t('relaySites.actions.sync')}
             </DropdownMenuItem>
-            <DropdownMenuItem disabled={checkinMutation.isPending} onClick={() => checkinMutation.mutate(relaySite.id)}>
-              <CalendarCheck className='mr-2 h-4 w-4' />
-              {t('relaySites.actions.checkin')}
-            </DropdownMenuItem>
+            {supportsCheckin && (
+              <DropdownMenuItem disabled={checkinMutation.isPending} onClick={() => checkinMutation.mutate(relaySite.id)}>
+                <CalendarCheck className='mr-2 h-4 w-4' />
+                {t('relaySites.actions.checkin')}
+              </DropdownMenuItem>
+            )}
           </>
         )}
         <DropdownMenuItem

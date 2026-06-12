@@ -16,6 +16,12 @@ function nodes<T>(connection?: { edges?: Array<{ node: T }> | null } | null) {
   return connection?.edges?.map((edge) => edge.node) ?? [];
 }
 
+function statusVariant(status: string): 'default' | 'secondary' | 'destructive' {
+  if (status === 'success') return 'default';
+  if (status === 'skipped') return 'secondary';
+  return 'destructive';
+}
+
 export function RelaySiteCheckinLogsDialog() {
   const { t } = useTranslation();
   const { isCheckinLogsDialogOpen, setIsCheckinLogsDialogOpen, viewingCheckinLogsRelaySite, setViewingCheckinLogsRelaySite } = useRelaySitesContext();
@@ -47,7 +53,7 @@ export function RelaySiteCheckinLogsDialog() {
                 <TableRow key={log.id}>
                   <TableCell className='whitespace-nowrap text-sm text-muted-foreground'>{formatDate(log.executedAt)}</TableCell>
                   <TableCell>
-                    <Badge variant={log.status === 'success' ? 'default' : 'destructive'}>{t(`relaySites.checkinStatus.${log.status}`)}</Badge>
+                    <Badge variant={statusVariant(log.status)}>{t(`relaySites.checkinStatus.${log.status}`)}</Badge>
                   </TableCell>
                   <TableCell className='min-w-[280px] text-sm text-muted-foreground'>{log.errorMessage || log.message || '-'}</TableCell>
                 </TableRow>

@@ -90,6 +90,7 @@ type Status string
 const (
 	StatusSuccess Status = "success"
 	StatusFailed  Status = "failed"
+	StatusSkipped Status = "skipped"
 )
 
 func (s Status) String() string {
@@ -99,7 +100,7 @@ func (s Status) String() string {
 // StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
 func StatusValidator(s Status) error {
 	switch s {
-	case StatusSuccess, StatusFailed:
+	case StatusSuccess, StatusFailed, StatusSkipped:
 		return nil
 	default:
 		return fmt.Errorf("relaysitecheckinlog: invalid enum value for status field: %q", s)

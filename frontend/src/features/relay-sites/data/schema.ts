@@ -65,7 +65,7 @@ export type RelaySiteModelPrice = z.infer<typeof relaySiteModelPriceSchema>;
 export const relaySiteCheckinLogSchema = z.object({
   id: z.string(),
   executedAt: z.string(),
-  status: z.enum(['success', 'failed']),
+  status: z.enum(['success', 'failed', 'skipped']),
   message: z.string().nullable().optional(),
   errorMessage: z.string().nullable().optional(),
 });
@@ -167,6 +167,13 @@ export const relaySiteBatchOperationResultSchema = z.object({
   failures: z.array(relaySiteBatchOperationFailureSchema),
 });
 export type RelaySiteBatchOperationResult = z.infer<typeof relaySiteBatchOperationResultSchema>;
+
+export const relaySiteCheckinPageSchema = z.object({
+  relaySiteID: z.string(),
+  relaySiteName: z.string(),
+  url: z.string(),
+});
+export type RelaySiteCheckinPage = z.infer<typeof relaySiteCheckinPageSchema>;
 
 export const relaySiteCredentialInputSchema = z.object({
   authType: relaySiteCredentialAuthTypeSchema,
