@@ -1027,6 +1027,15 @@ func (s *RelaySiteService) ImportAPIKeyToChannel(ctx context.Context, relaySiteA
 	}
 	createdChannel.Status = channel.StatusEnabled
 
+	// 导入后立即同步模型价格到该渠道（衍生动作，失败不影响导入成功）
+	if err := s.syncModelPricesToChannel(ctx, apiKey.RelaySiteID, createdChannel.ID); err != nil {
+		log.Warn(ctx, "failed to sync model prices to imported channel",
+			log.Int("relay_site_id", apiKey.RelaySiteID),
+			log.Int("channel_id", createdChannel.ID),
+			log.Cause(err),
+		)
+	}
+
 	return createdChannel, nil
 }
 
