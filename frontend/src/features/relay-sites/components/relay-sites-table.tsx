@@ -248,7 +248,13 @@ export function RelaySitesTable({
                     </TableCell>
                     <TableCell className='border-0'><Badge variant='outline'>{t(`relaySites.types.${relaySite.type}`)}</Badge></TableCell>
                     <TableCell className='border-0'><StatusSwitch relaySite={relaySite} canWrite={canWrite} /></TableCell>
-                    <TableCell className='border-0'><AutoCheckinSwitch relaySite={relaySite} canWrite={canWrite} /></TableCell>
+                    <TableCell className='border-0'>
+                      {relaySite.type === 'new_api' ? (
+                        <AutoCheckinSwitch relaySite={relaySite} canWrite={canWrite} />
+                      ) : (
+                        <span className='text-sm text-muted-foreground'>-</span>
+                      )}
+                    </TableCell>
                     <TableCell className='border-0 text-sm text-muted-foreground'>{formatDate(relaySite.lastCheckinAt)}</TableCell>
                     <TableCell className='border-0'>
                       <div className='max-w-[280px] overflow-hidden text-ellipsis whitespace-nowrap text-sm text-muted-foreground'>
