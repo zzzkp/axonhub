@@ -446,6 +446,15 @@ func (s *RelaySiteService) SyncSite(ctx context.Context, id int) error {
 		return s.recordSyncFailure(ctx, id, err)
 	}
 
+	// After snapshot persisted, sync model prices to associated channels.
+	// This is a derivative action: failures are logged but do not fail the sync.
+	if err := s.syncModelPricesToChannels(ctx, id); err != nil {
+		log.Warn(ctx, "failed to sync model prices to channels after relay site sync",
+			log.Int("relay_site_id", id),
+			log.Cause(err),
+		)
+	}
+
 	return nil
 }
 
