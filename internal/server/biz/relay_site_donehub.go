@@ -196,6 +196,11 @@ func (a *RelaySiteDoneHubAdapter) ListGroups(ctx context.Context) ([]RelaySiteGr
 }
 
 func (a *RelaySiteDoneHubAdapter) GetBalance(ctx context.Context) (*RelaySiteBalance, error) {
+	// 特定站点跳过 user/self 调用，避免被拉黑
+	if a.shouldSkipUserSelf() {
+		return nil, ErrRelaySiteAdapterNotImplemented
+	}
+
 	self, err := doDoneHub[doneHubUserSelf](ctx, a, http.MethodGet, "/api/user/self", nil)
 	if err != nil {
 		return nil, err
@@ -456,5 +461,10 @@ func normalizeDoneHubChannelStatus(status int) string {
 	default:
 		return "unknown"
 	}
+}
+
+func (a *RelaySiteDoneHubAdapter) shouldSkipUserSelf() bool {
+	baseURL := strings.ToLower(strings.TrimSpace(a.config.BaseURL))
+	return strings.Contains(baseURL, "ai.hybgzs.com")
 }
 
