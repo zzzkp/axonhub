@@ -1,6 +1,6 @@
 # 中转站实现说明
 
-本文说明 AxonHub 中转站模块的实现结构和维护边界。中转站当前支持 `new-api` 和 `sub2api` 类型站点，用于管理外部中转站后台资源，不直接参与模型请求转发链路。
+本文说明 AxonHub 中转站模块的实现结构和维护边界。中转站当前支持 `new-api`、`sub2api` 和 `done-hub` 类型站点，用于管理外部中转站后台资源，不直接参与模型请求转发链路。
 
 ## 模块边界
 
@@ -51,7 +51,7 @@
 
 ## Adapter 设计
 
-统一适配器接口位于 `internal/server/biz/relay_site_adapter.go`。站点类型通过 adapter factory 路由到具体实现，当前实现包括 `new-api` 和 `sub2api`。
+统一适配器接口位于 `internal/server/biz/relay_site_adapter.go`。站点类型通过 adapter factory 路由到具体实现，当前实现包括 `new-api`、`sub2api` 和 `done-hub`。
 
 adapter 负责屏蔽不同中转站后台接口差异，向 service 提供统一能力：
 
@@ -109,7 +109,35 @@ sub2api 的远端 API Key 使用数字 `group_id`，本地快照会把它映射�
 
 部分 sub2api 站点不提供 pricing 接口。sub2api adapter 不依赖 pricing 接口同步模型数据，而是使用已同步到的远端 API Key 调用 OpenAI 兼容的 `GET /v1/models`，并按该 key 所属分组写入模型快照的 `enable_groups`。单个 key 的模型接口失败会被跳过，不会导致整个站点同步失败。
 
-sub2api 当前不支持内置签到；调用签到能力时返回“不支持”。模型快照主要用于模型选择和 Channel 导入，不包含 new-api 那类价格倍率数据。
+sub2api 当前不支持内置签到；调用签到能力时返回”不支持”。模型快照主要用于模型选择和 Channel 导入，不包含 new-api 那类价格倍率数据。
+
+`done-hub` 适配实现位于 `internal/server/biz/relay_site_donehub.go`。done-hub 是 one-hub 的衍生项目，API 设计与 new-api 有较大差异。当前调用的远端接口包括：
+
+- `GET /api/token` - 列出令牌
+- `GET /api/token/:id` - 获取令牌详情
+- `POST /api/token/` - 创建令牌
+- `PUT /api/token/` - 更新令牌
+- `DELETE /api/token/:id` - 删除令牌
+- `GET /api/group/` - 列出分组
+- `GET /api/user_group_map` - 获取分组倍率
+- `GET /api/user/self` - 获取用户信息和余额
+- `GET /api/available_model` - 获取模型价格
+- `GET /api/announcement` - 获取站点公告
+
+done-hub 使用 token 认证，凭据类型为 `token`，需提供 `token` 和 `userId` 字段。认证只需携带 `Authorization: Bearer {token}`，无需额外 header。
+
+done-hub 关键特性：
+- 分页从 1 开始，使用 `page` + `size` 参数
+- 响应结构为 `{success, data: {data[], page, size, total_count}}`
+- 令牌端点为 `/api/token` 而非 `/api/channel/`
+- 支持完整的模型价格信息（输入/输出价格 + tokens/times 计费类型）
+- 支持丰富的公告系统（5 种公告类型：default、success、warning、error、progress）
+- 不支持内置签到功能，调用签到能力时返回”不支持”
+- quota 按 `500000 quota = 1 USD` 换算为 USD 展示
+
+done-hub 的模型价格通过 `/api/available_model` 获取，返回每个模型的输入价格（input）、输出价格（output）和计费类型（type: tokens/times）。价格单位为 USD/M tokens（tokens 类型）或 USD/request（times 类型）。
+
+done-hub 的公告系统支持开关控制（enabled 字段）和多种公告类型，公告时间使用 Unix 时间戳（publish_time）。当 `enabled` 为 `false` 时，本地公告快照会按空列表同步。
 
 ## GraphQL 接口
 
@@ -185,10 +213,10 @@ GraphQL schema 和 resolver 位于：
 
 ## 扩展新站点类型
 
-新增 `done-hub` 等站点类型时，应优先复用现有边界：
+新增站点类型时，应优先复用现有边界：
 
 - 保持 `RelaySite` 系列 Ent 模型稳定。
-- 在 adapter factory 中新增站点类型分发，当前 `new-api` 对应内部类型值为 `new_api`，`sub2api` 对应内部类型值为 `sub2api`。
+- 在 adapter factory 中新增站点类型分发，当前 `new-api` 对应内部类型值为 `new_api`，`sub2api` 对应内部类型值为 `sub2api`，`done-hub` 对应内部类型值为 `done_hub`。
 - 新增具体 adapter 实现远端接口差异。
 - 仅在确有差异时扩展凭据或快照字段。
 - 不把中转站逻辑接入 `llm`、orchestrator、request 或 Channel 请求转发链路。

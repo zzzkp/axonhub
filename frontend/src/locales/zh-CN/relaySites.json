@@ -26,6 +26,7 @@
   "relaySites.fields.tokenExpiresAt": "令牌过期时间",
   "relaySites.types.new_api": "new-api",
   "relaySites.types.sub2api": "sub2api",
+  "relaySites.types.done_hub": "done-hub",
   "relaySites.status.enabled": "启用",
   "relaySites.status.disabled": "禁用",
   "relaySites.status.archived": "归档",
