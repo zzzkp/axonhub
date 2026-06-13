@@ -94,12 +94,14 @@ type newAPIPricingResponse struct {
 }
 
 type newAPIPricingItem struct {
-	ModelName       string   `json:"model_name"`
-	QuotaType       int      `json:"quota_type"`
-	ModelRatio      float64  `json:"model_ratio"`
-	ModelPrice      float64  `json:"model_price"`
-	CompletionRatio float64  `json:"completion_ratio"`
-	EnableGroups    []string `json:"enable_groups"`
+	ModelName        string   `json:"model_name"`
+	QuotaType        int      `json:"quota_type"`
+	ModelRatio       float64  `json:"model_ratio"`
+	ModelPrice       float64  `json:"model_price"`
+	CompletionRatio  float64  `json:"completion_ratio"`
+	CacheRatio       float64  `json:"cache_ratio"`
+	CreateCacheRatio float64  `json:"create_cache_ratio"`
+	EnableGroups     []string `json:"enable_groups"`
 }
 
 type newAPICheckinData struct {
