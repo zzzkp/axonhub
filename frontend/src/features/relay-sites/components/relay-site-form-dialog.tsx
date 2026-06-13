@@ -16,7 +16,7 @@ import { useCreateRelaySite, useUpdateRelaySite, type CreateRelaySiteInput, type
 
 type RelaySiteFormValues = {
   name: string;
-  type: 'new_api' | 'sub2api';
+  type: 'new_api' | 'sub2api' | 'done_hub';
   baseURL: string;
   status: 'enabled' | 'disabled' | 'archived';
   autoCheckinEnabled: boolean;
@@ -126,6 +126,12 @@ export function RelaySiteFormDialog({ mode }: { mode: 'create' | 'edit' }) {
       setValue('checkinPageURL', '');
       setValue('externalCheckinPageURL', '');
     }
+    if (siteType === 'done_hub') {
+      if (authType !== 'token') setValue('authType', 'token');
+      setValue('autoCheckinEnabled', false);
+      setValue('checkinPageURL', '');
+      setValue('externalCheckinPageURL', '');
+    }
     if (siteType === 'new_api' && authType === 'jwt') {
       setValue('authType', 'token');
     }
@@ -220,7 +226,7 @@ export function RelaySiteFormDialog({ mode }: { mode: 'create' | 'edit' }) {
             </div>
             <div className='grid gap-2'>
               <Label htmlFor={`${mode}-relay-site-base-url`}>{t('relaySites.fields.baseURL')}</Label>
-              <Input id={`${mode}-relay-site-base-url`} placeholder={siteType === 'sub2api' ? 'https://sub2api.example.com' : 'https://new-api.example.com'} {...register('baseURL', { required: t('relaySites.validation.baseURLRequired') })} />
+              <Input id={`${mode}-relay-site-base-url`} placeholder={siteType === 'sub2api' ? 'https://sub2api.example.com' : siteType === 'done_hub' ? 'https://done-hub.example.com' : 'https://new-api.example.com'} {...register('baseURL', { required: t('relaySites.validation.baseURLRequired') })} />
               {errors.baseURL && <span className='text-sm text-red-500'>{errors.baseURL.message}</span>}
             </div>
             <div className='grid gap-2'>
@@ -230,6 +236,7 @@ export function RelaySiteFormDialog({ mode }: { mode: 'create' | 'edit' }) {
                 <SelectContent>
                   <SelectItem value='new_api'>{t('relaySites.types.new_api')}</SelectItem>
                   <SelectItem value='sub2api'>{t('relaySites.types.sub2api')}</SelectItem>
+                  <SelectItem value='done_hub'>{t('relaySites.types.done_hub')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -274,6 +281,8 @@ export function RelaySiteFormDialog({ mode }: { mode: 'create' | 'edit' }) {
                 <SelectContent>
                   {siteType === 'sub2api' ? (
                     <SelectItem value='jwt'>{t('relaySites.authTypes.jwt')}</SelectItem>
+                  ) : siteType === 'done_hub' ? (
+                    <SelectItem value='token'>{t('relaySites.authTypes.token')}</SelectItem>
                   ) : (
                     <>
                       <SelectItem value='token'>{t('relaySites.authTypes.token')}</SelectItem>

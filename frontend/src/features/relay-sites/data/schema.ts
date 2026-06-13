@@ -3,7 +3,7 @@ import { pageInfoSchema } from '@/gql/pagination';
 import { channelTypeSchema } from '@/features/channels/data/schema';
 
 export const relaySiteStatusSchema = z.enum(['enabled', 'disabled', 'archived']);
-export const relaySiteTypeSchema = z.enum(['new_api', 'sub2api']);
+export const relaySiteTypeSchema = z.enum(['new_api', 'sub2api', 'done_hub']);
 export const relaySiteCredentialAuthTypeSchema = z.enum(['token', 'password', 'jwt']);
 
 export const relaySiteAPIKeySchema = z.object({

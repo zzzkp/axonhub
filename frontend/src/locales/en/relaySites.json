@@ -26,6 +26,7 @@
   "relaySites.fields.tokenExpiresAt": "Token Expires At",
   "relaySites.types.new_api": "new-api",
   "relaySites.types.sub2api": "sub2api",
+  "relaySites.types.done_hub": "done-hub",
   "relaySites.status.enabled": "Enabled",
   "relaySites.status.disabled": "Disabled",
   "relaySites.status.archived": "Archived",

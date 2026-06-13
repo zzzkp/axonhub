@@ -38,9 +38,9 @@ func (RelaySite) Fields() []ent.Field {
 		field.String("name").
 			Annotations(entgql.OrderField("NAME")),
 		field.Enum("type").
-			Values("new_api", "sub2api").
+			Values("new_api", "sub2api", "done_hub").
 			Default("new_api").
-			Comment("Relay site type. new_api represents a new-api relay site, sub2api represents a sub2api relay site.").
+			Comment("Relay site type. new_api represents a new-api relay site, sub2api represents a sub2api relay site, done_hub represents a done-hub relay site.").
 			Annotations(entgql.OrderField("TYPE")),
 		field.String("base_url"),
 		field.Enum("status").
