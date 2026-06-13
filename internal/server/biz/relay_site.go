@@ -430,7 +430,7 @@ func (s *RelaySiteService) SyncSite(ctx context.Context, id int) error {
 		return s.recordSyncFailure(ctx, id, err)
 	}
 	balance, err := adapter.GetBalance(ctx)
-	if err != nil {
+	if err != nil && !errors.Is(err, ErrRelaySiteAdapterNotImplemented) {
 		return s.recordSyncFailure(ctx, id, err)
 	}
 	modelPrices, err := adapter.ListModelPrices(ctx)

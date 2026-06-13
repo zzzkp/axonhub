@@ -124,13 +124,11 @@ export function RelaySiteFormDialog({ mode }: { mode: 'create' | 'edit' }) {
       if (authType !== 'jwt') setValue('authType', 'jwt');
       setValue('autoCheckinEnabled', false);
       setValue('checkinPageURL', '');
-      setValue('externalCheckinPageURL', '');
     }
     if (siteType === 'done_hub') {
       if (authType !== 'token') setValue('authType', 'token');
       setValue('autoCheckinEnabled', false);
       setValue('checkinPageURL', '');
-      setValue('externalCheckinPageURL', '');
     }
     if (siteType === 'new_api' && authType === 'jwt') {
       setValue('authType', 'token');
@@ -187,7 +185,7 @@ export function RelaySiteFormDialog({ mode }: { mode: 'create' | 'edit' }) {
         autoCheckinEnabled: data.type === 'new_api' && data.autoCheckinEnabled,
         remark: data.remark.trim(),
         checkinPageURL: data.type === 'new_api' ? data.checkinPageURL.trim() : '',
-        externalCheckinPageURL: data.type === 'new_api' ? data.externalCheckinPageURL.trim() : '',
+        externalCheckinPageURL: data.externalCheckinPageURL.trim(),
         credential: credential!,
       };
       await createMutation.mutateAsync(input);
@@ -203,7 +201,7 @@ export function RelaySiteFormDialog({ mode }: { mode: 'create' | 'edit' }) {
       autoCheckinEnabled: data.type === 'new_api' && data.autoCheckinEnabled,
       remark: data.remark.trim(),
       checkinPageURL: data.type === 'new_api' ? data.checkinPageURL.trim() : '',
-      externalCheckinPageURL: data.type === 'new_api' ? data.externalCheckinPageURL.trim() : '',
+      externalCheckinPageURL: data.externalCheckinPageURL.trim(),
       ...(credential ? { credential } : {}),
     };
     await updateMutation.mutateAsync({ id: editingRelaySite.id, input });
@@ -272,7 +270,7 @@ export function RelaySiteFormDialog({ mode }: { mode: 'create' | 'edit' }) {
             </div>
             <div className='grid gap-2'>
               <Label htmlFor={`${mode}-relay-site-external-checkin-page-url`}>{t('relaySites.fields.externalCheckinPageURL')}</Label>
-              <Input id={`${mode}-relay-site-external-checkin-page-url`} placeholder='https://...' disabled={siteType !== 'new_api'} {...register('externalCheckinPageURL')} />
+              <Input id={`${mode}-relay-site-external-checkin-page-url`} placeholder='https://...' {...register('externalCheckinPageURL')} />
             </div>
             <div className='grid gap-2'>
               <Label htmlFor={`${mode}-relay-site-auth-type`}>{t('relaySites.fields.authType')}</Label>
