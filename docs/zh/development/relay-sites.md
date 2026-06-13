@@ -44,6 +44,7 @@
 - 记录同步和签到结果。
 - 执行自动签到任务。
 - 将远端 API Key 显式导入为 Channel。
+- 同步完成后自动将模型价格换算并写入关联渠道。
 
 公告同步会根据远端公告 ID upsert 本地快照。新公告默认未读；当同一公告的内容、类型、附加信息或发布时间发生变化时，会清空 `readAt` 使其重新进入未读状态；远端接口不再返回的公告会从本地删除。
 
@@ -210,6 +211,66 @@ GraphQL schema 和 resolver 位于：
 - `gemini/contents`
 
 开启端点配置时，前端会保留现有自定义 endpoints，并补齐缺失的上述消息协议 endpoints。关闭端点配置时，只删除 apiFormat 属于上述集合且 `path`、`baseURL`、`transport` 均为空的 endpoint；如果用户在渠道端点配置中为这些协议设置了自定义 path、baseURL 或 transport，则关闭开关不会删除该 endpoint。
+
+## 价格自动同步到渠道
+
+站点同步完成后，系统会自动将模型价格快照换算并写入所有关联渠道的 `ChannelModelPrice`。该功能为衍生动作：换算或写入失败不影响站点同步本身成功，失败信息记录在日志中。
+
+核心换算逻辑位于 `internal/server/biz/relay_site_price_sync.go`。
+
+### 换算规则
+
+渠道价格 `UsagePerUnit` 语义为 **USD 每百万 token**，`FlatFee` 为 **USD 每次请求**。
+
+**new-api** 站点（基于 `500000 quota = 1 USD` 换算基准）：
+
+- 按量计费模型（`quota_type ≠ 1`，BillingUnit = `new-api-ratio`）：
+  - prompt price = `model_ratio × group_ratio × 2` USD/M tokens
+  - completion price = `completion_ratio × group_ratio × 2` USD/M tokens
+- 按次计费模型（`quota_type = 1`，BillingUnit = `new-api-model-price`）：
+  - flat fee = `model_price × group_ratio` USD/request
+
+**done-hub** 站点（价格已为 USD/M tokens 语义）：
+
+- tokens 类型（BillingUnit = `done-hub-tokens`）：
+  - prompt price = `input × group_ratio` USD/M tokens
+  - completion price = `output × group_ratio` USD/M tokens
+- times 类型（BillingUnit = `done-hub-times`）：
+  - flat fee = `input × group_ratio` USD/request
+
+**sub2api** 站点：模型快照不包含价格数据（`PromptPrice`/`CompletionPrice` 均为 nil），换算跳过该站点的所有关联渠道。
+
+### 分组倍率与模型过滤
+
+换算时从渠道 tags 中解析 `relay-site-api-key:<id>` 标签，查询对应 `RelaySiteAPIKey.GroupName`，再从 `RelaySiteGroup.Ratio` 获取该分组的价格倍率（缺省为 1）。
+
+模型价格快照包含 `enable_groups` 字段（保存在 `price.Raw["enable_groups"]`）。如果该字段为空列表，表示模型对所有分组启用；否则只对列表中的分组启用。换算时会过滤掉对当前渠道所属分组不可用的模型。
+
+### 写入策略
+
+使用 `ChannelService.SaveChannelModelPrices` 全量写入：
+
+- 存在于快照但不在渠道中的模型 → 创建新价格
+- 快照与渠道价格不一致 → 更新价格并归档旧版本到 `ChannelModelPriceVersion`
+- 存在于渠道但不在快照中的模型 → 删除价格并归档版本
+
+该策略等效"清空后重建"，但额外保留了历史版本用于审计和账单引用。
+
+当换算后某渠道无任何可用价格时（如 sub2api 渠道或所有模型都不对该分组启用），会跳过该渠道而非清空其价格，避免误删手动设置的价格。
+
+### 触发时机
+
+价格同步在以下操作完成后自动触发：
+
+- 手动点击"同步"按钮
+- 创建、更新、删除远端 API Key
+- 自动签到任务（如果站点启用自动签到）
+
+### 相关代码
+
+- `internal/server/biz/relay_site_price_sync.go` — 换算与同步逻辑
+- `internal/server/biz/relay_site.go` 的 `SyncSite` 方法 — 调用入口
+- `internal/server/biz/channel_price.go` 的 `SaveChannelModelPrices` — 渠道价格写入
 
 ## 扩展新站点类型
 
