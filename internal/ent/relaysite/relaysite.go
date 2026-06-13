@@ -176,6 +176,7 @@ const DefaultType = TypeNewAPI
 const (
 	TypeNewAPI  Type = "new_api"
 	TypeSub2api Type = "sub2api"
+	TypeDoneHub Type = "done_hub"
 )
 
 func (_type Type) String() string {
@@ -185,7 +186,7 @@ func (_type Type) String() string {
 // TypeValidator is a validator for the "type" field enum values. It is called by the builders before save.
 func TypeValidator(_type Type) error {
 	switch _type {
-	case TypeNewAPI, TypeSub2api:
+	case TypeNewAPI, TypeSub2api, TypeDoneHub:
 		return nil
 	default:
 		return fmt.Errorf("relaysite: invalid enum value for type field: %q", _type)

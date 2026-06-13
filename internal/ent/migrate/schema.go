@@ -534,7 +534,7 @@ var (
 		{Name: "updated_at", Type: field.TypeTime, Default: schema.Expr("CURRENT_TIMESTAMP")},
 		{Name: "deleted_at", Type: field.TypeInt, Default: 0},
 		{Name: "name", Type: field.TypeString},
-		{Name: "type", Type: field.TypeEnum, Enums: []string{"new_api", "sub2api"}, Default: "new_api"},
+		{Name: "type", Type: field.TypeEnum, Enums: []string{"new_api", "sub2api", "done_hub"}, Default: "new_api"},
 		{Name: "base_url", Type: field.TypeString},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"enabled", "disabled", "archived"}, Default: "disabled"},
 		{Name: "auto_checkin_enabled", Type: field.TypeBool, Default: false},
