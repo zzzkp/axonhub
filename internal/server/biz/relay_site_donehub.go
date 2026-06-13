@@ -417,11 +417,15 @@ func (item doneHubModelPricingItem) toRemoteModelPrice() objects.RelaySiteRemote
 		billingUnit = "done-hub-times"
 	}
 
+	raw := structToRaw(item)
+	// 将 groups 映射到 enable_groups，确保与前端 GraphQL resolver 约定一致
+	raw["enable_groups"] = item.Groups
+
 	return objects.RelaySiteRemoteModelPrice{
 		PromptPrice:     decimalPtr(item.Price.Input),
 		CompletionPrice: decimalPtr(item.Price.Output),
 		BillingUnit:     billingUnit,
-		Raw:             structToRaw(item),
+		Raw:             raw,
 	}
 }
 
