@@ -19,7 +19,7 @@ export function RelaySitesPrimaryButtons({ canWrite, sites }: { canWrite: boolea
   const importBackupMutation = useImportRelaySitesBackup();
 
   const handleOpenAllExternalPages = () => {
-    const urls = sites.filter(s => s.type === 'new_api').map(s => s.externalCheckinPageURL).filter(Boolean);
+    const urls = sites.map(s => s.externalCheckinPageURL).filter(Boolean);
     urls.forEach(url => window.open(url!, '_blank'));
   };
 
@@ -33,7 +33,7 @@ export function RelaySitesPrimaryButtons({ canWrite, sites }: { canWrite: boolea
     toast.success(t('relaySites.messages.openedFailedCheckinPages', { count: pages.length }));
   };
 
-  const externalPagesCount = sites.filter(s => s.type === 'new_api' && s.externalCheckinPageURL).length;
+  const externalPagesCount = sites.filter(s => s.externalCheckinPageURL).length;
 
   const handleExportBackup = async () => {
     let payload = '';
