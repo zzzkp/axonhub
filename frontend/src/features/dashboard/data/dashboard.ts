@@ -307,8 +307,8 @@ const TOP_PROJECTS_QUERY = `
 `;
 
 const CHANNEL_SUCCESS_RATES_QUERY = `
-  query GetChannelSuccessRates($timeWindow: String, $limit: Int) {
-    channelSuccessRates(timeWindow: $timeWindow, limit: $limit) {
+  query GetChannelSuccessRates($timeWindow: String, $limit: Int, $modelId: String) {
+    channelSuccessRates(timeWindow: $timeWindow, limit: $limit, modelId: $modelId) {
       channelId
       channelName
       channelType
@@ -318,6 +318,12 @@ const CHANNEL_SUCCESS_RATES_QUERY = `
       totalCount
       successRate
     }
+  }
+`;
+
+const REQUEST_MODEL_OPTIONS_QUERY = `
+  query GetRequestModelOptions($timeWindow: String) {
+    requestModelOptions(timeWindow: $timeWindow)
   }
 `;
 
@@ -560,15 +566,34 @@ export function useTokenStats() {
   });
 }
 
-export function useChannelSuccessRates(limit?: number, timeWindow?: string) {
+export function useChannelSuccessRates(limit?: number, timeWindow?: string, modelId?: string) {
   return useQuery({
-    queryKey: ['channelSuccessRates', limit, timeWindow],
+    queryKey: ['channelSuccessRates', limit, timeWindow, modelId],
     queryFn: async () => {
       const data = await graphqlRequest<{ channelSuccessRates: ChannelSuccessRate[] }>(
         CHANNEL_SUCCESS_RATES_QUERY,
-        { ...(timeWindow != null && { timeWindow }), ...(limit != null && { limit }) }
+        {
+          ...(timeWindow != null && { timeWindow }),
+          ...(limit != null && { limit }),
+          ...(modelId != null && { modelId }),
+        }
       );
       return data.channelSuccessRates.map((item) => channelSuccessRateSchema.parse(item));
+    },
+    refetchInterval: 300000,
+    placeholderData: (previousData) => previousData,
+  });
+}
+
+export function useRequestModelOptions(timeWindow?: string) {
+  return useQuery({
+    queryKey: ['requestModelOptions', timeWindow],
+    queryFn: async () => {
+      const data = await graphqlRequest<{ requestModelOptions: string[] }>(
+        REQUEST_MODEL_OPTIONS_QUERY,
+        { ...(timeWindow != null && { timeWindow }) }
+      );
+      return data.requestModelOptions;
     },
     refetchInterval: 300000,
     placeholderData: (previousData) => previousData,

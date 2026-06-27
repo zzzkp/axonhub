@@ -1251,7 +1251,7 @@ type ComplexityRoot struct {
 		ChannelOverrideTemplates     func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.ChannelOverrideTemplateOrder, where *ent.ChannelOverrideTemplateWhereInput) int
 		ChannelPerformanceStats      func(childComplexity int) int
 		ChannelProbeData             func(childComplexity int, input biz.GetChannelProbeDataInput) int
-		ChannelSuccessRates          func(childComplexity int, timeWindow *string, limit *int) int
+		ChannelSuccessRates          func(childComplexity int, timeWindow *string, limit *int, modelID *string) int
 		Channels                     func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.ChannelOrder, where *ent.ChannelWhereInput) int
 		CheckForUpdate               func(childComplexity int) int
 		CostStatsByAPIKey            func(childComplexity int, timeWindow *string) int
@@ -1287,6 +1287,7 @@ type ComplexityRoot struct {
 		QueryUnassociatedChannels    func(childComplexity int) int
 		QuotaEnforcementSettings     func(childComplexity int) int
 		RelaySites                   func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.RelaySiteOrder, where *ent.RelaySiteWhereInput) int
+		RequestModelOptions          func(childComplexity int, timeWindow *string) int
 		RequestStats                 func(childComplexity int) int
 		RequestStatsByAPIKey         func(childComplexity int, timeWindow *string) int
 		RequestStatsByChannel        func(childComplexity int, timeWindow *string) int
@@ -2441,7 +2442,8 @@ type QueryResolver interface {
 	DailyRequestStats(ctx context.Context) ([]*DailyRequestStats, error)
 	TopRequestsProjects(ctx context.Context) ([]*TopRequestsProjects, error)
 	TokenStats(ctx context.Context) (*TokenStats, error)
-	ChannelSuccessRates(ctx context.Context, timeWindow *string, limit *int) ([]*ChannelSuccessRate, error)
+	ChannelSuccessRates(ctx context.Context, timeWindow *string, limit *int, modelID *string) ([]*ChannelSuccessRate, error)
+	RequestModelOptions(ctx context.Context, timeWindow *string) ([]string, error)
 	FastestChannels(ctx context.Context, input FastestChannelsInput) ([]*FastestChannel, error)
 	FastestModels(ctx context.Context, input FastestChannelsInput) ([]*FastestModel, error)
 	ModelPerformanceStats(ctx context.Context) ([]*ModelPerformanceStat, error)
@@ -7846,7 +7848,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.complexity.Query.ChannelSuccessRates(childComplexity, args["timeWindow"].(*string), args["limit"].(*int)), true
+		return e.complexity.Query.ChannelSuccessRates(childComplexity, args["timeWindow"].(*string), args["limit"].(*int), args["modelId"].(*string)), true
 	case "Query.channels":
 		if e.complexity.Query.Channels == nil {
 			break
@@ -8167,6 +8169,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Query.RelaySites(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.RelaySiteOrder), args["where"].(*ent.RelaySiteWhereInput)), true
+	case "Query.requestModelOptions":
+		if e.complexity.Query.RequestModelOptions == nil {
+			break
+		}
+
+		args, err := ec.field_Query_requestModelOptions_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.RequestModelOptions(childComplexity, args["timeWindow"].(*string)), true
 	case "Query.requestStats":
 		if e.complexity.Query.RequestStats == nil {
 			break
@@ -14511,6 +14524,11 @@ func (ec *executionContext) field_Query_channelSuccessRates_args(ctx context.Con
 		return nil, err
 	}
 	args["limit"] = arg1
+	arg2, err := graphql.ProcessArgField(ctx, rawArgs, "modelId", ec.unmarshalOString2ᚖstring)
+	if err != nil {
+		return nil, err
+	}
+	args["modelId"] = arg2
 	return args, nil
 }
 
@@ -14953,6 +14971,17 @@ func (ec *executionContext) field_Query_relaySites_args(ctx context.Context, raw
 		return nil, err
 	}
 	args["where"] = arg5
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_requestModelOptions_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "timeWindow", ec.unmarshalOString2ᚖstring)
+	if err != nil {
+		return nil, err
+	}
+	args["timeWindow"] = arg0
 	return args, nil
 }
 
@@ -43936,7 +43965,7 @@ func (ec *executionContext) _Query_channelSuccessRates(ctx context.Context, fiel
 		ec.fieldContext_Query_channelSuccessRates,
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.resolvers.Query().ChannelSuccessRates(ctx, fc.Args["timeWindow"].(*string), fc.Args["limit"].(*int))
+			return ec.resolvers.Query().ChannelSuccessRates(ctx, fc.Args["timeWindow"].(*string), fc.Args["limit"].(*int), fc.Args["modelId"].(*string))
 		},
 		nil,
 		ec.marshalNChannelSuccessRate2ᚕᚖgithubᚗcomᚋloopljᚋaxonhubᚋinternalᚋserverᚋgqlᚐChannelSuccessRateᚄ,
@@ -43981,6 +44010,47 @@ func (ec *executionContext) fieldContext_Query_channelSuccessRates(ctx context.C
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_channelSuccessRates_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_requestModelOptions(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_requestModelOptions,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().RequestModelOptions(ctx, fc.Args["timeWindow"].(*string))
+		},
+		nil,
+		ec.marshalNString2ᚕstringᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_requestModelOptions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_requestModelOptions_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -108153,6 +108223,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_channelSuccessRates(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "requestModelOptions":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_requestModelOptions(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}

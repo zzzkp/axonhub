@@ -885,7 +885,7 @@ func (r *queryResolver) TokenStats(ctx context.Context) (*TokenStats, error) {
 // Note: Uses request_execution table for channel-level process tracking.
 // This provides success/failure rates per channel, suitable for monitoring channel health.
 // For result-only channel statistics, use RequestStatsByChannel instead.
-func (r *queryResolver) ChannelSuccessRates(ctx context.Context, timeWindow *string, limit *int) ([]*ChannelSuccessRate, error) {
+func (r *queryResolver) ChannelSuccessRates(ctx context.Context, timeWindow *string, limit *int, modelID *string) ([]*ChannelSuccessRate, error) {
 	ctx = authz.WithScopeDecision(ctx, scopes.ScopeReadDashboard)
 
 	// Parse time window, default to "day"
@@ -912,19 +912,32 @@ func (r *queryResolver) ChannelSuccessRates(ctx context.Context, timeWindow *str
 	// Step 1: Get success/failure counts from request_execution
 	err := r.client.RequestExecution.Query().
 		Modify(func(s *sql.Selector) {
+			// Qualify all columns with the request_execution table to avoid
+			// ambiguous column errors when joining the request table below.
+			statusCol := s.C(requestexecution.FieldStatus)
 			s.Select(
-				requestexecution.FieldChannelID,
-				sql.As("SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END)", "success_count"),
-				sql.As("SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END)", "failed_count"),
+				sql.As(s.C(requestexecution.FieldChannelID), "channel_id"),
+				sql.As(fmt.Sprintf("SUM(CASE WHEN %s = 'completed' THEN 1 ELSE 0 END)", statusCol), "success_count"),
+				sql.As(fmt.Sprintf("SUM(CASE WHEN %s = 'failed' THEN 1 ELSE 0 END)", statusCol), "failed_count"),
 			).
-				Where(sql.NotNull(requestexecution.FieldChannelID))
+				Where(sql.NotNull(s.C(requestexecution.FieldChannelID)))
+
+			// Filter by the user-requested model (request.model_id) when provided.
+			if modelID != nil && *modelID != "" {
+				requestTable := sql.Table(request.Table)
+				s.Join(requestTable).On(
+					s.C(requestexecution.FieldRequestID),
+					requestTable.C(request.FieldID),
+				)
+				s.Where(sql.EQ(requestTable.C(request.FieldModelID), *modelID))
+			}
 
 			// Apply time filter
 			if applyFilter {
 				s.Where(sql.GTE(s.C(requestexecution.FieldCreatedAt), since))
 			}
 
-			s.GroupBy(requestexecution.FieldChannelID)
+			s.GroupBy(s.C(requestexecution.FieldChannelID))
 		}).
 		Scan(ctx, &results)
 	if err != nil {
@@ -996,6 +1009,44 @@ func (r *queryResolver) ChannelSuccessRates(ctx context.Context, timeWindow *str
 	}
 
 	return response, nil
+}
+
+// RequestModelOptions is the resolver for the requestModelOptions field.
+// Returns the distinct user-requested model IDs (request.model_id) within the time window,
+// intended as the data source for the model filter on the channel success rate page.
+// Note: Uses the request table (not usage_logs) so that models with only failed
+// requests are still listed.
+func (r *queryResolver) RequestModelOptions(ctx context.Context, timeWindow *string) ([]string, error) {
+	ctx = authz.WithScopeDecision(ctx, scopes.ScopeReadDashboard)
+
+	since, applyFilter := r.parseTimeWindow(ctx, timeWindow)
+
+	type modelRow struct {
+		ModelID string `json:"model_id"`
+	}
+
+	var rows []modelRow
+
+	query := r.client.Request.Query()
+	if applyFilter {
+		query = query.Where(request.CreatedAtGTE(since))
+	}
+
+	err := query.
+		Where(request.ModelIDNEQ("")).
+		GroupBy(request.FieldModelID).
+		Scan(ctx, &rows)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get request model options: %w", err)
+	}
+
+	models := lo.Map(rows, func(row modelRow, _ int) string {
+		return row.ModelID
+	})
+
+	sort.Strings(models)
+
+	return models, nil
 }
 
 // FastestChannels is the resolver for the fastestChannels field.
