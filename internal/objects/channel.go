@@ -52,7 +52,16 @@ const (
 	OverrideOpArrayAppend  = "array_append"
 	OverrideOpArrayPrepend = "array_prepend"
 	OverrideOpArrayInsert  = "array_insert"
+	OverrideOpArrayRemove  = "array_remove"
 )
+
+// OverrideMatch defines a simple equality matcher for array_remove operations.
+type OverrideMatch struct {
+	// Path is resolved relative to each array item.
+	Path string `json:"path"`
+	// Eq is the value that removes the item when it matches.
+	Eq string `json:"eq"`
+}
 
 // OverrideOperation defines a structured override operation for request body/header manipulation.
 type OverrideOperation struct {
@@ -62,6 +71,8 @@ type OverrideOperation struct {
 	To        string `json:"to,omitempty"`
 	Value     string `json:"value,omitempty"`
 	Condition string `json:"condition,omitempty"`
+	// Match identifies array items removed by array_remove.
+	Match *OverrideMatch `json:"match,omitempty"`
 	// Index is the target position for array_insert. Only used by array_insert.
 	// Negative values count from the end (-1 = before last). Out-of-range values are clamped to [0, len].
 	Index *int `json:"index,omitempty"`
@@ -181,6 +192,16 @@ type ChannelSettings struct {
 	// trigger retry for this channel. Default retryable codes (429 and 5xx) are
 	// always handled by the retry policy even when this list is empty.
 	RetryableStatusCodes []int `json:"retryableStatusCodes,omitempty"`
+
+	// RetryableErrorPatterns configures additional error text patterns that should
+	// trigger retry for this channel. When Regex is false, Pattern is matched as a
+	// case-sensitive substring of the error text.
+	RetryableErrorPatterns []RetryableErrorPattern `json:"retryableErrorPatterns,omitempty"`
+}
+
+type RetryableErrorPattern struct {
+	Pattern string `json:"pattern"`
+	Regex   bool   `json:"regex,omitempty"`
 }
 
 type ChannelRateLimit struct {

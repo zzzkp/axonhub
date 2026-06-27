@@ -52,7 +52,7 @@ export function mergeOverrideHeaders(existing: OverrideOperation[], template: Ov
 /**
  * Merges override body operations with template body operations.
  * - For `set` and `delete` ops: match by `path`, template overrides existing
- * - For `rename` and `copy` ops: always appended from template
+ * - For `rename`, `copy`, and array ops: always appended from template
  * - Existing ops not matched by template are preserved
  */
 export function mergeOverrideOperations(existing: OverrideOperation[], template: OverrideOperation[]): OverrideOperation[] {
@@ -111,6 +111,7 @@ export function mergeChannelSettingsForUpdate(
     passThroughBody: pick('passThroughBody', existing?.passThroughBody ?? null),
     rateLimit: pick('rateLimit', existing?.rateLimit ?? null),
     retryableStatusCodes: pick('retryableStatusCodes', existing?.retryableStatusCodes ?? []),
+    retryableErrorPatterns: pick('retryableErrorPatterns', existing?.retryableErrorPatterns ?? []),
   };
 }
 
@@ -129,7 +130,7 @@ export function mergeOverrideParameters(existing: string, template: string): str
 
     // Use compact format to match backend
     return JSON.stringify(merged);
-  } catch (error) {
+  } catch {
     // If parsing fails, return template
     return template;
   }
