@@ -225,8 +225,11 @@ GraphQL schema 和 resolver 位于：
 **new-api** 站点（基于 `500000 quota = 1 USD` 换算基准）：
 
 - 按量计费模型（`quota_type ≠ 1`，BillingUnit = `new-api-ratio`）：
+  - new-api 中 `completion_ratio`、`cache_ratio`、`create_cache_ratio` 均为相对 `model_ratio` 的倍率，换算时需先乘 `model_ratio`。
   - prompt price = `model_ratio × group_ratio × 2` USD/M tokens
-  - completion price = `completion_ratio × group_ratio × 2` USD/M tokens
+  - completion price = `model_ratio × completion_ratio × group_ratio × 2` USD/M tokens
+  - cache read price = `model_ratio × cache_ratio × group_ratio × 2` USD/M tokens
+  - cache write price = `model_ratio × create_cache_ratio × group_ratio × 2` USD/M tokens
 - 按次计费模型（`quota_type = 1`，BillingUnit = `new-api-model-price`）：
   - flat fee = `model_price × group_ratio` USD/request
 

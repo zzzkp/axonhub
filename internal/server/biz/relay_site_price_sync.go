@@ -226,23 +226,26 @@ func relaySiteModelPriceToChannelPrice(price objects.RelaySiteRemoteModelPrice, 
 			return objects.ModelPrice{}, false
 		}
 
+		// new-api: completion_ratio / cache_ratio / create_cache_ratio are multipliers
+		// relative to model_ratio, not absolute ratios. So the effective ratio is
+		// model_ratio * the relative ratio before converting to USD.
 		modelRatio := *price.PromptPrice
 		promptUSD := modelRatio.Mul(groupRatio).Mul(newAPIRatioToUSDPerMillion)
 		items := []objects.ModelPriceItem{usagePerUnitItem(objects.PriceItemCodeUsage, promptUSD)}
 
 		if price.CompletionPrice != nil {
 			completionRatio := *price.CompletionPrice
-			completionUSD := completionRatio.Mul(groupRatio).Mul(newAPIRatioToUSDPerMillion)
+			completionUSD := modelRatio.Mul(completionRatio).Mul(groupRatio).Mul(newAPIRatioToUSDPerMillion)
 			items = append(items, usagePerUnitItem(objects.PriceItemCodeCompletion, completionUSD))
 		}
 
 		// Extract cache pricing from raw fields
 		if cacheRatio := extractFloat64FromRaw(price.Raw, "cache_ratio"); cacheRatio > 0 {
-			cacheReadUSD := decimal.NewFromFloat(cacheRatio).Mul(groupRatio).Mul(newAPIRatioToUSDPerMillion)
+			cacheReadUSD := modelRatio.Mul(decimal.NewFromFloat(cacheRatio)).Mul(groupRatio).Mul(newAPIRatioToUSDPerMillion)
 			items = append(items, usagePerUnitItem(objects.PriceItemCodePromptCachedToken, cacheReadUSD))
 		}
 		if createCacheRatio := extractFloat64FromRaw(price.Raw, "create_cache_ratio"); createCacheRatio > 0 {
-			cacheWriteUSD := decimal.NewFromFloat(createCacheRatio).Mul(groupRatio).Mul(newAPIRatioToUSDPerMillion)
+			cacheWriteUSD := modelRatio.Mul(decimal.NewFromFloat(createCacheRatio)).Mul(groupRatio).Mul(newAPIRatioToUSDPerMillion)
 			items = append(items, usagePerUnitItem(objects.PriceItemCodeWriteCachedTokens, cacheWriteUSD))
 		}
 
