@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from '@tanstack/react-router';
-import { useChannelSuccessRates, useTokensByChannel, type TokensByChannel } from '../data/dashboard';
+import { useChannelSuccessRates, useTokensByChannel, useRequestModelOptions, type TokensByChannel } from '../data/dashboard';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -21,14 +21,22 @@ export default function DashboardChannelSuccessRates() {
   const navigate = useNavigate();
 
   const [timeWindow, setTimeWindow] = useState<string>('day');
+  const [selectedModel, setSelectedModel] = useState<string>('all');
   const [sortField, setSortField] = useState<SortField>('successRate');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   const [currentPage, setCurrentPage] = useState(1);
   const [filterType, setFilterType] = useState<string>('all');
   const [showWarningsOnly, setShowWarningsOnly] = useState(false);
 
-  // Fetch all data (limit = undefined)
-  const { data: channels, isLoading, error } = useChannelSuccessRates(undefined, timeWindow);
+  // Fetch all data (limit = undefined), filtered by the selected requested model
+  const { data: channels, isLoading, error } = useChannelSuccessRates(
+    undefined,
+    timeWindow,
+    selectedModel === 'all' ? undefined : selectedModel
+  );
+
+  // Fetch the requested-model options for the filter dropdown
+  const { data: modelOptions } = useRequestModelOptions(timeWindow);
 
   // Fetch token stats by channel (reuse existing API)
   const { data: tokenData } = useTokensByChannel(timeWindow);
@@ -116,10 +124,23 @@ export default function DashboardChannelSuccessRates() {
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [timeWindow, filterType, showWarningsOnly, sortField, sortOrder]);
+  }, [timeWindow, selectedModel, filterType, showWarningsOnly, sortField, sortOrder]);
 
   const handleBack = () => {
     navigate({ to: '/' });
+  };
+
+  // Drill down to the requests list, filtered by this channel, the currently
+  // selected requested model (when any), and failed status.
+  const handleDrillDown = (channelId: string) => {
+    const search: Record<string, unknown> = {
+      channel: [channelId],
+      status: ['failed'],
+    };
+    if (selectedModel !== 'all') {
+      search.modelID = selectedModel;
+    }
+    navigate({ to: '/project/requests', search });
   };
 
   const scrollToTop = () => {
@@ -174,6 +195,21 @@ export default function DashboardChannelSuccessRates() {
                 <SelectItem value="day">{t('dashboard.stats.today')}</SelectItem>
                 <SelectItem value="week">{t('dashboard.stats.thisWeek')}</SelectItem>
                 <SelectItem value="month">{t('dashboard.stats.thisMonth')}</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* Requested model filter */}
+            <Select value={selectedModel} onValueChange={setSelectedModel}>
+              <SelectTrigger className="w-[200px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t('dashboard.channelSuccessRates.allModels')}</SelectItem>
+                {(modelOptions ?? []).map((model) => (
+                  <SelectItem key={model} value={model}>
+                    {model}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
 
@@ -270,7 +306,19 @@ export default function DashboardChannelSuccessRates() {
               const showTokens = tokens && tokens.totalTokens > 0;
 
               return (
-                <Card key={channel.channelId} className="hover-card min-w-0">
+                <Card
+                  key={channel.channelId}
+                  className="hover-card min-w-0 cursor-pointer transition-shadow hover:shadow-md"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => handleDrillDown(channel.channelId)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleDrillDown(channel.channelId);
+                    }
+                  }}
+                >
                   <CardContent className="space-y-3">
                     {/* Channel info */}
                     <div className="flex items-center gap-3">
