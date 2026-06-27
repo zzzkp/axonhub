@@ -313,7 +313,7 @@ func (s *RelaySiteService) importBackupSite(ctx context.Context, client *ent.Cli
 	if siteType == "" {
 		siteType = relaysite.TypeNewAPI
 	}
-	if siteType != relaysite.TypeNewAPI && siteType != relaysite.TypeSub2api {
+	if siteType != relaysite.TypeNewAPI && siteType != relaysite.TypeSub2api && siteType != relaysite.TypeDoneHub {
 		return fmt.Errorf("unsupported relay site type in backup %q: %s", backup.Name, siteType)
 	}
 	status := backup.Status
