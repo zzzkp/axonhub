@@ -17,6 +17,12 @@
 
 ### Above combination will ignore all files without extension ###
 
+# Compiled binaries (re-ignore even though they have extensions)
+*.exe
+*.dll
+*.so
+*.dylib
+
 *.iml
 
 ## Directory-based project format:
