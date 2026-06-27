@@ -78,6 +78,8 @@
   "dashboard.channelSuccessRates.pageTitle": "Channel Success Rates",
   "dashboard.channelSuccessRates.backToDashboard": "Back to Dashboard",
   "dashboard.channelSuccessRates.allTypes": "All Types",
+  "dashboard.channelSuccessRates.modelFilter": "Model",
+  "dashboard.channelSuccessRates.allModels": "All Models",
   "dashboard.channelSuccessRates.showWarnings": "Show Warnings Only",
   "dashboard.channelSuccessRates.sortByTotal": "Sort by Total",
   "dashboard.channelSuccessRates.sortBySuccess": "Sort by Success",

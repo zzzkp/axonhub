@@ -235,7 +235,15 @@ extend type Query {
   dailyRequestStats: [DailyRequestStats!]!
   topRequestsProjects: [TopRequestsProjects!]!
   tokenStats: TokenStats!
-  channelSuccessRates(timeWindow: String, limit: Int): [ChannelSuccessRate!]!
+  channelSuccessRates(
+    timeWindow: String
+    limit: Int
+    modelId: String
+  ): [ChannelSuccessRate!]!
+  """
+  Get distinct requested model IDs within the time window, for filtering.
+  """
+  requestModelOptions(timeWindow: String): [String!]!
   fastestChannels(input: FastestChannelsInput!): [FastestChannel!]!
   fastestModels(input: FastestChannelsInput!): [FastestModel!]!
   """

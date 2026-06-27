@@ -78,6 +78,8 @@
   "dashboard.channelSuccessRates.pageTitle": "渠道成功率",
   "dashboard.channelSuccessRates.backToDashboard": "返回仪表盘",
   "dashboard.channelSuccessRates.allTypes": "所有类型",
+  "dashboard.channelSuccessRates.modelFilter": "模型",
+  "dashboard.channelSuccessRates.allModels": "全部模型",
   "dashboard.channelSuccessRates.showWarnings": "只显示警告",
   "dashboard.channelSuccessRates.sortByTotal": "按总数排序",
   "dashboard.channelSuccessRates.sortBySuccess": "按成功数排序",
