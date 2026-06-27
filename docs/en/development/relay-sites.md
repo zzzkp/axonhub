@@ -190,7 +190,7 @@ Channel `UsagePerUnit` is denominated in **USD per million tokens**, `FlatFee` i
 
 - Usage-based models (`quota_type ≠ 1`, BillingUnit = `new-api-ratio`):
   - prompt price = `model_ratio × group_ratio × 2` USD/M tokens
-  - completion price = `completion_ratio × group_ratio × 2` USD/M tokens
+  - completion price = `model_ratio × completion_ratio × group_ratio × 2` USD/M tokens
 - Per-request models (`quota_type = 1`, BillingUnit = `new-api-model-price`):
   - flat fee = `model_price × group_ratio` USD/request
 
