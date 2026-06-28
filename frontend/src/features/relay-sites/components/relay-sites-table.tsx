@@ -25,12 +25,14 @@ interface RelaySitesTableProps {
   totalCount?: number;
   nameFilter: string;
   statusFilter: string;
+  natureFilter: string;
   canWrite: boolean;
   onNextPage: () => void;
   onPreviousPage: () => void;
   onPageSizeChange: (pageSize: number) => void;
   onNameFilterChange: (filter: string) => void;
   onStatusFilterChange: (status: string) => void;
+  onNatureFilterChange: (nature: string) => void;
 }
 
 function formatDate(value?: string | null) {
@@ -146,12 +148,14 @@ export function RelaySitesTable({
   totalCount,
   nameFilter,
   statusFilter,
+  natureFilter,
   canWrite,
   onNextPage,
   onPreviousPage,
   onPageSizeChange,
   onNameFilterChange,
   onStatusFilterChange,
+  onNatureFilterChange,
 }: RelaySitesTableProps) {
   const { t } = useTranslation();
   const { setManagingRelaySite, setIsModelsAndTokensDialogOpen, setViewingAnnouncementsRelaySite, setIsAnnouncementsDialogOpen } = useRelaySitesContext();
@@ -192,6 +196,15 @@ export function RelaySitesTable({
             <SelectItem value='all'>{t('relaySites.filters.all')}</SelectItem>
           </SelectContent>
         </Select>
+        <Select value={natureFilter} onValueChange={onNatureFilterChange}>
+          <SelectTrigger className='sm:w-[180px]'><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value='all'>{t('relaySites.filters.allNature')}</SelectItem>
+            <SelectItem value='public'>{t('relaySites.nature.public')}</SelectItem>
+            <SelectItem value='semi_public'>{t('relaySites.nature.semi_public')}</SelectItem>
+            <SelectItem value='paid'>{t('relaySites.nature.paid')}</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <div className='shadow-soft relative mt-4 flex-1 overflow-auto rounded-lg border border-[var(--table-border)]'>
@@ -227,6 +240,7 @@ export function RelaySitesTable({
                     <TableCell className='min-w-[260px] border-0'>
                       <div className='flex flex-wrap items-center gap-2 font-medium'>
                         <span>{relaySite.name}</span>
+                        <Badge variant='secondary'>{t(`relaySites.nature.${relaySite.nature}`)}</Badge>
                         {relaySite.hasUnreadAnnouncements && (
                           <Badge
                             variant='destructive'

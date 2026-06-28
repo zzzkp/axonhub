@@ -4854,6 +4854,20 @@ var (
 			}
 		},
 	}
+	// RelaySiteOrderFieldNature orders RelaySite by nature.
+	RelaySiteOrderFieldNature = &RelaySiteOrderField{
+		Value: func(_m *RelaySite) (ent.Value, error) {
+			return _m.Nature, nil
+		},
+		column: relaysite.FieldNature,
+		toTerm: relaysite.ByNature,
+		toCursor: func(_m *RelaySite) Cursor {
+			return Cursor{
+				ID:    _m.ID,
+				Value: _m.Nature,
+			}
+		},
+	}
 	// RelaySiteOrderFieldType orders RelaySite by type.
 	RelaySiteOrderFieldType = &RelaySiteOrderField{
 		Value: func(_m *RelaySite) (ent.Value, error) {
@@ -4936,6 +4950,8 @@ func (f RelaySiteOrderField) String() string {
 		str = "UPDATED_AT"
 	case RelaySiteOrderFieldName.column:
 		str = "NAME"
+	case RelaySiteOrderFieldNature.column:
+		str = "NATURE"
 	case RelaySiteOrderFieldType.column:
 		str = "TYPE"
 	case RelaySiteOrderFieldStatus.column:
@@ -4968,6 +4984,8 @@ func (f *RelaySiteOrderField) UnmarshalGQL(v interface{}) error {
 		*f = *RelaySiteOrderFieldUpdatedAt
 	case "NAME":
 		*f = *RelaySiteOrderFieldName
+	case "NATURE":
+		*f = *RelaySiteOrderFieldNature
 	case "TYPE":
 		*f = *RelaySiteOrderFieldType
 	case "STATUS":

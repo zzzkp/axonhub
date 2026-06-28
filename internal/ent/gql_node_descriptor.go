@@ -1563,7 +1563,7 @@ func (_m *RelaySite) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     _m.ID,
 		Type:   "RelaySite",
-		Fields: make([]*Field, 14),
+		Fields: make([]*Field, 15),
 		Edges:  make([]*Edge, 6),
 	}
 	var buf []byte
@@ -1591,10 +1591,18 @@ func (_m *RelaySite) Node(ctx context.Context) (node *Node, err error) {
 		Name:  "name",
 		Value: string(buf),
 	}
-	if buf, err = json.Marshal(_m.Type); err != nil {
+	if buf, err = json.Marshal(_m.Nature); err != nil {
 		return nil, err
 	}
 	node.Fields[3] = &Field{
+		Type:  "relaysite.Nature",
+		Name:  "nature",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(_m.Type); err != nil {
+		return nil, err
+	}
+	node.Fields[4] = &Field{
 		Type:  "relaysite.Type",
 		Name:  "type",
 		Value: string(buf),
@@ -1602,7 +1610,7 @@ func (_m *RelaySite) Node(ctx context.Context) (node *Node, err error) {
 	if buf, err = json.Marshal(_m.BaseURL); err != nil {
 		return nil, err
 	}
-	node.Fields[4] = &Field{
+	node.Fields[5] = &Field{
 		Type:  "string",
 		Name:  "base_url",
 		Value: string(buf),
@@ -1610,7 +1618,7 @@ func (_m *RelaySite) Node(ctx context.Context) (node *Node, err error) {
 	if buf, err = json.Marshal(_m.Status); err != nil {
 		return nil, err
 	}
-	node.Fields[5] = &Field{
+	node.Fields[6] = &Field{
 		Type:  "relaysite.Status",
 		Name:  "status",
 		Value: string(buf),
@@ -1618,7 +1626,7 @@ func (_m *RelaySite) Node(ctx context.Context) (node *Node, err error) {
 	if buf, err = json.Marshal(_m.AutoCheckinEnabled); err != nil {
 		return nil, err
 	}
-	node.Fields[6] = &Field{
+	node.Fields[7] = &Field{
 		Type:  "bool",
 		Name:  "auto_checkin_enabled",
 		Value: string(buf),
@@ -1626,7 +1634,7 @@ func (_m *RelaySite) Node(ctx context.Context) (node *Node, err error) {
 	if buf, err = json.Marshal(_m.Remark); err != nil {
 		return nil, err
 	}
-	node.Fields[7] = &Field{
+	node.Fields[8] = &Field{
 		Type:  "string",
 		Name:  "remark",
 		Value: string(buf),
@@ -1634,7 +1642,7 @@ func (_m *RelaySite) Node(ctx context.Context) (node *Node, err error) {
 	if buf, err = json.Marshal(_m.LastSyncedAt); err != nil {
 		return nil, err
 	}
-	node.Fields[8] = &Field{
+	node.Fields[9] = &Field{
 		Type:  "time.Time",
 		Name:  "last_synced_at",
 		Value: string(buf),
@@ -1642,7 +1650,7 @@ func (_m *RelaySite) Node(ctx context.Context) (node *Node, err error) {
 	if buf, err = json.Marshal(_m.LastSyncError); err != nil {
 		return nil, err
 	}
-	node.Fields[9] = &Field{
+	node.Fields[10] = &Field{
 		Type:  "string",
 		Name:  "last_sync_error",
 		Value: string(buf),
@@ -1650,7 +1658,7 @@ func (_m *RelaySite) Node(ctx context.Context) (node *Node, err error) {
 	if buf, err = json.Marshal(_m.LastCheckinAt); err != nil {
 		return nil, err
 	}
-	node.Fields[10] = &Field{
+	node.Fields[11] = &Field{
 		Type:  "time.Time",
 		Name:  "last_checkin_at",
 		Value: string(buf),
@@ -1658,7 +1666,7 @@ func (_m *RelaySite) Node(ctx context.Context) (node *Node, err error) {
 	if buf, err = json.Marshal(_m.LastCheckinResult); err != nil {
 		return nil, err
 	}
-	node.Fields[11] = &Field{
+	node.Fields[12] = &Field{
 		Type:  "string",
 		Name:  "last_checkin_result",
 		Value: string(buf),
@@ -1666,7 +1674,7 @@ func (_m *RelaySite) Node(ctx context.Context) (node *Node, err error) {
 	if buf, err = json.Marshal(_m.CheckinPageURL); err != nil {
 		return nil, err
 	}
-	node.Fields[12] = &Field{
+	node.Fields[13] = &Field{
 		Type:  "string",
 		Name:  "checkin_page_url",
 		Value: string(buf),
@@ -1674,7 +1682,7 @@ func (_m *RelaySite) Node(ctx context.Context) (node *Node, err error) {
 	if buf, err = json.Marshal(_m.ExternalCheckinPageURL); err != nil {
 		return nil, err
 	}
-	node.Fields[13] = &Field{
+	node.Fields[14] = &Field{
 		Type:  "string",
 		Name:  "external_checkin_page_url",
 		Value: string(buf),

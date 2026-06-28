@@ -4,6 +4,7 @@ import { channelTypeSchema } from '@/features/channels/data/schema';
 
 export const relaySiteStatusSchema = z.enum(['enabled', 'disabled', 'archived']);
 export const relaySiteTypeSchema = z.enum(['new_api', 'sub2api', 'done_hub']);
+export const relaySiteNatureSchema = z.enum(['public', 'semi_public', 'paid']);
 export const relaySiteCredentialAuthTypeSchema = z.enum(['token', 'password', 'jwt']);
 
 export const relaySiteAPIKeySchema = z.object({
@@ -96,6 +97,7 @@ export const relaySiteSchema = z.object({
   createdAt: z.string(),
   updatedAt: z.string(),
   name: z.string(),
+  nature: relaySiteNatureSchema,
   type: relaySiteTypeSchema,
   baseURL: z.string(),
   status: relaySiteStatusSchema,
@@ -123,6 +125,7 @@ export const relaySiteFormResultSchema = relaySiteSchema.pick({
   createdAt: true,
   updatedAt: true,
   name: true,
+  nature: true,
   type: true,
   baseURL: true,
   status: true,
@@ -199,6 +202,7 @@ export type ImportedRelaySiteChannel = z.infer<typeof importedRelaySiteChannelSc
 
 export const createRelaySiteInputSchema = z.object({
   name: z.string().min(1),
+  nature: relaySiteNatureSchema.optional(),
   type: relaySiteTypeSchema.optional(),
   baseURL: z.string().min(1),
   status: relaySiteStatusSchema.optional(),
@@ -212,6 +216,7 @@ export type CreateRelaySiteInput = z.infer<typeof createRelaySiteInputSchema>;
 
 export const updateRelaySiteInputSchema = z.object({
   name: z.string().min(1).optional(),
+  nature: relaySiteNatureSchema.optional(),
   baseURL: z.string().min(1).optional(),
   status: relaySiteStatusSchema.optional(),
   autoCheckinEnabled: z.boolean().optional(),

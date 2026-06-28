@@ -26,6 +26,7 @@ type RelaySiteDisplayCredential {
 
 input CreateRelaySiteConfigInput {
   name: String!
+  nature: RelaySiteNature
   type: RelaySiteType
   baseURL: String!
   status: RelaySiteStatus
@@ -38,6 +39,7 @@ input CreateRelaySiteConfigInput {
 
 input UpdateRelaySiteConfigInput {
   name: String
+  nature: RelaySiteNature
   baseURL: String
   status: RelaySiteStatus
   autoCheckinEnabled: Boolean

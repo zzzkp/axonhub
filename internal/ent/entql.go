@@ -382,6 +382,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			relaysite.FieldUpdatedAt:              {Type: field.TypeTime, Column: relaysite.FieldUpdatedAt},
 			relaysite.FieldDeletedAt:              {Type: field.TypeInt, Column: relaysite.FieldDeletedAt},
 			relaysite.FieldName:                   {Type: field.TypeString, Column: relaysite.FieldName},
+			relaysite.FieldNature:                 {Type: field.TypeEnum, Column: relaysite.FieldNature},
 			relaysite.FieldType:                   {Type: field.TypeEnum, Column: relaysite.FieldType},
 			relaysite.FieldBaseURL:                {Type: field.TypeString, Column: relaysite.FieldBaseURL},
 			relaysite.FieldStatus:                 {Type: field.TypeEnum, Column: relaysite.FieldStatus},
@@ -3443,6 +3444,11 @@ func (f *RelaySiteFilter) WhereDeletedAt(p entql.IntP) {
 // WhereName applies the entql string predicate on the name field.
 func (f *RelaySiteFilter) WhereName(p entql.StringP) {
 	f.Where(p.Field(relaysite.FieldName))
+}
+
+// WhereNature applies the entql string predicate on the nature field.
+func (f *RelaySiteFilter) WhereNature(p entql.StringP) {
+	f.Where(p.Field(relaysite.FieldNature))
 }
 
 // WhereType applies the entql string predicate on the type field.

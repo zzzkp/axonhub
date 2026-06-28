@@ -16252,6 +16252,7 @@ type RelaySiteMutation struct {
 	deleted_at                *int
 	adddeleted_at             *int
 	name                      *string
+	nature                    *relaysite.Nature
 	_type                     *relaysite.Type
 	base_url                  *string
 	status                    *relaysite.Status
@@ -16549,6 +16550,42 @@ func (m *RelaySiteMutation) OldName(ctx context.Context) (v string, err error) {
 // ResetName resets all changes to the "name" field.
 func (m *RelaySiteMutation) ResetName() {
 	m.name = nil
+}
+
+// SetNature sets the "nature" field.
+func (m *RelaySiteMutation) SetNature(r relaysite.Nature) {
+	m.nature = &r
+}
+
+// Nature returns the value of the "nature" field in the mutation.
+func (m *RelaySiteMutation) Nature() (r relaysite.Nature, exists bool) {
+	v := m.nature
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldNature returns the old "nature" field's value of the RelaySite entity.
+// If the RelaySite object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RelaySiteMutation) OldNature(ctx context.Context) (v relaysite.Nature, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldNature is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldNature requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldNature: %w", err)
+	}
+	return oldValue.Nature, nil
+}
+
+// ResetNature resets all changes to the "nature" field.
+func (m *RelaySiteMutation) ResetNature() {
+	m.nature = nil
 }
 
 // SetType sets the "type" field.
@@ -17435,7 +17472,7 @@ func (m *RelaySiteMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *RelaySiteMutation) Fields() []string {
-	fields := make([]string, 0, 15)
+	fields := make([]string, 0, 16)
 	if m.created_at != nil {
 		fields = append(fields, relaysite.FieldCreatedAt)
 	}
@@ -17447,6 +17484,9 @@ func (m *RelaySiteMutation) Fields() []string {
 	}
 	if m.name != nil {
 		fields = append(fields, relaysite.FieldName)
+	}
+	if m.nature != nil {
+		fields = append(fields, relaysite.FieldNature)
 	}
 	if m._type != nil {
 		fields = append(fields, relaysite.FieldType)
@@ -17497,6 +17537,8 @@ func (m *RelaySiteMutation) Field(name string) (ent.Value, bool) {
 		return m.DeletedAt()
 	case relaysite.FieldName:
 		return m.Name()
+	case relaysite.FieldNature:
+		return m.Nature()
 	case relaysite.FieldType:
 		return m.GetType()
 	case relaysite.FieldBaseURL:
@@ -17536,6 +17578,8 @@ func (m *RelaySiteMutation) OldField(ctx context.Context, name string) (ent.Valu
 		return m.OldDeletedAt(ctx)
 	case relaysite.FieldName:
 		return m.OldName(ctx)
+	case relaysite.FieldNature:
+		return m.OldNature(ctx)
 	case relaysite.FieldType:
 		return m.OldType(ctx)
 	case relaysite.FieldBaseURL:
@@ -17594,6 +17638,13 @@ func (m *RelaySiteMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetName(v)
+		return nil
+	case relaysite.FieldNature:
+		v, ok := value.(relaysite.Nature)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetNature(v)
 		return nil
 	case relaysite.FieldType:
 		v, ok := value.(relaysite.Type)
@@ -17792,6 +17843,9 @@ func (m *RelaySiteMutation) ResetField(name string) error {
 		return nil
 	case relaysite.FieldName:
 		m.ResetName()
+		return nil
+	case relaysite.FieldNature:
+		m.ResetNature()
 		return nil
 	case relaysite.FieldType:
 		m.ResetType()

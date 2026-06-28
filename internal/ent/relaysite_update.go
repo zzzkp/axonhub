@@ -77,6 +77,20 @@ func (_u *RelaySiteUpdate) SetNillableName(v *string) *RelaySiteUpdate {
 	return _u
 }
 
+// SetNature sets the "nature" field.
+func (_u *RelaySiteUpdate) SetNature(v relaysite.Nature) *RelaySiteUpdate {
+	_u.mutation.SetNature(v)
+	return _u
+}
+
+// SetNillableNature sets the "nature" field if the given value is not nil.
+func (_u *RelaySiteUpdate) SetNillableNature(v *relaysite.Nature) *RelaySiteUpdate {
+	if v != nil {
+		_u.SetNature(*v)
+	}
+	return _u
+}
+
 // SetType sets the "type" field.
 func (_u *RelaySiteUpdate) SetType(v relaysite.Type) *RelaySiteUpdate {
 	_u.mutation.SetType(v)
@@ -563,6 +577,11 @@ func (_u *RelaySiteUpdate) defaults() error {
 
 // check runs all checks and user-defined validators on the builder.
 func (_u *RelaySiteUpdate) check() error {
+	if v, ok := _u.mutation.Nature(); ok {
+		if err := relaysite.NatureValidator(v); err != nil {
+			return &ValidationError{Name: "nature", err: fmt.Errorf(`ent: validator failed for field "RelaySite.nature": %w`, err)}
+		}
+	}
 	if v, ok := _u.mutation.GetType(); ok {
 		if err := relaysite.TypeValidator(v); err != nil {
 			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "RelaySite.type": %w`, err)}
@@ -605,6 +624,9 @@ func (_u *RelaySiteUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(relaysite.FieldName, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.Nature(); ok {
+		_spec.SetField(relaysite.FieldNature, field.TypeEnum, value)
 	}
 	if value, ok := _u.mutation.GetType(); ok {
 		_spec.SetField(relaysite.FieldType, field.TypeEnum, value)
@@ -1018,6 +1040,20 @@ func (_u *RelaySiteUpdateOne) SetName(v string) *RelaySiteUpdateOne {
 func (_u *RelaySiteUpdateOne) SetNillableName(v *string) *RelaySiteUpdateOne {
 	if v != nil {
 		_u.SetName(*v)
+	}
+	return _u
+}
+
+// SetNature sets the "nature" field.
+func (_u *RelaySiteUpdateOne) SetNature(v relaysite.Nature) *RelaySiteUpdateOne {
+	_u.mutation.SetNature(v)
+	return _u
+}
+
+// SetNillableNature sets the "nature" field if the given value is not nil.
+func (_u *RelaySiteUpdateOne) SetNillableNature(v *relaysite.Nature) *RelaySiteUpdateOne {
+	if v != nil {
+		_u.SetNature(*v)
 	}
 	return _u
 }
@@ -1521,6 +1557,11 @@ func (_u *RelaySiteUpdateOne) defaults() error {
 
 // check runs all checks and user-defined validators on the builder.
 func (_u *RelaySiteUpdateOne) check() error {
+	if v, ok := _u.mutation.Nature(); ok {
+		if err := relaysite.NatureValidator(v); err != nil {
+			return &ValidationError{Name: "nature", err: fmt.Errorf(`ent: validator failed for field "RelaySite.nature": %w`, err)}
+		}
+	}
 	if v, ok := _u.mutation.GetType(); ok {
 		if err := relaysite.TypeValidator(v); err != nil {
 			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "RelaySite.type": %w`, err)}
@@ -1580,6 +1621,9 @@ func (_u *RelaySiteUpdateOne) sqlSave(ctx context.Context) (_node *RelaySite, er
 	}
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(relaysite.FieldName, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.Nature(); ok {
+		_spec.SetField(relaysite.FieldNature, field.TypeEnum, value)
 	}
 	if value, ok := _u.mutation.GetType(); ok {
 		_spec.SetField(relaysite.FieldType, field.TypeEnum, value)

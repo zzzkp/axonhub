@@ -4030,6 +4030,11 @@ func (_q *RelaySiteQuery) collectField(ctx context.Context, oneNode bool, opCtx 
 				selectedFields = append(selectedFields, relaysite.FieldName)
 				fieldSeen[relaysite.FieldName] = struct{}{}
 			}
+		case "nature":
+			if _, ok := fieldSeen[relaysite.FieldNature]; !ok {
+				selectedFields = append(selectedFields, relaysite.FieldNature)
+				fieldSeen[relaysite.FieldNature] = struct{}{}
+			}
 		case "type":
 			if _, ok := fieldSeen[relaysite.FieldType]; !ok {
 				selectedFields = append(selectedFields, relaysite.FieldType)

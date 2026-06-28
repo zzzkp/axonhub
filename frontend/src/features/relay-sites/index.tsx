@@ -19,6 +19,7 @@ function RelaySitesContent() {
   });
   const [nameFilter, setNameFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('active');
+  const [natureFilter, setNatureFilter] = useState('all');
   const debouncedNameFilter = useDebounce(nameFilter, 300);
 
   const whereClause = (() => {
@@ -26,6 +27,7 @@ function RelaySitesContent() {
     if (debouncedNameFilter) where.nameContainsFold = debouncedNameFilter;
     if (statusFilter === 'active') where.statusIn = ['enabled', 'disabled'];
     else if (statusFilter !== 'all') where.status = statusFilter;
+    if (natureFilter !== 'all') where.natureIn = [natureFilter];
     return Object.keys(where).length > 0 ? where : undefined;
   })();
 
@@ -59,6 +61,11 @@ function RelaySitesContent() {
     resetCursor();
   };
 
+  const handleNatureFilterChange = (nature: string) => {
+    setNatureFilter(nature);
+    resetCursor();
+  };
+
   return (
     <div className='flex flex-1 flex-col overflow-hidden'>
       <RelaySitesTable
@@ -69,12 +76,14 @@ function RelaySitesContent() {
         totalCount={data?.totalCount}
         nameFilter={nameFilter}
         statusFilter={statusFilter}
+        natureFilter={natureFilter}
         canWrite={channelPermissions.canWrite}
         onNextPage={handleNextPage}
         onPreviousPage={handlePreviousPage}
         onPageSizeChange={setPageSize}
         onNameFilterChange={handleNameFilterChange}
         onStatusFilterChange={handleStatusFilterChange}
+        onNatureFilterChange={handleNatureFilterChange}
       />
     </div>
   );
@@ -89,6 +98,7 @@ export default function RelaySitesManagement() {
   });
   const [nameFilter, setNameFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('active');
+  const [natureFilter, setNatureFilter] = useState('all');
   const debouncedNameFilter = useDebounce(nameFilter, 300);
 
   const whereClause = (() => {
@@ -96,6 +106,7 @@ export default function RelaySitesManagement() {
     if (debouncedNameFilter) where.nameContainsFold = debouncedNameFilter;
     if (statusFilter === 'active') where.statusIn = ['enabled', 'disabled'];
     else if (statusFilter !== 'all') where.status = statusFilter;
+    if (natureFilter !== 'all') where.natureIn = [natureFilter];
     return Object.keys(where).length > 0 ? where : undefined;
   })();
 
@@ -126,6 +137,11 @@ export default function RelaySitesManagement() {
 
   const handleStatusFilterChange = (status: string) => {
     setStatusFilter(status);
+    resetCursor();
+  };
+
+  const handleNatureFilterChange = (nature: string) => {
+    setNatureFilter(nature);
     resetCursor();
   };
 
@@ -150,12 +166,14 @@ export default function RelaySitesManagement() {
             totalCount={data?.totalCount}
             nameFilter={nameFilter}
             statusFilter={statusFilter}
+            natureFilter={natureFilter}
             canWrite={channelPermissions.canWrite}
             onNextPage={handleNextPage}
             onPreviousPage={handlePreviousPage}
             onPageSizeChange={setPageSize}
             onNameFilterChange={handleNameFilterChange}
             onStatusFilterChange={handleStatusFilterChange}
+            onNatureFilterChange={handleNatureFilterChange}
           />
         </div>
       </Main>

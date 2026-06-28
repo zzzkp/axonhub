@@ -77,6 +77,20 @@ func (_c *RelaySiteCreate) SetName(v string) *RelaySiteCreate {
 	return _c
 }
 
+// SetNature sets the "nature" field.
+func (_c *RelaySiteCreate) SetNature(v relaysite.Nature) *RelaySiteCreate {
+	_c.mutation.SetNature(v)
+	return _c
+}
+
+// SetNillableNature sets the "nature" field if the given value is not nil.
+func (_c *RelaySiteCreate) SetNillableNature(v *relaysite.Nature) *RelaySiteCreate {
+	if v != nil {
+		_c.SetNature(*v)
+	}
+	return _c
+}
+
 // SetType sets the "type" field.
 func (_c *RelaySiteCreate) SetType(v relaysite.Type) *RelaySiteCreate {
 	_c.mutation.SetType(v)
@@ -387,6 +401,10 @@ func (_c *RelaySiteCreate) defaults() error {
 		v := relaysite.DefaultDeletedAt
 		_c.mutation.SetDeletedAt(v)
 	}
+	if _, ok := _c.mutation.Nature(); !ok {
+		v := relaysite.DefaultNature
+		_c.mutation.SetNature(v)
+	}
 	if _, ok := _c.mutation.GetType(); !ok {
 		v := relaysite.DefaultType
 		_c.mutation.SetType(v)
@@ -409,6 +427,14 @@ func (_c *RelaySiteCreate) check() error {
 	}
 	if _, ok := _c.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "RelaySite.name"`)}
+	}
+	if _, ok := _c.mutation.Nature(); !ok {
+		return &ValidationError{Name: "nature", err: errors.New(`ent: missing required field "RelaySite.nature"`)}
+	}
+	if v, ok := _c.mutation.Nature(); ok {
+		if err := relaysite.NatureValidator(v); err != nil {
+			return &ValidationError{Name: "nature", err: fmt.Errorf(`ent: validator failed for field "RelaySite.nature": %w`, err)}
+		}
 	}
 	if _, ok := _c.mutation.GetType(); !ok {
 		return &ValidationError{Name: "type", err: errors.New(`ent: missing required field "RelaySite.type"`)}
@@ -474,6 +500,10 @@ func (_c *RelaySiteCreate) createSpec() (*RelaySite, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.Name(); ok {
 		_spec.SetField(relaysite.FieldName, field.TypeString, value)
 		_node.Name = value
+	}
+	if value, ok := _c.mutation.Nature(); ok {
+		_spec.SetField(relaysite.FieldNature, field.TypeEnum, value)
+		_node.Nature = value
 	}
 	if value, ok := _c.mutation.GetType(); ok {
 		_spec.SetField(relaysite.FieldType, field.TypeEnum, value)
@@ -722,6 +752,18 @@ func (u *RelaySiteUpsert) SetName(v string) *RelaySiteUpsert {
 // UpdateName sets the "name" field to the value that was provided on create.
 func (u *RelaySiteUpsert) UpdateName() *RelaySiteUpsert {
 	u.SetExcluded(relaysite.FieldName)
+	return u
+}
+
+// SetNature sets the "nature" field.
+func (u *RelaySiteUpsert) SetNature(v relaysite.Nature) *RelaySiteUpsert {
+	u.Set(relaysite.FieldNature, v)
+	return u
+}
+
+// UpdateNature sets the "nature" field to the value that was provided on create.
+func (u *RelaySiteUpsert) UpdateNature() *RelaySiteUpsert {
+	u.SetExcluded(relaysite.FieldNature)
 	return u
 }
 
@@ -990,6 +1032,20 @@ func (u *RelaySiteUpsertOne) SetName(v string) *RelaySiteUpsertOne {
 func (u *RelaySiteUpsertOne) UpdateName() *RelaySiteUpsertOne {
 	return u.Update(func(s *RelaySiteUpsert) {
 		s.UpdateName()
+	})
+}
+
+// SetNature sets the "nature" field.
+func (u *RelaySiteUpsertOne) SetNature(v relaysite.Nature) *RelaySiteUpsertOne {
+	return u.Update(func(s *RelaySiteUpsert) {
+		s.SetNature(v)
+	})
+}
+
+// UpdateNature sets the "nature" field to the value that was provided on create.
+func (u *RelaySiteUpsertOne) UpdateNature() *RelaySiteUpsertOne {
+	return u.Update(func(s *RelaySiteUpsert) {
+		s.UpdateNature()
 	})
 }
 
@@ -1453,6 +1509,20 @@ func (u *RelaySiteUpsertBulk) SetName(v string) *RelaySiteUpsertBulk {
 func (u *RelaySiteUpsertBulk) UpdateName() *RelaySiteUpsertBulk {
 	return u.Update(func(s *RelaySiteUpsert) {
 		s.UpdateName()
+	})
+}
+
+// SetNature sets the "nature" field.
+func (u *RelaySiteUpsertBulk) SetNature(v relaysite.Nature) *RelaySiteUpsertBulk {
+	return u.Update(func(s *RelaySiteUpsert) {
+		s.SetNature(v)
+	})
+}
+
+// UpdateNature sets the "nature" field to the value that was provided on create.
+func (u *RelaySiteUpsertBulk) UpdateNature() *RelaySiteUpsertBulk {
+	return u.Update(func(s *RelaySiteUpsert) {
+		s.UpdateNature()
 	})
 }
 

@@ -670,7 +670,7 @@ func init() {
 	// relaysite.DefaultDeletedAt holds the default value on creation for the deleted_at field.
 	relaysite.DefaultDeletedAt = relaysiteDescDeletedAt.Default.(int)
 	// relaysiteDescAutoCheckinEnabled is the schema descriptor for auto_checkin_enabled field.
-	relaysiteDescAutoCheckinEnabled := relaysiteFields[4].Descriptor()
+	relaysiteDescAutoCheckinEnabled := relaysiteFields[5].Descriptor()
 	// relaysite.DefaultAutoCheckinEnabled holds the default value on creation for the auto_checkin_enabled field.
 	relaysite.DefaultAutoCheckinEnabled = relaysiteDescAutoCheckinEnabled.Default.(bool)
 	relaysiteapikeyMixin := schema.RelaySiteAPIKey{}.Mixin()

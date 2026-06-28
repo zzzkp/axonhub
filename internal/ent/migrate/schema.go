@@ -534,6 +534,7 @@ var (
 		{Name: "updated_at", Type: field.TypeTime, Default: schema.Expr("CURRENT_TIMESTAMP")},
 		{Name: "deleted_at", Type: field.TypeInt, Default: 0},
 		{Name: "name", Type: field.TypeString},
+		{Name: "nature", Type: field.TypeEnum, Enums: []string{"public", "semi_public", "paid"}, Default: "paid"},
 		{Name: "type", Type: field.TypeEnum, Enums: []string{"new_api", "sub2api", "done_hub"}, Default: "new_api"},
 		{Name: "base_url", Type: field.TypeString},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"enabled", "disabled", "archived"}, Default: "disabled"},
@@ -558,14 +559,19 @@ var (
 				Columns: []*schema.Column{RelaySitesColumns[4], RelaySitesColumns[3]},
 			},
 			{
-				Name:    "relaysite_type",
+				Name:    "relaysite_nature",
 				Unique:  false,
 				Columns: []*schema.Column{RelaySitesColumns[5]},
 			},
 			{
+				Name:    "relaysite_type",
+				Unique:  false,
+				Columns: []*schema.Column{RelaySitesColumns[6]},
+			},
+			{
 				Name:    "relaysite_status",
 				Unique:  false,
-				Columns: []*schema.Column{RelaySitesColumns[7]},
+				Columns: []*schema.Column{RelaySitesColumns[8]},
 			},
 		},
 	}

@@ -16,6 +16,7 @@ import { useCreateRelaySite, useUpdateRelaySite, type CreateRelaySiteInput, type
 
 type RelaySiteFormValues = {
   name: string;
+  nature: 'public' | 'semi_public' | 'paid';
   type: 'new_api' | 'sub2api' | 'done_hub';
   baseURL: string;
   status: 'enabled' | 'disabled' | 'archived';
@@ -65,6 +66,7 @@ function buildCredential(data: RelaySiteFormValues, credentialRequired: boolean)
 
 const emptyRelaySiteFormValues: RelaySiteFormValues = {
   name: '',
+  nature: 'paid',
   type: 'new_api',
   baseURL: '',
   status: 'enabled',
@@ -145,6 +147,7 @@ export function RelaySiteFormDialog({ mode }: { mode: 'create' | 'edit' }) {
       const credential = editingRelaySite.displayCredential;
       reset({
         name: editingRelaySite.name,
+        nature: editingRelaySite.nature,
         type: editingRelaySite.type,
         baseURL: editingRelaySite.baseURL,
         status: editingRelaySite.status,
@@ -179,6 +182,7 @@ export function RelaySiteFormDialog({ mode }: { mode: 'create' | 'edit' }) {
     if (isCreate) {
       const input: CreateRelaySiteInput = {
         name: data.name.trim(),
+        nature: data.nature,
         type: data.type,
         baseURL: normalizeBaseURL(data.baseURL),
         status: data.status,
@@ -196,6 +200,7 @@ export function RelaySiteFormDialog({ mode }: { mode: 'create' | 'edit' }) {
     if (!editingRelaySite) return;
     const input: UpdateRelaySiteInput = {
       name: data.name.trim(),
+      nature: data.nature,
       baseURL: normalizeBaseURL(data.baseURL),
       status: data.status,
       autoCheckinEnabled: data.type === 'new_api' && data.autoCheckinEnabled,
@@ -235,6 +240,17 @@ export function RelaySiteFormDialog({ mode }: { mode: 'create' | 'edit' }) {
                   <SelectItem value='new_api'>{t('relaySites.types.new_api')}</SelectItem>
                   <SelectItem value='sub2api'>{t('relaySites.types.sub2api')}</SelectItem>
                   <SelectItem value='done_hub'>{t('relaySites.types.done_hub')}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className='grid gap-2'>
+              <Label htmlFor={`${mode}-relay-site-nature`}>{t('relaySites.fields.nature')}</Label>
+              <Select value={watch('nature')} onValueChange={(value) => setValue('nature', value as RelaySiteFormValues['nature'])}>
+                <SelectTrigger id={`${mode}-relay-site-nature`}><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value='public'>{t('relaySites.nature.public')}</SelectItem>
+                  <SelectItem value='semi_public'>{t('relaySites.nature.semi_public')}</SelectItem>
+                  <SelectItem value='paid'>{t('relaySites.nature.paid')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>

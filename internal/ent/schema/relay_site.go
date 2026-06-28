@@ -28,6 +28,7 @@ func (RelaySite) Indexes() []ent.Index {
 		index.Fields("name", "deleted_at").
 			StorageKey("relay_sites_by_name").
 			Unique(),
+		index.Fields("nature"),
 		index.Fields("type"),
 		index.Fields("status"),
 	}
@@ -37,6 +38,11 @@ func (RelaySite) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("name").
 			Annotations(entgql.OrderField("NAME")),
+		field.Enum("nature").
+			Values("public", "semi_public", "paid").
+			Default("paid").
+			Comment("Relay site nature. public represents a public-benefit relay site, semi_public represents a semi-public-benefit relay site, paid represents a paid relay site.").
+			Annotations(entgql.OrderField("NATURE")),
 		field.Enum("type").
 			Values("new_api", "sub2api", "done_hub").
 			Default("new_api").
