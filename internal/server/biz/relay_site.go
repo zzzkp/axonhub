@@ -23,6 +23,7 @@ import (
 	"github.com/looplj/axonhub/internal/ent/relaysitecredential"
 	"github.com/looplj/axonhub/internal/ent/relaysitegroup"
 	"github.com/looplj/axonhub/internal/ent/relaysitemodelprice"
+	"github.com/looplj/axonhub/internal/ent/schema/schematype"
 	"github.com/looplj/axonhub/internal/log"
 	"github.com/looplj/axonhub/internal/objects"
 	"github.com/looplj/axonhub/internal/pkg/xerrors"
@@ -471,11 +472,18 @@ func (s *RelaySiteService) persistSyncSnapshots(ctx context.Context, id int, api
 			return err
 		}
 
-		seenGroups, err := s.syncGroupSnapshots(ctx, client, id, groups, now)
-		if err != nil {
+		if err := deleteRelaySiteGroups(ctx, client, id); err != nil {
 			return err
 		}
-		if err := softDeleteMissingRelaySiteGroups(ctx, client, id, seenGroups); err != nil {
+		if _, err := s.syncGroupSnapshots(ctx, client, id, groups, now); err != nil {
+			return err
+		}
+
+		if err := deleteRelaySiteModelPrices(ctx, client, id); err != nil {
+			return err
+		}
+		_, err = s.syncModelPriceSnapshots(ctx, client, id, modelPrices, now)
+		if err != nil {
 			return err
 		}
 
@@ -488,14 +496,6 @@ func (s *RelaySiteService) persistSyncSnapshots(ctx context.Context, id int, api
 				Save(ctx); err != nil {
 				return fmt.Errorf("failed to create relay site balance snapshot: %w", err)
 			}
-		}
-
-		seenModelPrices, err := s.syncModelPriceSnapshots(ctx, client, id, modelPrices, now)
-		if err != nil {
-			return err
-		}
-		if err := softDeleteMissingRelaySiteModelPrices(ctx, client, id, seenModelPrices); err != nil {
-			return err
 		}
 
 		seenAnnouncements, err := s.syncAnnouncementSnapshots(ctx, client, id, announcements, now)
@@ -629,6 +629,14 @@ func (s *RelaySiteService) syncGroupSnapshots(ctx context.Context, client *ent.C
 	return seen, nil
 }
 
+func deleteRelaySiteGroups(ctx context.Context, client *ent.Client, siteID int) error {
+	if _, err := client.RelaySiteGroup.Delete().Where(relaysitegroup.RelaySiteIDEQ(siteID)).Exec(schematype.SkipSoftDelete(ctx)); err != nil {
+		return fmt.Errorf("failed to delete relay site group snapshots: %w", err)
+	}
+
+	return nil
+}
+
 func (s *RelaySiteService) syncModelPriceSnapshots(ctx context.Context, client *ent.Client, siteID int, snapshots []RelaySiteModelPriceSnapshot, syncedAt time.Time) (map[string]struct{}, error) {
 	seen := make(map[string]struct{}, len(snapshots))
 	for _, snapshot := range snapshots {
@@ -662,6 +670,14 @@ func (s *RelaySiteService) syncModelPriceSnapshots(ctx context.Context, client *
 	}
 
 	return seen, nil
+}
+
+func deleteRelaySiteModelPrices(ctx context.Context, client *ent.Client, siteID int) error {
+	if _, err := client.RelaySiteModelPrice.Delete().Where(relaysitemodelprice.RelaySiteIDEQ(siteID)).Exec(schematype.SkipSoftDelete(ctx)); err != nil {
+		return fmt.Errorf("failed to delete relay site model price snapshots: %w", err)
+	}
+
+	return nil
 }
 
 func (s *RelaySiteService) syncAnnouncementSnapshots(ctx context.Context, client *ent.Client, siteID int, snapshots []RelaySiteAnnouncementSnapshot, fetchedAt time.Time) (map[string]struct{}, error) {
@@ -739,28 +755,6 @@ func softDeleteMissingRelaySiteAPIKeys(ctx context.Context, client *ent.Client, 
 	}
 	if _, err := query.Exec(ctx); err != nil {
 		return fmt.Errorf("failed to delete stale relay site api key snapshots: %w", err)
-	}
-	return nil
-}
-
-func softDeleteMissingRelaySiteGroups(ctx context.Context, client *ent.Client, siteID int, seen map[string]struct{}) error {
-	query := client.RelaySiteGroup.Delete().Where(relaysitegroup.RelaySiteIDEQ(siteID))
-	if len(seen) > 0 {
-		query.Where(relaysitegroup.NameNotIn(lo.Keys(seen)...))
-	}
-	if _, err := query.Exec(ctx); err != nil {
-		return fmt.Errorf("failed to delete stale relay site group snapshots: %w", err)
-	}
-	return nil
-}
-
-func softDeleteMissingRelaySiteModelPrices(ctx context.Context, client *ent.Client, siteID int, seen map[string]struct{}) error {
-	query := client.RelaySiteModelPrice.Delete().Where(relaysitemodelprice.RelaySiteIDEQ(siteID))
-	if len(seen) > 0 {
-		query.Where(relaysitemodelprice.ModelIDNotIn(lo.Keys(seen)...))
-	}
-	if _, err := query.Exec(ctx); err != nil {
-		return fmt.Errorf("failed to delete stale relay site model price snapshots: %w", err)
 	}
 	return nil
 }
