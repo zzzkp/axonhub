@@ -1358,6 +1358,7 @@ type ComplexityRoot struct {
 		LastSyncedAt           func(childComplexity int) int
 		ModelPrices            func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.RelaySiteModelPriceOrder, where *ent.RelaySiteModelPriceWhereInput) int
 		Name                   func(childComplexity int) int
+		Nature                 func(childComplexity int) int
 		Remark                 func(childComplexity int) int
 		Status                 func(childComplexity int) int
 		Type                   func(childComplexity int) int
@@ -8666,6 +8667,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.RelaySite.Name(childComplexity), true
+	case "RelaySite.nature":
+		if e.complexity.RelaySite.Nature == nil {
+			break
+		}
+
+		return e.complexity.RelaySite.Nature(childComplexity), true
 	case "RelaySite.remark":
 		if e.complexity.RelaySite.Remark == nil {
 			break
@@ -36882,6 +36889,8 @@ func (ec *executionContext) fieldContext_Mutation_createRelaySiteConfig(ctx cont
 				return ec.fieldContext_RelaySite_updatedAt(ctx, field)
 			case "name":
 				return ec.fieldContext_RelaySite_name(ctx, field)
+			case "nature":
+				return ec.fieldContext_RelaySite_nature(ctx, field)
 			case "type":
 				return ec.fieldContext_RelaySite_type(ctx, field)
 			case "baseURL":
@@ -36971,6 +36980,8 @@ func (ec *executionContext) fieldContext_Mutation_updateRelaySiteConfig(ctx cont
 				return ec.fieldContext_RelaySite_updatedAt(ctx, field)
 			case "name":
 				return ec.fieldContext_RelaySite_name(ctx, field)
+			case "nature":
+				return ec.fieldContext_RelaySite_nature(ctx, field)
 			case "type":
 				return ec.fieldContext_RelaySite_type(ctx, field)
 			case "baseURL":
@@ -37060,6 +37071,8 @@ func (ec *executionContext) fieldContext_Mutation_deleteRelaySiteConfig(ctx cont
 				return ec.fieldContext_RelaySite_updatedAt(ctx, field)
 			case "name":
 				return ec.fieldContext_RelaySite_name(ctx, field)
+			case "nature":
+				return ec.fieldContext_RelaySite_nature(ctx, field)
 			case "type":
 				return ec.fieldContext_RelaySite_type(ctx, field)
 			case "baseURL":
@@ -37219,6 +37232,8 @@ func (ec *executionContext) fieldContext_Mutation_syncRelaySite(ctx context.Cont
 				return ec.fieldContext_RelaySite_updatedAt(ctx, field)
 			case "name":
 				return ec.fieldContext_RelaySite_name(ctx, field)
+			case "nature":
+				return ec.fieldContext_RelaySite_nature(ctx, field)
 			case "type":
 				return ec.fieldContext_RelaySite_type(ctx, field)
 			case "baseURL":
@@ -37447,6 +37462,8 @@ func (ec *executionContext) fieldContext_Mutation_refreshRelaySiteAnnouncements(
 				return ec.fieldContext_RelaySite_updatedAt(ctx, field)
 			case "name":
 				return ec.fieldContext_RelaySite_name(ctx, field)
+			case "nature":
+				return ec.fieldContext_RelaySite_nature(ctx, field)
 			case "type":
 				return ec.fieldContext_RelaySite_type(ctx, field)
 			case "baseURL":
@@ -37536,6 +37553,8 @@ func (ec *executionContext) fieldContext_Mutation_markRelaySiteAnnouncementsRead
 				return ec.fieldContext_RelaySite_updatedAt(ctx, field)
 			case "name":
 				return ec.fieldContext_RelaySite_name(ctx, field)
+			case "nature":
+				return ec.fieldContext_RelaySite_nature(ctx, field)
 			case "type":
 				return ec.fieldContext_RelaySite_type(ctx, field)
 			case "baseURL":
@@ -37625,6 +37644,8 @@ func (ec *executionContext) fieldContext_Mutation_createRelaySiteAPIKey(ctx cont
 				return ec.fieldContext_RelaySite_updatedAt(ctx, field)
 			case "name":
 				return ec.fieldContext_RelaySite_name(ctx, field)
+			case "nature":
+				return ec.fieldContext_RelaySite_nature(ctx, field)
 			case "type":
 				return ec.fieldContext_RelaySite_type(ctx, field)
 			case "baseURL":
@@ -37714,6 +37735,8 @@ func (ec *executionContext) fieldContext_Mutation_updateRelaySiteAPIKey(ctx cont
 				return ec.fieldContext_RelaySite_updatedAt(ctx, field)
 			case "name":
 				return ec.fieldContext_RelaySite_name(ctx, field)
+			case "nature":
+				return ec.fieldContext_RelaySite_nature(ctx, field)
 			case "type":
 				return ec.fieldContext_RelaySite_type(ctx, field)
 			case "baseURL":
@@ -37803,6 +37826,8 @@ func (ec *executionContext) fieldContext_Mutation_deleteRelaySiteAPIKey(ctx cont
 				return ec.fieldContext_RelaySite_updatedAt(ctx, field)
 			case "name":
 				return ec.fieldContext_RelaySite_name(ctx, field)
+			case "nature":
+				return ec.fieldContext_RelaySite_nature(ctx, field)
 			case "type":
 				return ec.fieldContext_RelaySite_type(ctx, field)
 			case "baseURL":
@@ -37892,6 +37917,8 @@ func (ec *executionContext) fieldContext_Mutation_createRelaySiteAPIKeysForAllGr
 				return ec.fieldContext_RelaySite_updatedAt(ctx, field)
 			case "name":
 				return ec.fieldContext_RelaySite_name(ctx, field)
+			case "nature":
+				return ec.fieldContext_RelaySite_nature(ctx, field)
 			case "type":
 				return ec.fieldContext_RelaySite_type(ctx, field)
 			case "baseURL":
@@ -46667,6 +46694,35 @@ func (ec *executionContext) fieldContext_RelaySite_name(_ context.Context, field
 	return fc, nil
 }
 
+func (ec *executionContext) _RelaySite_nature(ctx context.Context, field graphql.CollectedField, obj *ent.RelaySite) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_RelaySite_nature,
+		func(ctx context.Context) (any, error) {
+			return obj.Nature, nil
+		},
+		nil,
+		ec.marshalNRelaySiteNature2githubᚗcomᚋloopljᚋaxonhubᚋinternalᚋentᚋrelaysiteᚐNature,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_RelaySite_nature(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "RelaySite",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type RelaySiteNature does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _RelaySite_type(ctx context.Context, field graphql.CollectedField, obj *ent.RelaySite) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -47734,6 +47790,8 @@ func (ec *executionContext) fieldContext_RelaySiteAPIKey_relaySite(_ context.Con
 				return ec.fieldContext_RelaySite_updatedAt(ctx, field)
 			case "name":
 				return ec.fieldContext_RelaySite_name(ctx, field)
+			case "nature":
+				return ec.fieldContext_RelaySite_nature(ctx, field)
 			case "type":
 				return ec.fieldContext_RelaySite_type(ctx, field)
 			case "baseURL":
@@ -48348,6 +48406,8 @@ func (ec *executionContext) fieldContext_RelaySiteAnnouncement_relaySite(_ conte
 				return ec.fieldContext_RelaySite_updatedAt(ctx, field)
 			case "name":
 				return ec.fieldContext_RelaySite_name(ctx, field)
+			case "nature":
+				return ec.fieldContext_RelaySite_nature(ctx, field)
 			case "type":
 				return ec.fieldContext_RelaySite_type(ctx, field)
 			case "baseURL":
@@ -48817,6 +48877,8 @@ func (ec *executionContext) fieldContext_RelaySiteBalanceSnapshot_relaySite(_ co
 				return ec.fieldContext_RelaySite_updatedAt(ctx, field)
 			case "name":
 				return ec.fieldContext_RelaySite_name(ctx, field)
+			case "nature":
+				return ec.fieldContext_RelaySite_nature(ctx, field)
 			case "type":
 				return ec.fieldContext_RelaySite_type(ctx, field)
 			case "baseURL":
@@ -49516,6 +49578,8 @@ func (ec *executionContext) fieldContext_RelaySiteCheckinLog_relaySite(_ context
 				return ec.fieldContext_RelaySite_updatedAt(ctx, field)
 			case "name":
 				return ec.fieldContext_RelaySite_name(ctx, field)
+			case "nature":
+				return ec.fieldContext_RelaySite_nature(ctx, field)
 			case "type":
 				return ec.fieldContext_RelaySite_type(ctx, field)
 			case "baseURL":
@@ -50167,6 +50231,8 @@ func (ec *executionContext) fieldContext_RelaySiteEdge_node(_ context.Context, f
 				return ec.fieldContext_RelaySite_updatedAt(ctx, field)
 			case "name":
 				return ec.fieldContext_RelaySite_name(ctx, field)
+			case "nature":
+				return ec.fieldContext_RelaySite_nature(ctx, field)
 			case "type":
 				return ec.fieldContext_RelaySite_type(ctx, field)
 			case "baseURL":
@@ -50476,6 +50542,8 @@ func (ec *executionContext) fieldContext_RelaySiteGroup_relaySite(_ context.Cont
 				return ec.fieldContext_RelaySite_updatedAt(ctx, field)
 			case "name":
 				return ec.fieldContext_RelaySite_name(ctx, field)
+			case "nature":
+				return ec.fieldContext_RelaySite_nature(ctx, field)
 			case "type":
 				return ec.fieldContext_RelaySite_type(ctx, field)
 			case "baseURL":
@@ -50906,6 +50974,8 @@ func (ec *executionContext) fieldContext_RelaySiteModelPrice_relaySite(_ context
 				return ec.fieldContext_RelaySite_updatedAt(ctx, field)
 			case "name":
 				return ec.fieldContext_RelaySite_name(ctx, field)
+			case "nature":
+				return ec.fieldContext_RelaySite_nature(ctx, field)
 			case "type":
 				return ec.fieldContext_RelaySite_type(ctx, field)
 			case "baseURL":
@@ -73476,7 +73546,7 @@ func (ec *executionContext) unmarshalInputCreateRelaySiteConfigInput(ctx context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "type", "baseURL", "status", "autoCheckinEnabled", "remark", "credential", "checkinPageURL", "externalCheckinPageURL"}
+	fieldsInOrder := [...]string{"name", "nature", "type", "baseURL", "status", "autoCheckinEnabled", "remark", "credential", "checkinPageURL", "externalCheckinPageURL"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -73490,6 +73560,13 @@ func (ec *executionContext) unmarshalInputCreateRelaySiteConfigInput(ctx context
 				return it, err
 			}
 			it.Name = data
+		case "nature":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nature"))
+			data, err := ec.unmarshalORelaySiteNature2ᚖgithubᚗcomᚋloopljᚋaxonhubᚋinternalᚋentᚋrelaysiteᚐNature(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Nature = data
 		case "type":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
 			data, err := ec.unmarshalORelaySiteType2ᚖgithubᚗcomᚋloopljᚋaxonhubᚋinternalᚋentᚋrelaysiteᚐType(ctx, v)
@@ -73561,7 +73638,7 @@ func (ec *executionContext) unmarshalInputCreateRelaySiteInput(ctx context.Conte
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "type", "baseURL", "status", "autoCheckinEnabled", "remark", "checkinPageURL", "externalCheckinPageURL"}
+	fieldsInOrder := [...]string{"name", "nature", "type", "baseURL", "status", "autoCheckinEnabled", "remark", "checkinPageURL", "externalCheckinPageURL"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -73575,6 +73652,13 @@ func (ec *executionContext) unmarshalInputCreateRelaySiteInput(ctx context.Conte
 				return it, err
 			}
 			it.Name = data
+		case "nature":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nature"))
+			data, err := ec.unmarshalORelaySiteNature2ᚖgithubᚗcomᚋloopljᚋaxonhubᚋinternalᚋentᚋrelaysiteᚐNature(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Nature = data
 		case "type":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
 			data, err := ec.unmarshalORelaySiteType2ᚖgithubᚗcomᚋloopljᚋaxonhubᚋinternalᚋentᚋrelaysiteᚐType(ctx, v)
@@ -85374,7 +85458,7 @@ func (ec *executionContext) unmarshalInputRelaySiteWhereInput(ctx context.Contex
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "type", "typeNEQ", "typeIn", "typeNotIn", "baseURL", "baseURLNEQ", "baseURLIn", "baseURLNotIn", "baseURLGT", "baseURLGTE", "baseURLLT", "baseURLLTE", "baseURLContains", "baseURLHasPrefix", "baseURLHasSuffix", "baseURLEqualFold", "baseURLContainsFold", "status", "statusNEQ", "statusIn", "statusNotIn", "autoCheckinEnabled", "autoCheckinEnabledNEQ", "remark", "remarkNEQ", "remarkIn", "remarkNotIn", "remarkGT", "remarkGTE", "remarkLT", "remarkLTE", "remarkContains", "remarkHasPrefix", "remarkHasSuffix", "remarkIsNil", "remarkNotNil", "remarkEqualFold", "remarkContainsFold", "lastSyncedAt", "lastSyncedAtNEQ", "lastSyncedAtIn", "lastSyncedAtNotIn", "lastSyncedAtGT", "lastSyncedAtGTE", "lastSyncedAtLT", "lastSyncedAtLTE", "lastSyncedAtIsNil", "lastSyncedAtNotNil", "lastSyncError", "lastSyncErrorNEQ", "lastSyncErrorIn", "lastSyncErrorNotIn", "lastSyncErrorGT", "lastSyncErrorGTE", "lastSyncErrorLT", "lastSyncErrorLTE", "lastSyncErrorContains", "lastSyncErrorHasPrefix", "lastSyncErrorHasSuffix", "lastSyncErrorIsNil", "lastSyncErrorNotNil", "lastSyncErrorEqualFold", "lastSyncErrorContainsFold", "lastCheckinAt", "lastCheckinAtNEQ", "lastCheckinAtIn", "lastCheckinAtNotIn", "lastCheckinAtGT", "lastCheckinAtGTE", "lastCheckinAtLT", "lastCheckinAtLTE", "lastCheckinAtIsNil", "lastCheckinAtNotNil", "lastCheckinResult", "lastCheckinResultNEQ", "lastCheckinResultIn", "lastCheckinResultNotIn", "lastCheckinResultGT", "lastCheckinResultGTE", "lastCheckinResultLT", "lastCheckinResultLTE", "lastCheckinResultContains", "lastCheckinResultHasPrefix", "lastCheckinResultHasSuffix", "lastCheckinResultIsNil", "lastCheckinResultNotNil", "lastCheckinResultEqualFold", "lastCheckinResultContainsFold", "checkinPageURL", "checkinPageURLNEQ", "checkinPageURLIn", "checkinPageURLNotIn", "checkinPageURLGT", "checkinPageURLGTE", "checkinPageURLLT", "checkinPageURLLTE", "checkinPageURLContains", "checkinPageURLHasPrefix", "checkinPageURLHasSuffix", "checkinPageURLIsNil", "checkinPageURLNotNil", "checkinPageURLEqualFold", "checkinPageURLContainsFold", "externalCheckinPageURL", "externalCheckinPageURLNEQ", "externalCheckinPageURLIn", "externalCheckinPageURLNotIn", "externalCheckinPageURLGT", "externalCheckinPageURLGTE", "externalCheckinPageURLLT", "externalCheckinPageURLLTE", "externalCheckinPageURLContains", "externalCheckinPageURLHasPrefix", "externalCheckinPageURLHasSuffix", "externalCheckinPageURLIsNil", "externalCheckinPageURLNotNil", "externalCheckinPageURLEqualFold", "externalCheckinPageURLContainsFold", "hasAPIKeys", "hasAPIKeysWith", "hasGroups", "hasGroupsWith", "hasBalanceSnapshots", "hasBalanceSnapshotsWith", "hasModelPrices", "hasModelPricesWith", "hasCheckinLogs", "hasCheckinLogsWith", "hasAnnouncements", "hasAnnouncementsWith"}
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "nature", "natureNEQ", "natureIn", "natureNotIn", "type", "typeNEQ", "typeIn", "typeNotIn", "baseURL", "baseURLNEQ", "baseURLIn", "baseURLNotIn", "baseURLGT", "baseURLGTE", "baseURLLT", "baseURLLTE", "baseURLContains", "baseURLHasPrefix", "baseURLHasSuffix", "baseURLEqualFold", "baseURLContainsFold", "status", "statusNEQ", "statusIn", "statusNotIn", "autoCheckinEnabled", "autoCheckinEnabledNEQ", "remark", "remarkNEQ", "remarkIn", "remarkNotIn", "remarkGT", "remarkGTE", "remarkLT", "remarkLTE", "remarkContains", "remarkHasPrefix", "remarkHasSuffix", "remarkIsNil", "remarkNotNil", "remarkEqualFold", "remarkContainsFold", "lastSyncedAt", "lastSyncedAtNEQ", "lastSyncedAtIn", "lastSyncedAtNotIn", "lastSyncedAtGT", "lastSyncedAtGTE", "lastSyncedAtLT", "lastSyncedAtLTE", "lastSyncedAtIsNil", "lastSyncedAtNotNil", "lastSyncError", "lastSyncErrorNEQ", "lastSyncErrorIn", "lastSyncErrorNotIn", "lastSyncErrorGT", "lastSyncErrorGTE", "lastSyncErrorLT", "lastSyncErrorLTE", "lastSyncErrorContains", "lastSyncErrorHasPrefix", "lastSyncErrorHasSuffix", "lastSyncErrorIsNil", "lastSyncErrorNotNil", "lastSyncErrorEqualFold", "lastSyncErrorContainsFold", "lastCheckinAt", "lastCheckinAtNEQ", "lastCheckinAtIn", "lastCheckinAtNotIn", "lastCheckinAtGT", "lastCheckinAtGTE", "lastCheckinAtLT", "lastCheckinAtLTE", "lastCheckinAtIsNil", "lastCheckinAtNotNil", "lastCheckinResult", "lastCheckinResultNEQ", "lastCheckinResultIn", "lastCheckinResultNotIn", "lastCheckinResultGT", "lastCheckinResultGTE", "lastCheckinResultLT", "lastCheckinResultLTE", "lastCheckinResultContains", "lastCheckinResultHasPrefix", "lastCheckinResultHasSuffix", "lastCheckinResultIsNil", "lastCheckinResultNotNil", "lastCheckinResultEqualFold", "lastCheckinResultContainsFold", "checkinPageURL", "checkinPageURLNEQ", "checkinPageURLIn", "checkinPageURLNotIn", "checkinPageURLGT", "checkinPageURLGTE", "checkinPageURLLT", "checkinPageURLLTE", "checkinPageURLContains", "checkinPageURLHasPrefix", "checkinPageURLHasSuffix", "checkinPageURLIsNil", "checkinPageURLNotNil", "checkinPageURLEqualFold", "checkinPageURLContainsFold", "externalCheckinPageURL", "externalCheckinPageURLNEQ", "externalCheckinPageURLIn", "externalCheckinPageURLNotIn", "externalCheckinPageURLGT", "externalCheckinPageURLGTE", "externalCheckinPageURLLT", "externalCheckinPageURLLTE", "externalCheckinPageURLContains", "externalCheckinPageURLHasPrefix", "externalCheckinPageURLHasSuffix", "externalCheckinPageURLIsNil", "externalCheckinPageURLNotNil", "externalCheckinPageURLEqualFold", "externalCheckinPageURLContainsFold", "hasAPIKeys", "hasAPIKeysWith", "hasGroups", "hasGroupsWith", "hasBalanceSnapshots", "hasBalanceSnapshotsWith", "hasModelPrices", "hasModelPricesWith", "hasCheckinLogs", "hasCheckinLogsWith", "hasAnnouncements", "hasAnnouncementsWith"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -85693,6 +85777,34 @@ func (ec *executionContext) unmarshalInputRelaySiteWhereInput(ctx context.Contex
 				return it, err
 			}
 			it.NameContainsFold = data
+		case "nature":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nature"))
+			data, err := ec.unmarshalORelaySiteNature2ᚖgithubᚗcomᚋloopljᚋaxonhubᚋinternalᚋentᚋrelaysiteᚐNature(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Nature = data
+		case "natureNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("natureNEQ"))
+			data, err := ec.unmarshalORelaySiteNature2ᚖgithubᚗcomᚋloopljᚋaxonhubᚋinternalᚋentᚋrelaysiteᚐNature(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NatureNEQ = data
+		case "natureIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("natureIn"))
+			data, err := ec.unmarshalORelaySiteNature2ᚕgithubᚗcomᚋloopljᚋaxonhubᚋinternalᚋentᚋrelaysiteᚐNatureᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NatureIn = data
+		case "natureNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("natureNotIn"))
+			data, err := ec.unmarshalORelaySiteNature2ᚕgithubᚗcomᚋloopljᚋaxonhubᚋinternalᚋentᚋrelaysiteᚐNatureᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NatureNotIn = data
 		case "type":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
 			data, err := ec.unmarshalORelaySiteType2ᚖgithubᚗcomᚋloopljᚋaxonhubᚋinternalᚋentᚋrelaysiteᚐType(ctx, v)
@@ -93498,7 +93610,7 @@ func (ec *executionContext) unmarshalInputUpdateRelaySiteConfigInput(ctx context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "baseURL", "status", "autoCheckinEnabled", "remark", "credential", "checkinPageURL", "externalCheckinPageURL"}
+	fieldsInOrder := [...]string{"name", "nature", "baseURL", "status", "autoCheckinEnabled", "remark", "credential", "checkinPageURL", "externalCheckinPageURL"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -93512,6 +93624,13 @@ func (ec *executionContext) unmarshalInputUpdateRelaySiteConfigInput(ctx context
 				return it, err
 			}
 			it.Name = data
+		case "nature":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nature"))
+			data, err := ec.unmarshalORelaySiteNature2ᚖgithubᚗcomᚋloopljᚋaxonhubᚋinternalᚋentᚋrelaysiteᚐNature(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Nature = data
 		case "baseURL":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("baseURL"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
@@ -93576,7 +93695,7 @@ func (ec *executionContext) unmarshalInputUpdateRelaySiteInput(ctx context.Conte
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "type", "baseURL", "status", "autoCheckinEnabled", "remark", "clearRemark", "checkinPageURL", "clearCheckinPageURL", "externalCheckinPageURL", "clearExternalCheckinPageURL"}
+	fieldsInOrder := [...]string{"name", "nature", "type", "baseURL", "status", "autoCheckinEnabled", "remark", "clearRemark", "checkinPageURL", "clearCheckinPageURL", "externalCheckinPageURL", "clearExternalCheckinPageURL"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -93590,6 +93709,13 @@ func (ec *executionContext) unmarshalInputUpdateRelaySiteInput(ctx context.Conte
 				return it, err
 			}
 			it.Name = data
+		case "nature":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nature"))
+			data, err := ec.unmarshalORelaySiteNature2ᚖgithubᚗcomᚋloopljᚋaxonhubᚋinternalᚋentᚋrelaysiteᚐNature(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Nature = data
 		case "type":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
 			data, err := ec.unmarshalORelaySiteType2ᚖgithubᚗcomᚋloopljᚋaxonhubᚋinternalᚋentᚋrelaysiteᚐType(ctx, v)
@@ -110347,6 +110473,11 @@ func (ec *executionContext) _RelaySite(ctx context.Context, sel ast.SelectionSet
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "nature":
+			out.Values[i] = ec._RelaySite_nature(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
 		case "type":
 			out.Values[i] = ec._RelaySite_type(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -124536,6 +124667,16 @@ func (ec *executionContext) unmarshalNRelaySiteModelPriceWhereInput2ᚖgithubᚗ
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNRelaySiteNature2githubᚗcomᚋloopljᚋaxonhubᚋinternalᚋentᚋrelaysiteᚐNature(ctx context.Context, v any) (relaysite.Nature, error) {
+	var res relaysite.Nature
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNRelaySiteNature2githubᚗcomᚋloopljᚋaxonhubᚋinternalᚋentᚋrelaysiteᚐNature(ctx context.Context, sel ast.SelectionSet, v relaysite.Nature) graphql.Marshaler {
+	return v
+}
+
 func (ec *executionContext) unmarshalNRelaySiteOrderField2ᚖgithubᚗcomᚋloopljᚋaxonhubᚋinternalᚋentᚐRelaySiteOrderField(ctx context.Context, v any) (*ent.RelaySiteOrderField, error) {
 	var res = new(ent.RelaySiteOrderField)
 	err := res.UnmarshalGQL(v)
@@ -131698,6 +131839,87 @@ func (ec *executionContext) unmarshalORelaySiteModelPriceWhereInput2ᚖgithubᚗ
 	}
 	res, err := ec.unmarshalInputRelaySiteModelPriceWhereInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalORelaySiteNature2ᚕgithubᚗcomᚋloopljᚋaxonhubᚋinternalᚋentᚋrelaysiteᚐNatureᚄ(ctx context.Context, v any) ([]relaysite.Nature, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
+	var err error
+	res := make([]relaysite.Nature, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNRelaySiteNature2githubᚗcomᚋloopljᚋaxonhubᚋinternalᚋentᚋrelaysiteᚐNature(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalORelaySiteNature2ᚕgithubᚗcomᚋloopljᚋaxonhubᚋinternalᚋentᚋrelaysiteᚐNatureᚄ(ctx context.Context, sel ast.SelectionSet, v []relaysite.Nature) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNRelaySiteNature2githubᚗcomᚋloopljᚋaxonhubᚋinternalᚋentᚋrelaysiteᚐNature(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) unmarshalORelaySiteNature2ᚖgithubᚗcomᚋloopljᚋaxonhubᚋinternalᚋentᚋrelaysiteᚐNature(ctx context.Context, v any) (*relaysite.Nature, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(relaysite.Nature)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalORelaySiteNature2ᚖgithubᚗcomᚋloopljᚋaxonhubᚋinternalᚋentᚋrelaysiteᚐNature(ctx context.Context, sel ast.SelectionSet, v *relaysite.Nature) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
 }
 
 func (ec *executionContext) unmarshalORelaySiteOrder2ᚖgithubᚗcomᚋloopljᚋaxonhubᚋinternalᚋentᚐRelaySiteOrder(ctx context.Context, v any) (*ent.RelaySiteOrder, error) {

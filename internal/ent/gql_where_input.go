@@ -6465,6 +6465,12 @@ type RelaySiteWhereInput struct {
 	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
 	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
 
+	// "nature" field predicates.
+	Nature      *relaysite.Nature  `json:"nature,omitempty"`
+	NatureNEQ   *relaysite.Nature  `json:"natureNEQ,omitempty"`
+	NatureIn    []relaysite.Nature `json:"natureIn,omitempty"`
+	NatureNotIn []relaysite.Nature `json:"natureNotIn,omitempty"`
+
 	// "type" field predicates.
 	Type      *relaysite.Type  `json:"type,omitempty"`
 	TypeNEQ   *relaysite.Type  `json:"typeNEQ,omitempty"`
@@ -6811,6 +6817,18 @@ func (i *RelaySiteWhereInput) P() (predicate.RelaySite, error) {
 	}
 	if i.NameContainsFold != nil {
 		predicates = append(predicates, relaysite.NameContainsFold(*i.NameContainsFold))
+	}
+	if i.Nature != nil {
+		predicates = append(predicates, relaysite.NatureEQ(*i.Nature))
+	}
+	if i.NatureNEQ != nil {
+		predicates = append(predicates, relaysite.NatureNEQ(*i.NatureNEQ))
+	}
+	if len(i.NatureIn) > 0 {
+		predicates = append(predicates, relaysite.NatureIn(i.NatureIn...))
+	}
+	if len(i.NatureNotIn) > 0 {
+		predicates = append(predicates, relaysite.NatureNotIn(i.NatureNotIn...))
 	}
 	if i.Type != nil {
 		predicates = append(predicates, relaysite.TypeEQ(*i.Type))

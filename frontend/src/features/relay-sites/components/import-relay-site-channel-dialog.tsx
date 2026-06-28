@@ -13,6 +13,7 @@ import { CHANNEL_CONFIGS } from '@/features/channels/data/config_channels';
 import type { ChannelType } from '@/features/channels/data/schema';
 import { useRelaySitesContext } from '../context/relay-sites-context';
 import { useImportRelaySiteAPIKeyToChannel, type ImportRelaySiteAPIKeyToChannelInput } from '../data/relay-sites';
+import { relaySiteNatureTag } from '../utils/nature';
 
 type ImportChannelFormValues = {
   name: string;
@@ -95,7 +96,7 @@ export function ImportRelaySiteChannelDialog() {
       baseURL: normalizeBaseURL(importingRelaySite.baseURL),
       supportedModels: models.join('\n'),
       defaultTestModel: defaultModel,
-      tags: 'relay-site',
+      tags: ['relay-site', relaySiteNatureTag(importingRelaySite.nature)].join(', '),
       remark: importingRelaySite.remark ?? '',
     });
   }, [importingAPIKey, importingRelaySite, isImportChannelDialogOpen, reset]);

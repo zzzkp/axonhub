@@ -46,6 +46,7 @@ const RELAY_SITE_FIELDS = `
   createdAt
   updatedAt
   name
+  nature
   type
   baseURL
   status
@@ -90,6 +91,7 @@ const RELAY_SITE_FORM_FIELDS = `
   createdAt
   updatedAt
   name
+  nature
   type
   baseURL
   status

@@ -29,6 +29,7 @@ import {
   type RelaySiteModelPrice,
   type ImportRelaySiteAPIKeyToChannelInput,
 } from '../data/relay-sites';
+import { relaySiteNatureTag } from '../utils/nature';
 import { RelaySiteAPIKeyFormDialog } from './relay-site-api-key-form-dialog';
 
 type APIKeyFormMode = 'create' | 'edit' | 'allGroups';
@@ -99,7 +100,7 @@ function buildImportInput(relaySite: RelaySite, apiKey: RelaySiteAPIKey): Import
     baseURL: normalizeBaseURL(relaySite.baseURL),
     supportedModels: models,
     defaultTestModel: models[0],
-    tags: ['relay-site'],
+    tags: ['relay-site', relaySiteNatureTag(relaySite.nature)],
     remark: relaySite.remark ?? '',
   };
 }

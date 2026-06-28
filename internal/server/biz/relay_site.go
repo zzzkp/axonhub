@@ -53,6 +53,7 @@ type RelaySiteService struct {
 
 type CreateRelaySiteConfigInput struct {
 	Name                   string
+	Nature                 *relaysite.Nature
 	Type                   *relaysite.Type
 	BaseURL                string
 	Status                 *relaysite.Status
@@ -65,6 +66,7 @@ type CreateRelaySiteConfigInput struct {
 
 type UpdateRelaySiteConfigInput struct {
 	Name                   *string
+	Nature                 *relaysite.Nature
 	BaseURL                *string
 	Status                 *relaysite.Status
 	AutoCheckinEnabled     *bool
@@ -106,6 +108,10 @@ func NewRelaySiteService(params RelaySiteServiceParams) *RelaySiteService {
 }
 
 func (s *RelaySiteService) CreateSite(ctx context.Context, input CreateRelaySiteConfigInput) (*ent.RelaySite, error) {
+	siteNature := relaysite.NaturePaid
+	if input.Nature != nil {
+		siteNature = *input.Nature
+	}
 	siteType := relaysite.TypeNewAPI
 	if input.Type != nil {
 		siteType = *input.Type
@@ -121,6 +127,7 @@ func (s *RelaySiteService) CreateSite(ctx context.Context, input CreateRelaySite
 
 		create := client.RelaySite.Create().
 			SetName(input.Name).
+			SetNature(siteNature).
 			SetType(siteType).
 			SetBaseURL(input.BaseURL).
 			SetNillableStatus(input.Status).
@@ -175,6 +182,7 @@ func (s *RelaySiteService) UpdateSite(ctx context.Context, id int, input UpdateR
 
 		update := client.RelaySite.UpdateOneID(id).
 			SetNillableName(input.Name).
+			SetNillableNature(input.Nature).
 			SetNillableBaseURL(input.BaseURL).
 			SetNillableStatus(input.Status).
 			SetNillableAutoCheckinEnabled(input.AutoCheckinEnabled).
@@ -1007,7 +1015,11 @@ func (s *RelaySiteService) ImportAPIKeyToChannel(ctx context.Context, relaySiteA
 	if err != nil {
 		return nil, err
 	}
-	channelInput.Tags = appendRelaySiteChannelTags(channelInput.Tags, apiKey.RelaySiteID, apiKey.ID)
+	site, err := s.entFromContext(ctx).RelaySite.Get(ctx, apiKey.RelaySiteID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get relay site: %w", err)
+	}
+	channelInput.Tags = appendRelaySiteChannelTags(channelInput.Tags, apiKey.RelaySiteID, apiKey.ID, site.Nature)
 
 	createdChannel, err := s.channelService.CreateChannel(ctx, channelInput)
 	if err != nil {
@@ -1199,16 +1211,28 @@ func (s *RelaySiteService) relaySiteChannelIDs(ctx context.Context, relaySiteID 
 	return ids, nil
 }
 
-func appendRelaySiteChannelTags(tags []string, relaySiteID int, relaySiteAPIKeyID int) []string {
+func appendRelaySiteChannelTags(tags []string, relaySiteID int, relaySiteAPIKeyID int, nature relaysite.Nature) []string {
 	return normalizeStringList(append(tags,
 		relaySiteChannelTag,
 		relaySiteScopedChannelTag(relaySiteID),
 		fmt.Sprintf("relay-site-api-key:%d", relaySiteAPIKeyID),
+		relaySiteNatureDisplayTag(nature),
 	))
 }
 
 func relaySiteScopedChannelTag(relaySiteID int) string {
 	return fmt.Sprintf("relay-site:%d", relaySiteID)
+}
+
+func relaySiteNatureDisplayTag(nature relaysite.Nature) string {
+	switch nature {
+	case relaysite.NaturePublic:
+		return "公益站"
+	case relaysite.NatureSemiPublic:
+		return "半公益"
+	default:
+		return "收费站"
+	}
 }
 
 func relaySiteAPIKeyValueFromMetadata(metadata objects.RelaySiteAPIKeyMetadata) string {

@@ -26,6 +26,7 @@ type RelaySitesBackupFile struct {
 
 type RelaySitesBackupSite struct {
 	Name                   string                         `json:"name"`
+	Nature                 relaysite.Nature               `json:"nature"`
 	Type                   relaysite.Type                 `json:"type"`
 	BaseURL                string                         `json:"baseURL"`
 	Status                 relaysite.Status               `json:"status"`
@@ -159,6 +160,7 @@ func (s *RelaySiteService) exportBackupSite(ctx context.Context, site *ent.Relay
 
 	backupSite := RelaySitesBackupSite{
 		Name:                   site.Name,
+		Nature:                 site.Nature,
 		Type:                   site.Type,
 		BaseURL:                site.BaseURL,
 		Status:                 site.Status,
@@ -313,8 +315,15 @@ func (s *RelaySiteService) importBackupSite(ctx context.Context, client *ent.Cli
 	if siteType == "" {
 		siteType = relaysite.TypeNewAPI
 	}
+	nature := backup.Nature
+	if nature == "" {
+		nature = relaysite.NaturePaid
+	}
 	if siteType != relaysite.TypeNewAPI && siteType != relaysite.TypeSub2api && siteType != relaysite.TypeDoneHub {
 		return fmt.Errorf("unsupported relay site type in backup %q: %s", backup.Name, siteType)
+	}
+	if nature != relaysite.NaturePublic && nature != relaysite.NatureSemiPublic && nature != relaysite.NaturePaid {
+		return fmt.Errorf("unsupported relay site nature in backup %q: %s", backup.Name, nature)
 	}
 	status := backup.Status
 	if status == "" {
@@ -328,6 +337,7 @@ func (s *RelaySiteService) importBackupSite(ctx context.Context, client *ent.Cli
 
 	createdSite, err := client.RelaySite.Create().
 		SetName(backup.Name).
+		SetNature(nature).
 		SetType(siteType).
 		SetBaseURL(backup.BaseURL).
 		SetStatus(status).

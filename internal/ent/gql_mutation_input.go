@@ -911,6 +911,7 @@ func (c *PromptProtectionRuleUpdateOne) SetInput(i UpdatePromptProtectionRuleInp
 // CreateRelaySiteInput represents a mutation input for creating relaysites.
 type CreateRelaySiteInput struct {
 	Name                   string
+	Nature                 *relaysite.Nature
 	Type                   *relaysite.Type
 	BaseURL                string
 	Status                 *relaysite.Status
@@ -923,6 +924,9 @@ type CreateRelaySiteInput struct {
 // Mutate applies the CreateRelaySiteInput on the RelaySiteMutation builder.
 func (i *CreateRelaySiteInput) Mutate(m *RelaySiteMutation) {
 	m.SetName(i.Name)
+	if v := i.Nature; v != nil {
+		m.SetNature(*v)
+	}
 	if v := i.Type; v != nil {
 		m.SetType(*v)
 	}
@@ -953,6 +957,7 @@ func (c *RelaySiteCreate) SetInput(i CreateRelaySiteInput) *RelaySiteCreate {
 // UpdateRelaySiteInput represents a mutation input for updating relaysites.
 type UpdateRelaySiteInput struct {
 	Name                        *string
+	Nature                      *relaysite.Nature
 	Type                        *relaysite.Type
 	BaseURL                     *string
 	Status                      *relaysite.Status
@@ -969,6 +974,9 @@ type UpdateRelaySiteInput struct {
 func (i *UpdateRelaySiteInput) Mutate(m *RelaySiteMutation) {
 	if v := i.Name; v != nil {
 		m.SetName(*v)
+	}
+	if v := i.Nature; v != nil {
+		m.SetNature(*v)
 	}
 	if v := i.Type; v != nil {
 		m.SetType(*v)

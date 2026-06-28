@@ -26,6 +26,8 @@ const (
 	FieldDeletedAt = "deleted_at"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
+	// FieldNature holds the string denoting the nature field in the database.
+	FieldNature = "nature"
 	// FieldType holds the string denoting the type field in the database.
 	FieldType = "type"
 	// FieldBaseURL holds the string denoting the base_url field in the database.
@@ -122,6 +124,7 @@ var Columns = []string{
 	FieldUpdatedAt,
 	FieldDeletedAt,
 	FieldName,
+	FieldNature,
 	FieldType,
 	FieldBaseURL,
 	FieldStatus,
@@ -165,6 +168,33 @@ var (
 	// DefaultAutoCheckinEnabled holds the default value on creation for the "auto_checkin_enabled" field.
 	DefaultAutoCheckinEnabled bool
 )
+
+// Nature defines the type for the "nature" enum field.
+type Nature string
+
+// NaturePaid is the default value of the Nature enum.
+const DefaultNature = NaturePaid
+
+// Nature values.
+const (
+	NaturePublic     Nature = "public"
+	NatureSemiPublic Nature = "semi_public"
+	NaturePaid       Nature = "paid"
+)
+
+func (n Nature) String() string {
+	return string(n)
+}
+
+// NatureValidator is a validator for the "nature" field enum values. It is called by the builders before save.
+func NatureValidator(n Nature) error {
+	switch n {
+	case NaturePublic, NatureSemiPublic, NaturePaid:
+		return nil
+	default:
+		return fmt.Errorf("relaysite: invalid enum value for nature field: %q", n)
+	}
+}
 
 // Type defines the type for the "type" enum field.
 type Type string
@@ -246,6 +276,11 @@ func ByDeletedAt(opts ...sql.OrderTermOption) OrderOption {
 // ByName orders the results by the name field.
 func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
+}
+
+// ByNature orders the results by the nature field.
+func ByNature(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldNature, opts...).ToFunc()
 }
 
 // ByType orders the results by the type field.
@@ -441,6 +476,24 @@ func newAnnouncementsStep() *sqlgraph.Step {
 		sqlgraph.To(AnnouncementsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, AnnouncementsTable, AnnouncementsColumn),
 	)
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (e Nature) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(e.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (e *Nature) UnmarshalGQL(val interface{}) error {
+	str, ok := val.(string)
+	if !ok {
+		return fmt.Errorf("enum %T must be a string", val)
+	}
+	*e = Nature(str)
+	if err := NatureValidator(*e); err != nil {
+		return fmt.Errorf("%s is not a valid Nature", str)
+	}
+	return nil
 }
 
 // MarshalGQL implements graphql.Marshaler interface.

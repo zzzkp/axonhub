@@ -26,6 +26,8 @@ type RelaySite struct {
 	DeletedAt int `json:"deleted_at,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
+	// Relay site nature. public represents a public-benefit relay site, semi_public represents a semi-public-benefit relay site, paid represents a paid relay site.
+	Nature relaysite.Nature `json:"nature,omitempty"`
 	// Relay site type. new_api represents a new-api relay site, sub2api represents a sub2api relay site, done_hub represents a done-hub relay site.
 	Type relaysite.Type `json:"type,omitempty"`
 	// BaseURL holds the value of the "base_url" field.
@@ -158,7 +160,7 @@ func (*RelaySite) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case relaysite.FieldID, relaysite.FieldDeletedAt:
 			values[i] = new(sql.NullInt64)
-		case relaysite.FieldName, relaysite.FieldType, relaysite.FieldBaseURL, relaysite.FieldStatus, relaysite.FieldRemark, relaysite.FieldLastSyncError, relaysite.FieldLastCheckinResult, relaysite.FieldCheckinPageURL, relaysite.FieldExternalCheckinPageURL:
+		case relaysite.FieldName, relaysite.FieldNature, relaysite.FieldType, relaysite.FieldBaseURL, relaysite.FieldStatus, relaysite.FieldRemark, relaysite.FieldLastSyncError, relaysite.FieldLastCheckinResult, relaysite.FieldCheckinPageURL, relaysite.FieldExternalCheckinPageURL:
 			values[i] = new(sql.NullString)
 		case relaysite.FieldCreatedAt, relaysite.FieldUpdatedAt, relaysite.FieldLastSyncedAt, relaysite.FieldLastCheckinAt:
 			values[i] = new(sql.NullTime)
@@ -206,6 +208,12 @@ func (_m *RelaySite) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
 				_m.Name = value.String
+			}
+		case relaysite.FieldNature:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field nature", values[i])
+			} else if value.Valid {
+				_m.Nature = relaysite.Nature(value.String)
 			}
 		case relaysite.FieldType:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -362,6 +370,9 @@ func (_m *RelaySite) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(_m.Name)
+	builder.WriteString(", ")
+	builder.WriteString("nature=")
+	builder.WriteString(fmt.Sprintf("%v", _m.Nature))
 	builder.WriteString(", ")
 	builder.WriteString("type=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Type))

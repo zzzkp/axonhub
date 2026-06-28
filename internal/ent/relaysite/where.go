@@ -305,6 +305,26 @@ func NameContainsFold(v string) predicate.RelaySite {
 	return predicate.RelaySite(sql.FieldContainsFold(FieldName, v))
 }
 
+// NatureEQ applies the EQ predicate on the "nature" field.
+func NatureEQ(v Nature) predicate.RelaySite {
+	return predicate.RelaySite(sql.FieldEQ(FieldNature, v))
+}
+
+// NatureNEQ applies the NEQ predicate on the "nature" field.
+func NatureNEQ(v Nature) predicate.RelaySite {
+	return predicate.RelaySite(sql.FieldNEQ(FieldNature, v))
+}
+
+// NatureIn applies the In predicate on the "nature" field.
+func NatureIn(vs ...Nature) predicate.RelaySite {
+	return predicate.RelaySite(sql.FieldIn(FieldNature, vs...))
+}
+
+// NatureNotIn applies the NotIn predicate on the "nature" field.
+func NatureNotIn(vs ...Nature) predicate.RelaySite {
+	return predicate.RelaySite(sql.FieldNotIn(FieldNature, vs...))
+}
+
 // TypeEQ applies the EQ predicate on the "type" field.
 func TypeEQ(v Type) predicate.RelaySite {
 	return predicate.RelaySite(sql.FieldEQ(FieldType, v))
