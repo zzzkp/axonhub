@@ -19,7 +19,7 @@ import { AutoComplete } from '@/components/auto-complete';
 import { AutoCompleteSelect } from '@/components/auto-complete-select';
 import { FilterBuilder, type FilterBuilderCondition, type FilterBuilderField, type FilterBuilderGroupListValue } from '@/components/filter-builder';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useAllChannelSummarys, useAllChannelTags } from '@/features/channels/data/channels';
+import { useAllChannelSummarys, useAllChannelTags, useTestChannel } from '@/features/channels/data/channels';
 import { useModelSettings, useUpdateModelSettings } from '@/features/system/data/system';
 import { useModels } from '../context/models-context';
 import { useQueryModelChannelConnections, ModelAssociationInput, ModelChannelConnection } from '../data/models';
@@ -29,6 +29,18 @@ import { toast } from 'sonner';
 import { ChannelModelsList } from './channel-models-list';
 
 const MAX_ASSOCIATION_PRIORITY = 10;
+
+type TestStatus = 'not_started' | 'testing' | 'success' | 'failed';
+
+interface ModelTestResult {
+  status: TestStatus;
+  latency?: number;
+  error?: string;
+}
+
+function getModelTestKey(channelId: string | number, modelName: string) {
+  return `${channelId}::${modelName}`;
+}
 
 const requestFormatConditionOptions = [
   'openai/chat_completions',
@@ -636,7 +648,9 @@ export function ModelsAssociationDialog() {
   const { data: availableModels, mutateAsync: fetchModels } = useQueryModels();
   const { data: allTags = [] } = useAllChannelTags();
   const { mutateAsync: queryConnections } = useQueryModelChannelConnections();
+  const testChannel = useTestChannel({ silent: true });
   const [connections, setConnections] = useState<ModelChannelConnection[]>([]);
+  const [modelTestResults, setModelTestResults] = useState<Record<string, ModelTestResult>>({});
   const [channelFilter, setChannelFilter] = useState('');
   const dialogContentRef = useRef<HTMLDivElement>(null);
 
@@ -772,6 +786,14 @@ export function ModelsAssociationDialog() {
     }
   }, [isOpen, isDeveloperMode, currentRow, developerAssociations, form]);
 
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    setModelTestResults({});
+  }, [isOpen, debouncedAssociationsString]);
+
   const onSubmit = async (data: AssociationFormData) => {
     if (isDeveloperMode && (!settings || !activeDeveloper)) return;
     if (!isDeveloperMode && !currentRow) return;
@@ -820,6 +842,7 @@ export function ModelsAssociationDialog() {
     form.reset();
     setConnections([]);
     setChannelFilter('');
+    setModelTestResults({});
   }, [setOpen, setCurrentDeveloper, form]);
 
   const handleAddAssociation = useCallback(() => {
@@ -853,6 +876,49 @@ export function ModelsAssociationDialog() {
     const filter = channelFilter.toLowerCase().trim();
     return connections.filter((conn) => conn.channel.name.toLowerCase().includes(filter));
   }, [connections, channelFilter]);
+
+  const handleTestModel = useCallback(
+    async (channelID: string | number, modelName: string) => {
+      const key = getModelTestKey(channelID, modelName);
+
+      setModelTestResults((prev) => ({
+        ...prev,
+        [key]: {
+          ...(prev[key] || { status: 'not_started' }),
+          status: 'testing',
+          error: undefined,
+          latency: undefined,
+        },
+      }));
+
+      try {
+        const startTime = Date.now();
+        const result = await testChannel.mutateAsync({
+          channelID: String(channelID),
+          modelID: modelName,
+        });
+        const latency = (Date.now() - startTime) / 1000;
+
+        setModelTestResults((prev) => ({
+          ...prev,
+          [key]: {
+            status: result.success ? 'success' : 'failed',
+            latency: result.success ? result.latency || latency : undefined,
+            error: result.success ? undefined : result.error || t('common.errors.internalServerError'),
+          },
+        }));
+      } catch (error) {
+        setModelTestResults((prev) => ({
+          ...prev,
+          [key]: {
+            status: 'failed',
+            error: error instanceof Error ? error.message : t('common.errors.internalServerError'),
+          },
+        }));
+      }
+    },
+    [testChannel, t]
+  );
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -970,6 +1036,8 @@ export function ModelsAssociationDialog() {
                     ? t('models.dialogs.association.noFilteredConnections')
                     : t('models.dialogs.association.noConnections')
                 }
+                onTestModel={handleTestModel}
+                testResults={modelTestResults}
               />
             </div>
           </div>

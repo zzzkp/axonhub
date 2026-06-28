@@ -1,5 +1,8 @@
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { IconPlayerPlay } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
+import { ErrorDisplay } from '@/features/channels/utils/error-formatter';
 
 interface ChannelModel {
   requestModel: string;
@@ -12,15 +15,64 @@ interface Channel {
   status: string;
 }
 
+type TestStatus = 'not_started' | 'testing' | 'success' | 'failed';
+
+interface ModelTestResult {
+  status: TestStatus;
+  latency?: number;
+  error?: string;
+}
+
 interface ChannelModelsListProps {
   channels: Array<{
     channel: Channel;
     models: ChannelModel[];
   }>;
   emptyMessage?: string;
+  onTestModel?: (channelId: string | number, modelName: string) => void;
+  testResults?: Record<string, ModelTestResult>;
 }
 
-export function ChannelModelsList({ channels, emptyMessage }: ChannelModelsListProps) {
+const TEST_RESULT_NOT_STARTED: ModelTestResult = {
+  status: 'not_started',
+};
+
+function getModelTestKey(channelId: string | number, modelName: string) {
+  return `${channelId}::${modelName}`;
+}
+
+function getTestStatusBadge(status: TestStatus) {
+  switch (status) {
+    case 'testing':
+      return {
+        variant: 'secondary' as const,
+        labelKey: 'channels.dialogs.test.testingModel',
+      };
+    case 'success':
+      return {
+        variant: 'default' as const,
+        className: 'border-green-200 bg-green-100 text-green-800',
+        labelKey: 'channels.dialogs.test.testSuccess',
+      };
+    case 'failed':
+      return {
+        variant: 'destructive' as const,
+        labelKey: 'channels.dialogs.test.testFailed',
+      };
+    default:
+      return {
+        variant: 'outline' as const,
+        labelKey: 'channels.dialogs.test.notStarted',
+      };
+  }
+}
+
+export function ChannelModelsList({
+  channels,
+  emptyMessage,
+  onTestModel,
+  testResults,
+}: ChannelModelsListProps) {
   const { t } = useTranslation();
 
   const getStatusColor = (status: string) => {
@@ -72,8 +124,41 @@ export function ChannelModelsList({ channels, emptyMessage }: ChannelModelsListP
           </div>
           <div className='space-y-1'>
             {conn.models.map((model) => (
-              <div key={model.requestModel} className='bg-muted rounded px-2 py-1 text-xs'>
-                {model.requestModel}
+              <div key={`${conn.channel.id}::${model.requestModel}`} className='rounded border border-transparent bg-muted px-2 py-1 text-xs'>
+                <div className='flex items-start justify-between gap-2'>
+                  <span className='min-w-0 flex-1 break-all'>{model.requestModel}</span>
+                  {onTestModel ? (
+                    <div className='flex flex-col items-end gap-1'>
+                      {(() => {
+                        const key = getModelTestKey(conn.channel.id, model.requestModel);
+                        const result = testResults?.[key] || TEST_RESULT_NOT_STARTED;
+                        const status = getTestStatusBadge(result.status);
+
+                        return (
+                          <>
+                            <div className='flex items-center gap-2'>
+                              {result.status !== 'not_started' && <Badge variant={status.variant} className={status.className}>{t(status.labelKey)}</Badge>}
+                              <Button
+                                size='sm'
+                                variant='outline'
+                                onClick={() => onTestModel(conn.channel.id, model.requestModel)}
+                                disabled={result.status === 'testing'}
+                                className='h-7 px-2'
+                              >
+                                <IconPlayerPlay className='mr-1 h-3 w-3' />
+                                {result.status === 'testing' ? t('channels.dialogs.test.testingModel') : t('channels.dialogs.test.testModel')}
+                              </Button>
+                            </div>
+                            {typeof result.latency === 'number' && (
+                              <div className='text-muted-foreground mt-1 text-[11px]'>{result.latency.toFixed(2)}s</div>
+                            )}
+                            {result.error && <ErrorDisplay error={result.error} messageClassName='text-xs font-medium text-red-600' />}
+                          </>
+                        );
+                      })()}
+                    </div>
+                  ) : null}
+                </div>
               </div>
             ))}
           </div>
